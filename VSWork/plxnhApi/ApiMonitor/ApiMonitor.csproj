@@ -91,8 +91,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="js\" />
     <Folder Include="Models\" />
+    <Folder Include="pages\js\" />
     <Folder Include="View\" />
   </ItemGroup>
   <PropertyGroup>
