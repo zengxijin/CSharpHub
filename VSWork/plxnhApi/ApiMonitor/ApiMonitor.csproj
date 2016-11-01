@@ -57,6 +57,19 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="pages\mzbc.html" />
+    <Content Include="pages\czlp.html" />
+    <Content Include="pages\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="pages\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="pages\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="pages\fonts\Ubuntu-Bold.ttf" />
+    <Content Include="pages\fonts\Ubuntu-BoldItalic.ttf" />
+    <Content Include="pages\fonts\Ubuntu-Italic.ttf" />
+    <Content Include="pages\fonts\Ubuntu-Light.ttf" />
+    <Content Include="pages\fonts\Ubuntu-LightItalic.ttf" />
+    <Content Include="pages\fonts\Ubuntu-Medium.ttf" />
+    <Content Include="pages\fonts\Ubuntu-MediumItalic.ttf" />
+    <Content Include="pages\fonts\Ubuntu-Regular.ttf" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -65,10 +78,41 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="pages\css\bootstrap-admin-theme-change-size.css" />
+    <Content Include="pages\css\bootstrap-admin-theme-small.css" />
+    <Content Include="pages\css\bootstrap-admin-theme.css" />
+    <Content Include="pages\css\bootstrap-error-page.css" />
+    <Content Include="pages\css\bootstrap-small.css" />
+    <Content Include="pages\css\bootstrap-switch-small.css" />
+    <Content Include="pages\css\bootstrap-theme-switch.css" />
+    <Content Include="pages\css\bootstrap-theme-switch.min.css" />
+    <Content Include="pages\css\bootstrap-theme.css" />
+    <Content Include="pages\css\bootstrap-theme.min.css" />
+    <Content Include="pages\css\bootstrap.css" />
     <Content Include="pages\css\bootstrap.min.css" />
     <Content Include="Data_Update_M.asmx" />
     <Content Include="Global.asax" />
-    <Content Include="pages\index.html" />
+    <Content Include="pages\css\datepicker.fixes.css" />
+    <Content Include="pages\css\DT_bootstrap.css" />
+    <Content Include="pages\css\uniform.default.fixes.css" />
+    <Content Include="pages\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="pages\fonts\Ubuntu-LICENSE.txt" />
+    <Content Include="pages\images\bg-input-focus.png" />
+    <Content Include="pages\images\bg-input.png" />
+    <Content Include="pages\images\logo-meritoo.png" />
+    <Content Include="pages\images\sprite.png" />
+    <Content Include="pages\login.html" />
+    <Content Include="pages\js\bootstrap-admin-theme-change-size.js" />
+    <Content Include="pages\js\bootstrap.js" />
+    <Content Include="pages\js\bootstrap.min.js" />
+    <Content Include="pages\js\DT_bootstrap.js" />
+    <Content Include="pages\js\html5shiv.js" />
+    <Content Include="pages\js\jquery-2.0.3.min.js" />
+    <Content Include="pages\js\respond.min.js" />
+    <Content Include="pages\js\twitter-bootstrap-hover-dropdown.js" />
+    <Content Include="pages\js\twitter-bootstrap-hover-dropdown.min.js" />
+    <Content Include="pages\zymxsc.html" />
+    <Content Include="pages\rydj.html" />
     <Content Include="Web.config" />
     <Content Include="mzbcpj.aspx" />
   </ItemGroup>
@@ -92,7 +136,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
-    <Folder Include="pages\js\" />
     <Folder Include="View\" />
   </ItemGroup>
   <PropertyGroup>
