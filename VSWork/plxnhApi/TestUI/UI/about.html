@@ -1,12 +1,9 @@
 ﻿<!DOCTYPE html>
 <html>
     <head>
-        <title>About | Bootstrap 3.x Admin Theme</title>
+        <title>门诊补偿</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-        <!-- Bootstrap Docs -->
-        <link href="http://getbootstrap.com/docs-assets/css/docs.css" rel="stylesheet" media="screen">
 
         <!-- Bootstrap -->
         <link rel="stylesheet" media="screen" href="css/bootstrap.min.css">
@@ -86,10 +83,9 @@
                     <div class="col-lg-12">
                         <div class="collapse navbar-collapse">
                             <ul class="nav navbar-nav navbar-left bootstrap-admin-theme-change-size">
-                                
-                                <li><a class="size-changer small">门诊业务</a></li>
+                                <li><a class="size-changer large active">门诊业务</a></li>
                                 <li><a class="size-changer large active">住院业务</a></li>
-                                <li><a class="size-changer large ">退出</a></li>
+                                <li><a class="size-changer large active">退出</a></li>
                             </ul>
                             
                         </div>
@@ -191,208 +187,97 @@
                 </div>
             </div>
 
-            地区编码：
-            <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle"
-                        data-toggle="dropdown">
-                    选择 <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" role="menu">
-                    <li><a href="#">北京</a></li>
-                    <li><a href="#">上海</a></li>
-                    <li><a href="#">其他</a></li>
-                </ul>
-            </div>
-
-            <button class="btn btn-success">读卡</button>
-
-            医疗证号：<input type="email" class="form-control" style="width:200px;" placeholder="">
-           
+            <table>
+                <tr>
+                    <td>地区编码：</td>
+                    <td>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle"
+                                    data-toggle="dropdown">
+                                选择 <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">北京</a></li>
+                                <li><a href="#">上海</a></li>
+                                <li><a href="#">其他</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                    <td style="padding-left:30px;"><button class="btn btn-success">读卡</button></td>
+                    <td style="padding-left:30px;">医疗证号：</td>
+                    <td><input style="width:200px;" placeholder=""></td>
+                </tr>
+            </table>
 
             <p></p>
 
-            <div class="row">
-                <!-- left, vertical navbar -->
-                <div class="col-md-2 bootstrap-admin-col-left">
-                    <ul class="nav navbar-collapse collapse bootstrap-admin-navbar-side">
-                        <li class="active">
-                            <a href="about.html"><i class="glyphicon glyphicon-chevron-right"></i> About</a>
-                        </li>
-                        <li>
-                            <a href="dashboard.html"><i class="glyphicon glyphicon-chevron-right"></i> Dashboard</a>
-                        </li>
-                        <li class="disabled">
-                            <a href="#"><i class="glyphicon glyphicon-chevron-right"></i> Calendar</a><!-- calendar.html -->
-                        </li>
-                        <li class="disabled">
-                            <a href="#"><i class="glyphicon glyphicon-chevron-right"></i> Statistics (Charts)</a><!-- stats.html -->
-                        </li>
-                        <li>
-                            <a href="forms.html"><i class="glyphicon glyphicon-chevron-right"></i> Forms</a>
-                        </li>
-                        <li>
-                            <a href="tables.html"><i class="glyphicon glyphicon-chevron-right"></i> Tables</a>
-                        </li>
-                        <li>
-                            <a href="buttons-and-icons.html"><i class="glyphicon glyphicon-chevron-right"></i> Buttons &amp; Icons</a>
-                        </li>
-                        <li>
-                            <a href="wysiwyg-editors.html"><i class="glyphicon glyphicon-chevron-right"></i> WYSIWYG Editors</a>
-                        </li>
-                        <li>
-                            <a href="ui-and-interface.html"><i class="glyphicon glyphicon-chevron-right"></i> UI &amp; Interface</a>
-                        </li>
-                        <li>
-                            <a href="error-pages.html"><i class="glyphicon glyphicon-chevron-right"></i> Error pages</a>
-                        </li>
-                        <li>
-                            <a href="forms.html"><i class="glyphicon glyphicon-chevron-down"></i> Submenu</a>
-                            <ul class="nav navbar-collapse bootstrap-admin-navbar-side">
-                                <li><a href="about.html"><i class="glyphicon glyphicon-chevron-right"></i> Submenu 1</a></li>
-                                <li><a href="about.html"><i class="glyphicon glyphicon-chevron-right"></i> Submenu 2</a></li>
-                                <li><a href="about.html"><i class="glyphicon glyphicon-chevron-right"></i> Submenu 3</a></li>
+            <table>
+                <tr>
+                    <td>补偿类别：</td>
+                    <td>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle"
+                                    data-toggle="dropdown">
+                                选择 <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">类别1</a></li>
+                                <li><a href="#">类别2</a></li>
+                                <li><a href="#">类别3</a></li>
                             </ul>
-                        </li>
-                        <li>
-                            <a href="#"><span class="badge pull-right">731</span> Orders</a>
-                        </li>
-                        <li>
-                            <a href="#"><span class="badge pull-right">812</span> Invoices</a>
-                        </li>
-                        <li>
-                            <a href="#"><span class="badge pull-right">27</span> Clients</a>
-                        </li>
-                        <li>
-                            <a href="#"><span class="badge pull-right">1,234</span> Users</a>
-                        </li>
-                        <li>
-                            <a href="#"><span class="badge pull-right">2,221</span> Messages</a>
-                        </li>
-                        <li>
-                            <a href="#"><span class="badge pull-right">11</span> Reports</a>
-                        </li>
-                        <li>
-                            <a href="#"><span class="badge pull-right">83</span> Errors</a>
-                        </li>
-                        <li>
-                            <a href="#"><span class="badge pull-right">4,231</span> Logs</a>
-                        </li>
-                    </ul>
-                </div>
+                        </div>
+                    </td>
+                    <td style="padding-left:30px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                    <td style="padding-left:30px;">门诊疾病编码：</td>
+                    <td><input style="width:200px;" placeholder=""></td>
+                </tr>
+            </table>
 
-                <!-- content -->
-                <div class="col-md-10">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="page-header bootstrap-admin-content-title">
-                                <h1>Bootstrap 3.x Admin's Theme</h1>
-                                <a href="https://github.com/meritoo/Bootstrap-3-Admin-Theme" class="action btn">
-                                    Go to GitHub &raquo;
-                                </a>
-                                <a href="https://github.com/meritoo/Bootstrap-3-Admin-Theme/archive/master.zip" class="action">
-                                    <button class="btn btn-success">Download (.zip)</button>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+            <p></p>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <div class="text-muted bootstrap-admin-box-title">Details</div>
-                                </div>
-                                <div class="bootstrap-admin-panel-content">
-                                    <ul>
-                                        <li>An admin theme built with <a href="http://getbootstrap.com" target="_blank">Bootstrap 3.x.</a></li>
-                                        <li>Free for personal and commercial use</li>
-                                        <li>Inspired by and based on <a href="https://github.com/VinceG/Bootstrap-Admin-Theme" target="_blank">Bootstrap-Admin-Theme</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <div class="text-muted bootstrap-admin-box-title">Source</div>
-                                </div>
-                                <div class="bootstrap-admin-panel-content">
-                                    <ul>
-                                        <li>
-                                            <a href="https://github.com/meritoo/Bootstrap-3-Admin-Theme" target="_blank">Github Repository</a>
-                                        </li>
-                                        <li>
-                                            <a href="https://github.com/meritoo/Bootstrap-3-Admin-Theme/archive/master.zip">Download (.zip package)</a>
-                                        </li>
-                                        <li>
-                                            License: MIT (see below)
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div>
+                农合病人信息(根据医疗证号获取农合信息后并显示)
+            </div>
+            
+            <p></p>
 
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <div class="text-muted bootstrap-admin-box-title">License</div>
-                                </div>
-                                <div class="bootstrap-admin-panel-content">
-                                    <p>The MIT License (MIT)</p>
-                                    <p>Copyright © 2013 - Meritoo.pl &lt;github [at] meritoo [dot] pl&gt;</p>
-                                    <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
-                                    <p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
-                                    <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div>
+                <ul style="list-style:none;">
+                    <li style="float:left;width:20%;"><button class="btn btn-default">试算</button></li>
+                    <li style="float:left;width:20%;"><button class="btn btn-default">收费</button></li>
+                    <li style="float:left;width:20%;"><button class="btn btn-default">冲正</button></li>
+                    <li style="float:left;width:20%;"><button class="btn btn-default">打印补偿票据</button></li>
+                    <li style="float:left;width:20%;"><button class="btn btn-default">退出</button></li>
+                </ul>
+            </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="bs-docs-masthead">
-                                <a href="http://getbootstrap.com" target="_blank">
-                                    <h1>Bootstrap</h1>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-6 meritoo-logo">
-                            <a href="http://www.meritoo.pl" target="_blank">
-                                <img src="images/logo-meritoo.png" alt="Meritoo.pl">
-                                <span>Internet software house</span>
-                            </a>
-                        </div>
-                    </div>
+            <p></p>
+           
+        </div>
 
-                    <div class="row row-urls">
-                        <div class="col-md-6">
-                            <a href="http://getbootstrap.com" target="_blank">Bootstrap 3.x</a>
-                        </div>
-                        <div class="col-md-6">
-                            <a href="http://www.meritoo.pl" target="_blank">Meritoo.pl</a>
-                        </div>
-                    </div>
-                </div>
+        <div class="bottomInfo">
+            <div style="align-items:center;">
+                <ul style="list-style:none;padding-bottom:2px;">
+                    <li style="float:left;">使用单位:天泰医院</li>
+                    <li style="float:left;padding-left:10px;">当前登录人:刘德华</li>
+                    <li style="float:left;padding-left:10px;">所在单位ID:XDD888</li>
+                    <li style="float:left;padding-left:10px;">当前时间:2016-11-01 12:12:15</li>
+                </ul>
             </div>
         </div>
 
-        <!-- footer -->
-        <div class="navbar navbar-footer">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <footer role="contentinfo">
-                            <p class="left">Bootstrap 3.x Admin Theme</p>
-                            <p class="right">&copy; 2013 <a href="http://www.meritoo.pl" target="_blank">Meritoo.pl</a></p>
-                        </footer>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <style>
+            .bottomInfo {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 30px;
+                background-color: #DDDDDD;
+            }
+        </style>
 
-        <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+        <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
         <script type="text/javascript" src="js/bootstrap.min.js"></script>
         <script type="text/javascript" src="js/twitter-bootstrap-hover-dropdown.min.js"></script>
         <script type="text/javascript" src="js/bootstrap-admin-theme-change-size.js"></script>

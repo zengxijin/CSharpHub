@@ -1,0 +1,268 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>入院登记</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" media="screen" href="css/bootstrap.min.css">
+        <link rel="stylesheet" media="screen" href="css/bootstrap-theme.min.css">
+
+        <!-- Bootstrap Admin Theme -->
+        <link rel="stylesheet" media="screen" href="css/bootstrap-admin-theme.css">
+        <link rel="stylesheet" media="screen" href="css/bootstrap-admin-theme-change-size.css">
+
+        <!-- Custom styles -->
+        <style type="text/css">
+            @font-face {
+                font-family: Ubuntu;
+                src: url('fonts/Ubuntu-Regular.ttf');
+            }
+            .bs-docs-masthead{
+                background-color: #6f5499;
+                background-image: linear-gradient(to bottom, #563d7c 0px, #6f5499 100%);
+                background-repeat: repeat-x;
+            }
+            .bs-docs-masthead{
+                padding: 0;
+            }
+            .bs-docs-masthead h1{
+                color: #fff;
+                font-size: 40px;
+                margin: 0;
+                padding: 34px 0;
+                text-align: center;
+            }
+            .bs-docs-masthead a:hover{
+                text-decoration: none;
+            }
+            .meritoo-logo a{
+                background-color: #fff;
+                border: 1px solid rgba(66, 139, 202, 0.4);
+                display: block;
+                font-family: Ubuntu;
+                padding: 22px 0;
+                text-align: center;
+            }
+            .meritoo-logo a,
+            .meritoo-logo a:hover,
+            .meritoo-logo a:focus{
+                text-decoration: none;
+            }
+            .meritoo-logo a img{
+                display: block;
+                margin: 0 auto;
+            }
+            .meritoo-logo a span{
+                color: #4e4b4b;
+                font-size: 18px;
+            }
+            .row-urls{
+                margin-top: 4px;
+            }
+            .row-urls .col-md-6{
+                text-align: center;
+            }
+            .row-urls .col-md-6 a{
+                font-size: 14px;
+            }
+        </style>
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+           <script type="text/javascript" src="js/html5shiv.js"></script>
+           <script type="text/javascript" src="js/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body class="bootstrap-admin-with-small-navbar">
+        <!-- small navbar -->
+        <nav class="navbar navbar-default navbar-fixed-top bootstrap-admin-navbar-sm" role="navigation">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="collapse navbar-collapse">
+                            <ul class="nav navbar-nav navbar-left bootstrap-admin-theme-change-size">
+                                <li><a class="size-changer large active">门诊业务</a></li>
+                                <li><a class="size-changer large active">住院业务</a></li>
+                                <li><a class="size-changer large active">退出</a></li>
+                            </ul>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- main / large navbar -->
+        <nav class="navbar navbar-default navbar-fixed-top bootstrap-admin-navbar bootstrap-admin-navbar-under-small" role="navigation">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".main-navbar-collapse">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            
+                        </div>
+                        <div class="collapse navbar-collapse main-navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li ><a href="#">门诊补偿</a></li>
+                                <li class="active"><a href="#">住院业务</a></li>
+                                <li><a href="#">住院费用上传</a></li>
+                                <li><a href="#">发票打印</a></li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-hover="dropdown">其他 <b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li role="presentation" class="dropdown-header">#1</li>
+                                        <li><a href="#">菜单1</a></li>
+                                        
+                                        <li role="presentation" class="divider"></li>
+                                        <li role="presentation" class="dropdown-header">#2</li>
+                                        <li><a href="#">菜单2</a></li>
+                                        
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div><!-- /.navbar-collapse -->
+                    </div>
+                </div>
+            </div><!-- /.container -->
+        </nav>
+
+        <div class="container">
+            <!-- left, vertical navbar & content -->
+            <form class="form-inline" role="form">
+                <div class="form-group">
+                    住院号：<label class="sr-only" for="exampleInputEmail2"></label>
+                    <input type="email" class="form-control" id="exampleInputEmail2" placeholder="">
+                </div>
+
+                <button class="btn btn-success" style="margin-left:10px;">读卡</button>
+
+                <div class="form-group" style="margin-left:10px;">
+                    医疗证号：<label class="sr-only" for="exampleInputPassword2"></label>
+                    <input type="password" class="form-control" id="exampleInputPassword2" placeholder="">
+                </div>
+            </form>
+
+            <p></p>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="text-muted bootstrap-admin-box-title">HIS中病人信息</div>
+                        </div>
+                        <div class="bootstrap-admin-panel-content">
+                            <table class="table">
+                                
+                                <tbody>
+                                    <tr>
+                                        <td>姓名：刘德华</td>
+                                        <td>费别：xxxx</td>
+                                        <td>住院号：123456789</td>
+                                        <td>住院流水：4564687631xxadas</td>
+                                    </tr>
+                                    <tr>
+                                        <td>性别：男</td>
+                                        <td>出生日期：1988-10-25</td>
+                                        <td>年龄：29</td>
+                                        <td>电话：13591993625</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">地址：甘肃省平凉市解放大街100号</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <td>入院科室：呼吸道感染</td>
+                                        <td>入院时间：2016-10-10</td>
+                                        <td>地区编码：123</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>门诊医生：张学友</td>
+                                        <td>出院时间：2016-10-15</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>入院诊断：感冒</td>
+                                        <td>当前科室：呼吸道感染</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="text-muted bootstrap-admin-box-title">农合基本信息</div>
+                        </div>
+                        <div class="bootstrap-admin-panel-content">
+                            <table class="table">
+
+                                <tbody>
+                                    <tr>
+                                        <td>姓名：刘德华</td>
+                                        <td>费别：xxxx</td>
+                                        <td>住院号：123456789</td>
+                                        <td>住院流水：4564687631xxadas</td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p></p>
+
+            <div>
+                <ul style="list-style:none;">
+                    <li style="float:left;width:33%;"><button class="btn btn-default">入院登记</button></li>
+                    <li style="float:left;width:33%;"><button class="btn btn-default">取消登记</button></li>
+                    <li style="float:left;width:33%;"><button class="btn btn-default">关闭</button></li>
+                </ul>
+            </div>
+           
+        </div>
+
+        <div class="bottomInfo">
+            <div style="align-items:center;">
+                <ul style="list-style:none;padding-bottom:2px;">
+                    <li style="float:left;">使用单位:天泰医院</li>
+                    <li style="float:left;padding-left:10px;">当前登录人:刘德华</li>
+                    <li style="float:left;padding-left:10px;">所在单位ID:XDD888</li>
+                    <li style="float:left;padding-left:10px;">当前时间:2016-11-01 12:12:15</li>
+                </ul>
+            </div>
+        </div>
+
+        <style>
+            .bottomInfo {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 30px;
+                background-color: #DDDDDD;
+            }
+        </style>
+
+        <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/twitter-bootstrap-hover-dropdown.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap-admin-theme-change-size.js"></script>
+    </body>
+</html>
