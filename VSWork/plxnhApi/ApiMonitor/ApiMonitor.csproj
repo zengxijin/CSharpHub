@@ -57,6 +57,8 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="pages\js\jquery.cookie.js" />
+    <Content Include="pages\js\xnh.js" />
     <Content Include="pages\mzbc.html" />
     <Content Include="pages\czlp.html" />
     <Content Include="pages\fonts\glyphicons-halflings-regular.eot" />
