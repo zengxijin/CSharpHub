@@ -66,6 +66,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="pages\js\jquery.confirm.min.js" />
     <Content Include="pages\js\jquery.cookie.js" />
     <Content Include="pages\js\xnh.js" />
     <Content Include="pages\mzbc.html" />

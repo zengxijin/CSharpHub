@@ -12,3 +12,18 @@ function isLogin() {
         return true;
     }
 }
+
+function checkLogin() {
+    if (isLogin()) {
+
+    } else {
+        window.location = 'login.html';
+    }
+}
+
+function exit() {
+    if (confirm("是否确认退出？")) {
+        loginCache(null);
+        window.location = 'login.html';
+    }
+}
