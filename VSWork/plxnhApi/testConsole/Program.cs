@@ -15,12 +15,7 @@ namespace testConsole
     {
         static void Main(string[] args)
         {
-            Dictionary<string, string> myDictionary = new Dictionary<string, string>();
-            myDictionary.Add("111","222");
-            myDictionary.Add("asdas", "www");
-
-            string myjson = JsonConvert.SerializeObject(myDictionary);
-            Console.WriteLine(myjson);
+            loginTest();
             //json();
             //hhh();
         }

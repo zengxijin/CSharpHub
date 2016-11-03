@@ -69,7 +69,7 @@ namespace Service.Util
         {
             loadConfig();
 
-            return json[serviceName][serviceName]["callService"]["service"].ToString();
+            return json[serviceName]["callService"]["service"].ToString();
         }
     }
 }

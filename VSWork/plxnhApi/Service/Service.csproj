@@ -52,6 +52,7 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="Util\ConfigUtil.cs" />
+    <Compile Include="Util\MsgConvert.cs" />
     <Compile Include="WebService\IService.cs" />
     <Compile Include="WebService\ServiceImpl\login\LoginAuth.cs" />
     <Compile Include="Util\ServiceInvoke.cs" />

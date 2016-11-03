@@ -20,6 +20,12 @@ namespace ApiMonitor
         [WebMethod]
         public string Update_Data_String(string proc_name, string parames, string split)
         {
+            //模拟登陆
+            if (proc_name == "PROC_CHECK_USER")
+            {
+                return "0;12344;zengxijin;";
+            }
+
             return proc_name + parames + split;
         }
 
