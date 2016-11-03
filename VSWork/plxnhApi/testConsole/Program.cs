@@ -15,9 +15,9 @@ namespace testConsole
     {
         static void Main(string[] args)
         {
-            loginTest();
+            //loginTest();
             //json();
-            //hhh();
+            hhh();
         }
 
 
@@ -49,7 +49,7 @@ namespace testConsole
             //Console.WriteLine(zone);
 
             StringBuilder sb = new StringBuilder();
-            using (StreamReader sr = new StreamReader(@"D:\GitHub\JavaHub\VSWork\plxnhApi\Service\paramParse.json", Encoding.Default))
+            using (StreamReader sr = new StreamReader(@"D:\paramParse.json", Encoding.Default))
             {
 
                 while (!sr.EndOfStream)
@@ -60,7 +60,7 @@ namespace testConsole
             }
 
             string json = sb.ToString();
-            JObject jo = (JObject)JsonConvert.DeserializeObject(json);
+            JObject jo = JObject.Parse(json);
             string ss = jo["PROC_CHECK_USER"]["callService"]["service"].ToString();
             //string zone = jo["PROC_CHECK_USER"]["input"]["USER_CODE"].ToString();
             Dictionary<string, int> dic = new Dictionary<string, int>();

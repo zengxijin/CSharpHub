@@ -92,7 +92,7 @@ html,body {
 </style>
 
 <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
-    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
 <script type="text/javascript" src="js/xnh.js"></script>
 
 </head>
@@ -118,17 +118,17 @@ html,body {
 					<div class="col-xs-12  ">
 						<div class="input-group">
 							<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span>密&nbsp;&nbsp;&nbsp;码：</span>
-							<input type="text" id="password" name="password" class="form-control" placeholder="">
+                            <input type="password" id="password" name="password" class="form-control" placeholder="" />
 						</div>
 					</div>
 				</div>
 				
 				<div class="form-group" style="padding-left:70px;">
 					<div class="col-xs-6 link">
-                        <button class="btn btn-sm btn-info" onclick="window.location = 'mzbc.html'"><span class=" glyphicon=glyphicon glyphicon-off"=glyphicon-off"></span>确定</button>
+                        <button id="loginBtn" class="btn btn-sm btn-info" onclick="javascript: loginClick();" ><span class=" glyphicon=glyphicon glyphicon-off"=glyphicon-off"></span>确定</button>
 					</div>
 					<div class="col-xs-6 link">
-                        <button class="btn btn-sm btn-info"><span class="glyphicon glyphicon-off"></span>取消</button>
+                        <button id="cancelBtn" class="btn btn-sm btn-info"><span class="glyphicon glyphicon-off"></span>取消</button>
 					</div>
 				</div>
 			
@@ -139,97 +139,33 @@ html,body {
 
     <script type="text/javascript">
         $(document).ready(function () {
-            $(function () {
-                //$("#btnOK").click(function () {
-                $.ajax({
-                    type: "Post",
-                    url: "xnhservice.asmx/login",
-                    //方法传参的写法一定要对，str为形参的名字,str2为第二个形参的名字   
-                    data: "{'name':'aaa','pwd':'XXX'}",
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    success: function (data) {
-                        //返回的数据用data.d获取内容   
-                        alert(data.d);
-                        
-                    },
-                    error: function (err) {
-                        alert("错误");
-                        alert(err.toString());
-                    }
-                });
 
-                    //禁用按钮的提交   
-                 //   return false;
-               // });
-            });
         });
 
-        function my() {
-            var str = '{ "name": "Violet", "occupation": "character" }';
-            var obj = eval('(' + str + ')');
-            alert(obj.name);
-
-            for (var item in obj) {
-                alert(item);
-            }
-
-            $('#action-button').click(function () {
-                $.ajax({
-                    url: 'http://api.joind.in/v2.1/talks/10889',
-                    data: {
-                        format: 'json'
-                    },
-                    error: function () {
-                        $('#info').html('<p>An error has occurred</p>');
-                    },
-                    dataType: 'jsonp',
-                    success: function (data) {
-                        var $title = $('<h1>').text(data.talks[0].talk_title);
-                        var $description = $('<p>').text(data.talks[0].talk_description);
-                        $('#info')
-                           .append($title)
-                           .append($description);
-                    },
-                    type: 'GET'
-                });
-            });
-
-
-            //Use this code to send POST data and output result.
-
-            var menuId = $("ul.nav").first().attr("id");
-            var request = $.ajax({
-                url: "script.php",
-                type: "POST",
-                data: { id: menuId },
-                dataType: "html"
-            });
-
-            request.done(function (msg) {
-                $("#log").html(msg);
-            });
-
-            request.fail(function (jqXHR, textStatus) {
-                alert("Request failed: " + textStatus);
-            });
-
-            var myusername = $("#username").val();
+        function loginClick() {
+            var name = $("#username").val();
+            var pwd = $("#password").val();
+            var param = "{'name':'" + name + "','pwd':'" + pwd + "'}";
             $.ajax({
-                type: "GET",
-                url: "serverscript.xxx",
-                data: myusername,
-                cache: false,
+                type: "Post",
+                url: "xnhservice.asmx/login",
+                data: "{'name':'" + name + "','pwd':'" + pwd + "'}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
                 success: function (data) {
-                    $("#resultarea").text(data);
+                    //返回的数据用data.d获取内容
+                    var retVal = data.d;
+                    if (retVal == '') {
+                        alert('登录失败，请输入正确的用户名和密码');
+                    } else {
+                        window.location = 'mzbc.html';
+                    }
+
+                },
+                error: function (err) {
+                    alert(err.toString());
                 }
             });
-
-
-            //loginCache(null);
-            //alert($.cookie('xnhlogin'));
-
-            //alert(isLogin());
         }
     </script>
 

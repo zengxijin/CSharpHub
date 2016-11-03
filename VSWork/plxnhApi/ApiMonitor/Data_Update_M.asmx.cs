@@ -23,7 +23,11 @@ namespace ApiMonitor
             //模拟登陆
             if (proc_name == "PROC_CHECK_USER")
             {
-                return "0;12344;zengxijin;";
+                if (parames == "admin&admin")
+                {
+                    return "0;admin;admin;";
+                }
+                return "4;登录失败;";//"0;12344;zengxijin;";
             }
 
             return proc_name + parames + split;

@@ -236,7 +236,7 @@ namespace Service.WebService.ServiceImpl
         /// <returns></returns>
         public bool getExecuteStatus()
         {
-            if (string.IsNullOrEmpty(executeResult) == false)
+            if (string.IsNullOrEmpty(executeResult) == false && executeResult.Length > 1)
             {
                 if (executeResult.Substring(0, 1) == "0")
                     return true;

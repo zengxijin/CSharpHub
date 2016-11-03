@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace Service.Util
     {
         private static JObject json   = null;
         private static object lockObj = new object();
+        private static string configPath = ConfigurationManager.AppSettings["configPath"];
         /// <summary>
         /// 初始化配置文件，加锁
         /// </summary>
@@ -23,7 +25,7 @@ namespace Service.Util
                 lock (lockObj)
                 {
                     StringBuilder sb = new StringBuilder();
-                    using (StreamReader sr = new StreamReader("paramParse.json", Encoding.Default))
+                    using (StreamReader sr = new StreamReader(configPath, Encoding.Default))
                     {
                         while (!sr.EndOfStream)
                         {
@@ -31,7 +33,7 @@ namespace Service.Util
                             sb.Append(line);
                         }
                     }
-                    json = (JObject)JsonConvert.DeserializeObject(sb.ToString());
+                    json = JObject.Parse(sb.ToString());
                 }
             }
         }
