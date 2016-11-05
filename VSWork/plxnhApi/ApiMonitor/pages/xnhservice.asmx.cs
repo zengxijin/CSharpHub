@@ -1,6 +1,7 @@
 ﻿using ApiMonitor.log;
 using Service.Util;
 using Service.WebService.ServiceImpl.login;
+using Service.WebService.ServiceImpl.MZBC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,10 +64,32 @@ namespace ApiMonitor.pages
             return retVal;
         }
 
+        /// <summary>
+        /// (2).读卡调用交易：
+        ///1)	调用验证此卡号是否存在交易。
+        ///2)	根据上一返回的医疗证号调用获取家庭成员交易，如果返回多个人员根据序号进行选择。
+        ///3)	根据医疗证号和序号调用查询基础人员信息交易，将信息显示到用户画面。
+        ///4)	并验证本人是否已经住院（注：应该是住院状态不允许门诊报销）。
+        ///5)	调用取出补偿类别交易并在用户画面显示补偿类别，供门诊补偿时选择。
+        /// </summary>
+        /// <param name="AREA_NO">地区编码</param>
+        /// <param name="M_MM"></param>
+        /// <returns></returns>
         [WebMethod]
-        public string aaa()
+        public string readCard(string AREA_NO, string M_MM)
         {
             string retVal = "";
+
+            MZBC_Check_Ylzh_Bulsh check = new MZBC_Check_Ylzh_Bulsh();
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            param.Add("AREA_NO", AREA_NO);
+            param.Add("M_MM", M_MM);
+
+            string retStr = check.executeSql("", param, "&");
+            if (check.getExecuteStatus() == true)
+            {
+                Dictionary<string, string> retDic = check.getResponseResultWrapperMap();
+            }
 
             return retVal;
         }

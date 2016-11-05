@@ -8,8 +8,8 @@
 			"USER_PASS": "1"
 		},
 		"response": {
-			"info": "0",
-            "USER_ID": "1",
+			"return_code": "0",
+			"USER_ID": "1",
 			"USER_CODE": "2",
 			"USER_PASS": "3",
 			"USER_NAME": "4",
@@ -37,37 +37,27 @@
 		"callService": {
 			"service": "Execute_Sql"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"M_MM": "1"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"D401_10": "1"
-		}
-	},
-	"Get_Member": {
-		"callService": {
-			"service": "Execute_Sql"
-		},
-		"input": {
-			"AREA_NO": "0",
-			"D401_10": "1"
-		},
-		"output": {
-			"D401_21/D401_02": "1"
 		}
 	},
 	"PROC_ZYBZ_NOTICE_CHECK": {
 		"callService": {
 			"service": "Update_Data_String"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"D401_10": "1",
 			"D401_21": "2",
 			"DEP_ID": "3"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"info": "1"
 		}
 	},
@@ -75,13 +65,13 @@
 		"callService": {
 			"service": "Execute_Sql"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"D401_10": "1",
 			"D401_21": "2"
 		},
-		"output": {
-			"0": "0",
+		"response": {
+			"return_code": "0",
 			"D401_02": "1",
 			"D401_01": "2",
 			"SEX": "3",
@@ -96,26 +86,16 @@
 			"D401_04": "12"
 		}
 	},
-	"Get_S301_06": {
-		"callService": {
-			"service": "Execute_Sql"
-		},
-		"input": {
-			"AREA_NO": "0"
-		},
-		"output": {
-			"ITEM_CODE/ITEM_NAME": "1"
-		}
-	},
 	"GetYljgjb": {
 		"callService": {
 			"service": "Execute_Sql"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"DEP_ID": "1"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"ITEM_CODE": "1"
 		}
 	},
@@ -123,10 +103,11 @@
 		"callService": {
 			"service": "Update_Data_String"
 		},
-		"input": {
+		"request": {
 			"DIAGNOSIS_CODE": "0"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"info": "1"
 		}
 	},
@@ -134,7 +115,7 @@
 		"callService": {
 			"service": "Update_Data_String"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"D401_10": "1",
 			"D401_21": "2",
@@ -166,7 +147,8 @@
 			"ZCAOY_OUT": "28",
 			"ZCHENGY_OUT": "29"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"O_TOTAL_COSTS": "1",
 			"O_ZF_COSTS": "2",
 			"O_TOTAL_CHAGE": "3",
@@ -183,11 +165,12 @@
 		"callService": {
 			"service": "Execute_Sql"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"T_D502_01": "1"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"D501_01": "1",
 			"D501_03": "2",
 			"d501_04": "3",
@@ -215,11 +198,12 @@
 		"callService": {
 			"service": "Update_Data_String"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"T_D502_01": "1"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"info": "1"
 		}
 	},
@@ -227,11 +211,12 @@
 		"callService": {
 			"service": "Update_Data_String"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"T_D502_01": "1"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"info": "1"
 		}
 	},
@@ -239,11 +224,12 @@
 		"callService": {
 			"service": "Execute_Sql"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"D401_10_TEMP": "1"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"D401_10": "1"
 		}
 	},
@@ -251,12 +237,13 @@
 		"callService": {
 			"service": "Execute_Sql"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"D401_10": "1",
 			"D401_21": "2"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"D401_10": "1",
 			" D401_21": "2",
 			"D401_02": "3",
@@ -273,11 +260,12 @@
 		"callService": {
 			"service": "Update_Data_String"
 		},
-		"input": {
+		"request": {
 			"DEP_ID": "0",
 			"D504_09": "1"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"info": "1"
 		}
 	},
@@ -285,7 +273,7 @@
 		"callService": {
 			"service": "Update_Data_String"
 		},
-		"input": {
+		"request": {
 			"COME_AREA": "0",
 			"AREA_CODE": "1",
 			"D401_10": "2",
@@ -303,7 +291,8 @@
 			"D504_16": "14",
 			"D504_28": "15"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"D504_01": "1"
 		}
 	},
@@ -311,7 +300,7 @@
 		"callService": {
 			"service": "Update_Data_String"
 		},
-		"input": {
+		"request": {
 			"AREA_CODE": "0",
 			"D504_01": "1",
 			"D504_21": "2",
@@ -322,7 +311,8 @@
 			"D504_11": "7",
 			"D504_28": "8"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"info": "1"
 		}
 	},
@@ -330,37 +320,26 @@
 		"callService": {
 			"service": "Update_Data_String"
 		},
-		"input": {
+		"request": {
 			"AREA_CODE": "0",
 			"D504_01": "1"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"info": "1"
-		}
-	},
-	"Find_Member1": {
-		"callService": {
-			"service": "Execute_Sql"
-		},
-		"input": {
-			"AREA_NO": "0",
-			"DEP_ID": "1",
-			"D504_09": "2"
-		},
-		"output": {
-			"D401_21/D401_02": "1"
 		}
 	},
 	"Find_New_Ylzh": {
 		"callService": {
 			"service": "Execute_Sql"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"DEP_ID": "1",
 			"D504_09": "2"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"D401_10": "1"
 		}
 	},
@@ -368,14 +347,14 @@
 		"callService": {
 			"service": "Execute_Sql"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"D401_10": "1",
 			"D401_21": "2",
 			"DEP_ID": "3"
 		},
-		"output": {
-			"0": "0",
+		"response": {
+			"return_code": "0",
 			"D504_03": "1",
 			"D504_04": "2",
 			"D504_01": "3",
@@ -407,7 +386,7 @@
 		"callService": {
 			"service": "Update_Data_String"
 		},
-		"input": {
+		"request": {
 			"D505_02": "0",
 			"COME_AREA": "1",
 			"AREA_CODE": "2",
@@ -421,8 +400,8 @@
 			"USER_NAME": "10",
 			"LEVEL": "11"
 		},
-		"output": {
-			"0": "0",
+		"response": {
+			"return_code": "0",
 			"d505_01": "1",
 			"TOTAL_COSTS ": "2",
 			"TOTAL_CHAGE": "3",
@@ -433,13 +412,14 @@
 		"callService": {
 			"service": "Update_Data_String"
 		},
-		"input": {
+		"request": {
 			"AREA_CODE": "0",
 			"D504_01": "1",
 			"START_DATE": "2",
 			"END_DATE": "3"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"info": "1"
 		}
 	},
@@ -447,10 +427,11 @@
 		"callService": {
 			"service": "Execute_Sql"
 		},
-		"input": {
+		"request": {
 			"AREA_CODE": "0"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"info": "1"
 		}
 	},
@@ -458,7 +439,7 @@
 		"callService": {
 			"service": "Update_Data_String"
 		},
-		"input": {
+		"request": {
 			"D505_02": "0",
 			"COME_AREA": "1",
 			"AREA_CODE": "2",
@@ -477,8 +458,8 @@
 			"D504_16_T": "15",
 			"S701_01": "16"
 		},
-		"output": {
-			"0": "0",
+		"response": {
+			"return_code": "0",
 			"TOTAL_COSTS": "1",
 			"ZF_COSTS": "2",
 			"TOTAL_CHAGE": "3",
@@ -494,12 +475,12 @@
 		"callService": {
 			"service": "Execute_Sql"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"D504_01": "1"
 		},
-		"output": {
-			"0": "0",
+		"response": {
+			"return_code": "0",
 			"D504_01": "1",
 			"D506_16": "2",
 			"D506_25": "3",
@@ -536,12 +517,13 @@
 		"callService": {
 			"service": "Execute_Sql"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"D505_02": "1",
 			"IS_SAVE": "2"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"D504_01": "1"
 		}
 	},
@@ -549,12 +531,13 @@
 		"callService": {
 			"service": "Update_Data_String"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"D504_01": "1",
 			"USER_NAME": "2"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"info": "1"
 		}
 	},
@@ -562,10 +545,10 @@
 		"callService": {
 			"service": "Execute_Sql"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0"
 		},
-		"output": {
+		"response": {
 			"T_COUNT": "0",
 			"SK_TYPE": "1"
 		}
@@ -574,48 +557,13 @@
 		"callService": {
 			"service": "Execute_Sql"
 		},
-		"input": {
+		"request": {
 			"AREA_NO": "0",
 			"DEP_ID": "1"
 		},
-		"output": {
+		"response": {
+			"return_code": "0",
 			"info": "1"
-		}
-	},
-	"Find_Member1": {
-		"callService": {
-			"service": "Execute_Sql"
-		},
-		"input": {
-			"AREA_NO": "0",
-			"DEP_ID": "1",
-			"D504_09": "2"
-		},
-		"output": {
-			"D401_21/D401_02": "1"
-		}
-	},
-	"Get_S301_06": {
-		"callService": {
-			"service": "Execute_Sql"
-		},
-		"input": {
-			"AREA_NO": "0"
-		},
-		"output": {
-			"ITEM_CODE/ITEM_NAME": "1"
-		}
-	},
-	"Get_Member": {
-		"callService": {
-			"service": "Execute_Sql"
-		},
-		"input": {
-			"AREA_NO": "0",
-			"D401_10": "1"
-		},
-		"output": {
-			"D401_21/D401_02": "1"
 		}
 	}
 }
