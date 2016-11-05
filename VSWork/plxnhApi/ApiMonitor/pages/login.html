@@ -140,7 +140,7 @@ html,body {
     
     <script type="text/javascript">
         $(document).ready(function () {
-            
+            cacheCookie('ten', '10s');
         });
 
         function loginClick() {
@@ -155,7 +155,6 @@ html,body {
                 return;
             }
 
-            var param = "{'name':'" + name + "','pwd':'" + pwd + "'}";
             $.ajax({
                 type: "Post",
                 url: "xnhservice.asmx/login",
@@ -169,6 +168,11 @@ html,body {
                         alert('登录失败，请输入正确的用户名和密码');
                     } else {
                         loginCache(name);
+                        //缓存获取到的登录信息
+                        var json = eval("(" + retVal + ")");
+                        for (var item in json) {
+                            cacheCookie(item, json[item]);
+                        }
                         window.location = 'mzbc.html';
                     }
 

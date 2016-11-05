@@ -62,5 +62,13 @@ namespace ApiMonitor.pages
 
             return retVal;
         }
+
+        [WebMethod]
+        public string aaa()
+        {
+            string retVal = "";
+
+            return retVal;
+        }
     }
 }
