@@ -25,7 +25,20 @@ namespace Service.WebService.ServiceImpl.MZBC
 		//S_Returns=0;ITEM_CODE/ ITEM_NAME; ITEM_CODE/ ITEM_NAME
 		//ITEM_CODE： VARCHAR2(3)  补偿类别编码  
 		//ITEM_NAME： VARCHAR2(64) 补偿类别名称
-
+        /// <summary>
+        /// 覆盖接口的特殊实现
+        /// </summary>
+        /// <returns></returns>
+        public new object getResponseResultOtherWrapper()
+        {
+            object retObj = null;
+            if (this.getExecuteStatus() == true && this.executeResult.Length > 2)
+            {
+                //直接返回ITEM_CODE/ITEM_NAME;ITEM_CODE/ITEM_NAME
+                return this.executeResult.Substring(2);
+            }
+            return retObj;
+        }
 
     }
 }

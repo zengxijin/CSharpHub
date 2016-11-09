@@ -17,10 +17,17 @@ namespace ApiMonitor.log
         private static string logPath = ConfigurationManager.AppSettings["logPath"];
         public static void log(string msg)
         {
-            using (StreamWriter sw = new StreamWriter(logPath, true,Encoding.Default))
+            using (StreamWriter sw = new StreamWriter(logPath + getLogFileName(), true, Encoding.Default))
             {
                 sw.WriteLine(DateTime.Now.ToString() + " " + msg);
             }
         }
+
+
+        public static string getLogFileName()
+        {
+            return DateTime.Now.ToString("yyyy-MM-dd") + "_log.txt";
+        }
     }
+
 }

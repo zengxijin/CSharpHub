@@ -135,6 +135,7 @@
     <Content Include="mzbcpj.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Buffer\BufferUtil.cs" />
     <Compile Include="Data_Update_M.asmx.cs">
       <DependentUpon>Data_Update_M.asmx</DependentUpon>
       <SubType>Component</SubType>

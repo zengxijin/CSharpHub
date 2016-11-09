@@ -565,5 +565,17 @@
 			"return_code": "0",
 			"info": "1"
 		}
+	},
+    "Get_Member": {
+		"callService": {
+			"service": "Execute_Sql"
+		},
+		"request": {
+			"AREA_NO": "0",
+			"D401_10": "1"
+		},
+		"response": {
+			"return_code": "0"
+		}
 	}
 }

@@ -69,3 +69,16 @@ function showDate() {
 }
 //每隔1秒，调用一次showDate() 
 window.setInterval("showDate()", 1000);
+
+
+function map2Json(map) {
+    if (map != undefined && map != null) {
+        var json = '{';
+        for (var key in map) {
+            json += "'" + key + "':'" + map[key] + "',";
+        }
+        json = json.substring(0, json.length - 1);
+        json += '}';
+        return json;
+    }
+}

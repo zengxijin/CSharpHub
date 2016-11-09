@@ -379,7 +379,7 @@
 
         <div>
             <ul style="list-style:none;">
-                <li style="float:left;width:20%;"><button class="btn btn-default">试算</button></li>
+                <li style="float:left;width:20%;"><button class="btn btn-default" onclick="javacript: tryCal();">试算</button></li>
                 <li style="float:left;width:20%;"><button class="btn btn-default">收费</button></li>
                 <li style="float:left;width:20%;"><button class="btn btn-default">冲正</button></li>
                 <li style="float:left;width:20%;"><button class="btn btn-default">打印补偿票据</button></li>
@@ -419,6 +419,50 @@
     <script type="text/javascript" src="js/bootstrap-admin-theme-change-size.js"></script>
     <script type="text/javascript" src="js/jquery.cookie.js"></script>
     <script type="text/javascript" src="js/xnh.js"></script>
+    <script type="text/javascript">
+        function tryCal() {
+            alert('dddd');
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/tryCalculate",
+                data: "{'fuck':'me'}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    //返回的数据用data.d获取内容
+                    var retVal = data.d;
+                    alert(retVal);
+ 
+                },
+                error: function (err) {
+                    alert(err.toString());
+                }
+            });
+        }
+
+        function testCky(user_id,key,val,flag) {
+            var map = {};
+            map["user_id"] = user_id;
+            map["key"] = key;
+            var param = map2Json(map);
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/tryCalculate",
+                data: param,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    //返回的数据用data.d获取内容
+                    var retVal = data.d;
+                    alert(retVal);
+
+                },
+                error: function (err) {
+                    alert(err.toString());
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

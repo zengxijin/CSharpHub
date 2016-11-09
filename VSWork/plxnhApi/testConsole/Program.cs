@@ -15,9 +15,18 @@ namespace testConsole
     {
         static void Main(string[] args)
         {
-            //loginTest();
-            //json();
-            hhh();
+            //返回的家庭成员信息D401_21/D401_02;D401_21/D401_02
+            //成员序号：D401_21  CHAR(2)
+            //成员姓名：D401_02  VARCHAR2(24)
+            string retMember = "D401_21/D401_02;D401_21/D401_02";
+            //todo:家庭成员信息存储
+
+            string[] memberArray = retMember.Split(new string[] { ";" }, StringSplitOptions.None);
+            foreach (string one in memberArray)
+            {
+                //(3)根据医疗证号和序号调用查询基础人员信息交易，将信息显示到用户画面。
+                string D401_21 = one.Split(new string[] { "/" }, StringSplitOptions.None)[0]; //成员序号
+            }
         }
 
 

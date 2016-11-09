@@ -161,6 +161,16 @@ namespace Service.WebService.ServiceImpl
         }
 
         /// <summary>
+        /// 直接使用Dictionary包装的参数，其他参数由子类设置
+        /// </summary>
+        /// <param name="paramesDict">包装为Dictionary的参数</param>
+        /// <returns></returns>
+        public string executeSql(Dictionary<string, string> paramesDict)
+        {
+            return this.executeSql(this.sqlStr, paramesDict, this.split);
+        }
+
+        /// <summary>
         /// 返回接口执行后的字符串结果
         /// </summary>
         /// <returns></returns>
@@ -243,6 +253,16 @@ namespace Service.WebService.ServiceImpl
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// 对返回结果特殊处理的需求接口
+        /// 如获取家庭成员接口Get_Member，返回结果形式如0; D401_21/ D401_02; D401_21/ D401_02，需要特殊处理
+        /// </summary>
+        /// <returns></returns>
+        public object getResponseResultOtherWrapper()
+        {
+            return null;
         }
     }
 }
