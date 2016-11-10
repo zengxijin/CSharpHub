@@ -21,17 +21,17 @@ namespace ApiMonitor.DB
         /// <returns>DataTable</returns>
         public static DataTable queryExecute(string querySql)
         {
-            OracleConnection conn = new OracleConnection(oracleConnString);
+            OracleConnection conn = null;
             OracleCommand    cmd  = null;
             try
             {
+                conn = new OracleConnection(oracleConnString);
                 conn.Open();
                 cmd = new OracleCommand(querySql, conn);
                 OracleDataAdapter oda = new OracleDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 oda.Fill(dt);
                 return dt;
-                
             }
             catch (Exception ex)
             {
@@ -59,10 +59,11 @@ namespace ApiMonitor.DB
         /// <returns>修改的行数</returns>
         public static int updateExecute(string updateSql)
         {
-            OracleConnection conn = new OracleConnection(oracleConnString);
-            OracleCommand cmd = null;
+            OracleConnection conn = null;
+            OracleCommand    cmd  = null;
             try
             {
+                conn = new OracleConnection(oracleConnString);
                 conn.Open();
                 cmd = new OracleCommand(updateSql, conn);
                 return cmd.ExecuteNonQuery();
