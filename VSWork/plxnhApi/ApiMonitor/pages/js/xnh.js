@@ -82,3 +82,30 @@ function map2Json(map) {
         return json;
     }
 }
+
+/***********************遮罩相关********************/
+function showMask(msg) {
+    $("#mask_content").html(msg);
+    $("#mask_background,#mask_content").show();
+    conPosition();
+}
+
+function closeMask() {
+    $("#mask_background, #mask_content").hide();
+}
+function conPosition() {
+    var oBackground = document.getElementById("mask_background");
+    var dw = $(document).width();
+    var dh = $(document).height();
+    oBackground.style.width = dw + 'px';
+    oBackground.style.height = dh + 'px';
+    var oContent = document.getElementById("mask_content");
+    var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    var l = (document.documentElement.clientWidth - oContent.offsetWidth) / 2;
+    var t = ((document.documentElement.clientHeight - oContent.offsetHeight) / 2) + scrollTop;
+    oContent.style.left = l + 'px';
+    oContent.style.top = t + 'px';
+}
+
+$(window).resize(function () { conPosition(); });
+/***********************遮罩相关 end********************/

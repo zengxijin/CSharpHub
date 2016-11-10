@@ -4,6 +4,8 @@ using Service.WebService;
 using Service.WebService.ServiceImpl.login;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.OracleClient;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,18 +17,9 @@ namespace testConsole
     {
         static void Main(string[] args)
         {
-            //返回的家庭成员信息D401_21/D401_02;D401_21/D401_02
-            //成员序号：D401_21  CHAR(2)
-            //成员姓名：D401_02  VARCHAR2(24)
-            string retMember = "D401_21/D401_02;D401_21/D401_02";
-            //todo:家庭成员信息存储
-
-            string[] memberArray = retMember.Split(new string[] { ";" }, StringSplitOptions.None);
-            foreach (string one in memberArray)
-            {
-                //(3)根据医疗证号和序号调用查询基础人员信息交易，将信息显示到用户画面。
-                string D401_21 = one.Split(new string[] { "/" }, StringSplitOptions.None)[0]; //成员序号
-            }
+            string sql = @"insert into esb_service_cfg(ID,service_name,service_url,version) values (SEQ_ESB_SERVICE_CFG.NEXTVAL,'frr','loanstatus','2.0')";
+            int aa = updateExecute(sql);
+            
         }
 
 
@@ -46,6 +39,74 @@ namespace testConsole
                     kk.Add(pair.Key,ss[pair.Value]);
                 }
             }
+        }
+
+        public static int updateExecute(string updateSql)
+        {
+            OracleConnection conn = new OracleConnection(connString);
+            OracleCommand cmd = null;
+            try
+            {
+                conn.Open();
+                cmd = new OracleCommand(updateSql, conn);
+                return cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                //XnhLogger.log("DBUtil.updateExecute" + ex.ToString());
+            }
+            finally
+            {
+                if (cmd != null)
+                {
+                    cmd.Dispose();
+                }
+                if (conn != null)
+                {
+                    conn.Close();
+                }
+            }
+
+            return -1;
+
+        }
+
+        static string connString = "User ID=acs;Password=acs;Data Source=(DESCRIPTION =(ADDRESS = (PROTOCOL = TCP)(HOST = SIT-Oracle-02.quark.com)(PORT = 1521))(CONNECT_DATA =(SERVER = DEDICATED)(SERVICE_NAME = CORESIT.quark.com)))";
+        public static DataTable db()
+        {
+            
+            OracleConnection conn = new OracleConnection(connString);
+            try
+            {
+                conn.Open();
+                string sql = "select t.* from esb_service_cfg t";
+
+                OracleCommand cmd = new OracleCommand(sql, conn);
+
+                OracleDataAdapter oda = new OracleDataAdapter(cmd);
+
+                DataTable dt = new DataTable();
+
+                oda.Fill(dt);
+
+                //conn.Close();
+
+                cmd.Dispose();
+
+                return dt;   
+                
+            }
+            catch (Exception ex)
+            {
+                
+            }
+            finally
+            {
+                conn.Close();
+            }
+
+            return null;
         }
 
         public static Dictionary<string, int> hhh()

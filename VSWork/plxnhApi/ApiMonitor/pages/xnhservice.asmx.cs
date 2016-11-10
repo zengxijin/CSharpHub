@@ -172,19 +172,58 @@ namespace ApiMonitor.pages
             return "";
         }
 
+        /// <summary>
+        /// 试算
+        /// </summary>
+        /// <param name="user_id"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         [WebMethod]
-        public string tryCalculate(string user_id,string key)
+        public string tryCalculate(string user_id, string DIAGNOSIS_CODE)
         {
             try 
             {
-                string val = BufferUtil.getBufferByKey(user_id, key);
-                return val + " " + key; //从缓存获取信息
+                //(1)根据用户选择的疾病编码调用 验证输入疾病是否在疾病库中存在交易，判断是否存在，不存在提示报错，中断试算；存在进行试算业务交易。
+                MZBC_PROC_DIAGNOSIS_CHECK dCheck = new MZBC_PROC_DIAGNOSIS_CHECK();
+                string retStr = dCheck.executeSql(
+                    new Dictionary<string, string>() { { "DIAGNOSIS_CODE", DIAGNOSIS_CODE } }
+                    );
+                if (retStr == "0")
+                {
+                    //疾病存在，进行试算交易
+
+                }
+                else if (retStr == "1")
+                {
+                    //疾病不存在
+                }
+                else
+                {
+                    //出错，记录日志
+                    XnhLogger.log(this.GetType().ToString() + " tryCalculate " + DIAGNOSIS_CODE + "疾病代码不存在，接口返回结果：" + retStr);
+                }
             }
             catch (Exception ex)
             {
                 XnhLogger.log(this.GetType().ToString() + " tryCalculate " + ex.ToString());
             }
             return "fail";
+        }
+
+        /// <summary>
+        /// 验证疾病代码是否疾病库存在
+        ///0 成功
+        ///1 此疾病在疾病库中不存在
+        ///2 程序异常
+        /// </summary>
+        /// <param name="user_id"></param>
+        /// <param name="DIAGNOSIS_CODE"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public string diagnosisCheck(string user_id,string DIAGNOSIS_CODE)
+        {
+            
+            return null;
         }
     }
 }

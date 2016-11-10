@@ -89,6 +89,9 @@ html,body {
 	padding: 8px 24px !important;
 	font-size: 16px !important;
 }
+
+#mask_background {position:absolute; z-index:998; top:0px; left:0px; background:rgb(50,50,50);background:rgba(0,0,0,0.5); display:none;}
+#mask_content {position:absolute; width:500px; z-index:999; padding:10px; background:#fff; border-radius:5px; display:none;}
 </style>
 
 <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
@@ -99,6 +102,9 @@ html,body {
 
 <body>
 <div class="box">
+    <div id="mask_background"></div>
+    <div id="mask_content"></div>
+
 		<div class="login-box">
 			<div class="login-title text-center">
 				<h1><small>上海利翔科技发展有限公司-农合接口</small></h1>
@@ -131,10 +137,15 @@ html,body {
                         <button id="cancelBtn" class="btn btn-sm btn-info"><span class="glyphicon glyphicon-off"></span>取消</button>
 					</div>
 				</div>
+
+                
+
+
 			
 			</div>
 		</div>
 	</div>
+
 </div>
 
     
@@ -154,7 +165,7 @@ html,body {
                 alert('请输入密码');
                 return;
             }
-
+            showMask('正在登陆，请稍后...');
             $.ajax({
                 type: "Post",
                 url: "xnhservice.asmx/login",
@@ -162,6 +173,7 @@ html,body {
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (data) {
+                    closeMask();
                     //返回的数据用data.d获取内容
                     var retVal = data.d;
                     if (retVal == '') {
@@ -178,10 +190,15 @@ html,body {
 
                 },
                 error: function (err) {
+                    closeMask();
                     alert(err.toString());
                 }
             });
         }
+    </script>
+
+    <script type="text/javascript">
+        
     </script>
 
 </body>
