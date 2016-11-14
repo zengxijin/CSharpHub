@@ -3,6 +3,7 @@ using ApiMonitor.log;
 using Service.Util;
 using Service.WebService.ServiceImpl.login;
 using Service.WebService.ServiceImpl.MZBC;
+using Service.WebService.ServiceImpl.RJZ;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,17 +25,19 @@ namespace ApiMonitor.pages
         /// <summary>
         /// 登录服务
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="pwd"></param>
-        /// <returns></returns>
+        /// <param name="name">用户名</param>
+        /// <param name="pwd">密码</param>
+        /// <returns>验证失败返回空</returns>
         [WebMethod]
         public string login(string name,string pwd)
         {
             string retVal = "";
             try
             {
+                //todo:HIS系统先验证用户名和密码
+                
                 //调用接口认证
-                Service.WebService.IService service = new LoginAuth();
+                LoginAuth service = new LoginAuth();
 
                 //直接塞参数进入Dictionary，由框架自动组装顺序
                 Dictionary<string, string> requestParam = new Dictionary<string, string>();
@@ -62,7 +65,7 @@ namespace ApiMonitor.pages
             catch (Exception ex)
             {
                 XnhLogger.log(this.GetType().ToString() + " " + ex.ToString());
-                retVal = ex.ToString();
+                retVal = "";
             }
 
             return retVal;
@@ -190,8 +193,42 @@ namespace ApiMonitor.pages
                     );
                 if (retStr == "0")
                 {
-                    //疾病存在，进行试算交易
+                    //(2)疾病存在，进行试算交易
+                    RJZ_getShisuanResult shisuan = new RJZ_getShisuanResult();
+                    Dictionary<string, string> param = new Dictionary<string, string>();
+                    param.Add("D505_02", "");//登记流水号
+                    param.Add("COME_AREA", "");//地区代码(支付单位)
+                    param.Add("AREA_CODE", "");//病人地区编码(取前台选择的地区编码)
+                    param.Add("D504_07", "");//家庭编号
+                    param.Add("D504_02", "");//成员序号
+                    param.Add("D504_14", "");//就医机构
+                    param.Add("D504_21", "");//入院诊断(疾病代码)
+                    param.Add("D504_11", "");//就诊日期(入院时间) (格式为YYYY-MM-DD)
+                    param.Add("D506_15", "");//补偿类别代码
+                    param.Add("D504_15", "");//就医机构级别(相关数据代码标准:S201-06)
+                    param.Add("D504_06", "");//年龄
+                    param.Add("D504_10", "");//就诊类型(相关数据代码标准:S301-05)
+                    param.Add("D504_12", "");//出院时间(格式为YYYY-MM-DD)
+                    param.Add("D504_29", "");//出院诊断（疾病代码）
+                    param.Add("D504_16_D", "");//入院科室(相关数据代码标准:S201-03)
+                    param.Add("D504_16_T", "");//出院科室(相关数据代码标准:S201-03)
+                    param.Add("S701_01", "");//是否是中途结算(相关数据代码标准:S701-01)
 
+                    shisuan.executeSql(param);
+                    if(shisuan.getExecuteStatus() == true) //试算成功
+                    {
+                        //需要存储试算结果，进行收费交易
+                        Dictionary<string, string> retDict = shisuan.getResponseResultWrapperMap();
+                        //retDict["TOTAL_COSTS"];//总费用
+                        //retDict["ZF_COSTS"];//自费费用
+                        //retDict["TOTAL_CHAGE"];//合理费用
+                        //retDict["D506_23"];//实际补偿金额
+                        //retDict["D506_18"];//核算补偿金额[实际补偿合计额)
+                        //retDict["BEGINPAY"];//本次起伏线
+                        //retDict["SCALE"];//报销比例
+                        //retDict["HEAV_REDEEM_SUM"];//大病支付额
+                        //retDict["REDEEM_TOTAL"];//单次补偿合计
+                    }
                 }
                 else if (retStr == "1")
                 {
@@ -211,19 +248,129 @@ namespace ApiMonitor.pages
         }
 
         /// <summary>
-        /// 验证疾病代码是否疾病库存在
-        ///0 成功
-        ///1 此疾病在疾病库中不存在
-        ///2 程序异常
+        /// 收费
         /// </summary>
         /// <param name="user_id"></param>
         /// <param name="DIAGNOSIS_CODE"></param>
         /// <returns></returns>
         [WebMethod]
-        public string diagnosisCheck(string user_id,string DIAGNOSIS_CODE)
+        public string charge(string user_id,string DIAGNOSIS_CODE)
         {
+            try
+            {
+                //(1)收费
+                RJZ_shoufei shoufei = new RJZ_shoufei();
+                Dictionary<string, string> paramDict = new Dictionary<string, string>();
+                paramDict.Add("AREA_CODE", "");//病人地区编码(取前台选择的地区编码)
+                paramDict.Add("D504_01", "");//住院登记流水号
+                paramDict.Add("D504_12", "");//出院时间(格式为YYYY-MM-DD)
+                paramDict.Add("D504_15", "");//就医机构级别(相关数据代码标准:S201-06)
+                paramDict.Add("D504_17", "");//出院科室(相关数据代码标准:S201-03)
+                paramDict.Add("D504_18", "");//经治医生
+                paramDict.Add("D504_20", "");//出院状态(相关数据代码标准:S301-03)
+                paramDict.Add("D504_22", "");//并发症(为空时传’NULL’)
+                paramDict.Add("D506_03", "");//总费用（TOTAL_COSTS 总费用）试算得到
+                paramDict.Add("D506_13", "");//可补偿住院医药费（TOTAL_CHAGE 合理费用）试算得到
+                paramDict.Add("D506_18", "");//核算补偿金额（D506_18  核算补偿金额(实际补偿合计额)）试算得到
+                paramDict.Add("D506_15", "");//补偿类别代码
+                paramDict.Add("D506_14", "");//补偿账户类别(相关数据代码标准:S301-09)
+                paramDict.Add("D506_16", "");//核算机构(代码)
+                paramDict.Add("D506_17", "");//核算人
+                paramDict.Add("D506_23", "");//实际补偿额（D506_23   实际补偿金额）试算得到
+                paramDict.Add("D506_26", "");//付款人
+                paramDict.Add("D506_27", "");//中途结算标志(相关数据代码标准:S701-01)
+                paramDict.Add("SELF_PAY", "");//自费金额（ZF_COSTS  自费费用）试算得到
+                paramDict.Add("HEAV_REDEEM_SUM", "");//大病支付金额（HEAV_REDEEM_SUM  大病支付额）试算得到
+                paramDict.Add("BEGINPAY", "");//本次起付额（BEGINPAY   本次起伏线）试算得到
+                paramDict.Add("D504_29", "");//出院诊断(疾病代码)
+
+                shoufei.executeSql(paramDict);
+
+                //(2)收费成功后将相应的信息保存到数据库中，并修改HIS中补偿标志（供以后制作报表查询使用）
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " diagnosisCheck " + ex.ToString());
+            }
             
             return null;
+        }
+
+        public string upload()
+        {
+            string retStr = "";
+            try
+            {
+                //单独传明细（调用保存药品交易）
+                RJZ_Save_Row saveRow = new RJZ_Save_Row();
+                Dictionary<string, string> paramDict = new Dictionary<string, string>();
+                paramDict.Add("D505_02", "");//住院登记流水号
+                paramDict.Add("COME_AREA", "");//地区代码(医疗机构)
+                paramDict.Add("AREA_CODE", "");//病人地区编码(取前台选择的地区编码)
+                paramDict.Add("D505_04", "");//收费项目编码组合(此处因药品可能是多个，药品编码和下一个药品编码用分号分隔(下面的数量、单价、比例、收费项目唯一ID也一样)
+                paramDict.Add("D505_08", "");//收费项目数量组合
+                paramDict.Add("D505_07", "");//收费项目单价组合
+                paramDict.Add("D505_09", "");//收费项目比例组合
+                paramDict.Add("D505_ID_HIS", "");//收费项目唯一ID组合(对应HIS)
+                paramDict.Add("USER_ID", "");//当前操作员id
+                paramDict.Add("D504_14", "");//诊治单位代码
+                paramDict.Add("USER_NAME", "");//操作员姓名
+                paramDict.Add("LEVEL", "");//诊治单位级别
+
+                saveRow.executeSql(paramDict);
+
+                Dictionary<string, string> retDict = saveRow.getResponseResultWrapperMap();
+
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.ToString());
+            }
+
+            return retStr;
+        }
+    
+        public string delete_item()
+        {
+            string retStr = "";
+            try
+            {
+                RJZ_PROC_DELETE_PRICE_LIST deleteList = new RJZ_PROC_DELETE_PRICE_LIST();
+                Dictionary<string, string> paramDict = new Dictionary<string, string>();
+                paramDict.Add("AREA_CODE", "");//病人地区编码(取前台选择的地区编码)
+                paramDict.Add("D504_01", "");//住院登记流水号
+                paramDict.Add("START_DATE", "");//收费项目录入起始时间(为空时传’NULL’) (格式为YYYY-MM-DD)
+                paramDict.Add("END_DATE", "");//收费项目录入结束时间(为空时传’NULL’) (格式为YYYY-MM-DD)
+
+                deleteList.executeSql(paramDict);
+
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.ToString());
+            }
+            return retStr;
+        }
+    
+        public string zuofei()
+        {
+            string retStr = "";
+            try
+            {
+                //作废单个收费项目
+                RJZ_PROC_DELETE_PRICE_LIST_PER deleteListPer = new RJZ_PROC_DELETE_PRICE_LIST_PER();
+                Dictionary<string, string> paramDict = new Dictionary<string, string>();
+                paramDict.Add("AREA_CODE", ""); //病人地区编码(取前台选择的地区编码)
+                paramDict.Add("D504_01", "");//住院登记流水号
+                paramDict.Add("HIS_ID", "");//对应HIS项目唯一ID
+
+                deleteListPer.executeSql(paramDict);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.ToString());
+            }
+            return retStr;
         }
     }
 }
