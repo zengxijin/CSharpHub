@@ -20,8 +20,41 @@ namespace testConsole
             string sql = @"insert into esb_service_cfg(ID,service_name,service_url,version) values (SEQ_ESB_SERVICE_CFG.NEXTVAL,'frr','loanstatus','2.0')";
             int aa = updateExecute(sql);
             
+            DataTable dt = db();
+            string ss = DataTable2Json(dt);
+            
+            //string sql = @"insert into esb_service_cfg(ID,service_name,service_url,version) values (SEQ_ESB_SERVICE_CFG.NEXTVAL,'frr','loanstatus','2.0')";
+            //int aa = updateExecute(sql);
         }
 
+        public static string DataTable2Json(DataTable dt)
+        {
+            string retVal = "";
+
+            StringBuilder jsonBuilder = new StringBuilder();
+            jsonBuilder.Append("{\"data\":[");
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                jsonBuilder.Append("{");
+                for (int j = 0; j < dt.Columns.Count; j++)
+                {
+                    jsonBuilder.Append("\"");
+                    jsonBuilder.Append(dt.Columns[j].ColumnName);
+                    jsonBuilder.Append("\":\"");
+                    jsonBuilder.Append(dt.Rows[i][j].ToString());
+                    jsonBuilder.Append("\",");
+                }
+                jsonBuilder.Remove(jsonBuilder.Length - 1, 1);
+                jsonBuilder.Append("},");
+            }
+            jsonBuilder.Remove(jsonBuilder.Length - 1, 1);
+            jsonBuilder.Append("]");
+            jsonBuilder.Append("}");
+
+            retVal = jsonBuilder.ToString();
+
+            return retVal;
+        }
 
         public static void json()
         {

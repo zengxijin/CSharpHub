@@ -1,4 +1,6 @@
 ﻿using ApiMonitor.Buffer;
+using ApiMonitor.DataConvertUtil;
+using ApiMonitor.DB;
 using ApiMonitor.log;
 using Service.Util;
 using Service.WebService.ServiceImpl.login;
@@ -6,6 +8,7 @@ using Service.WebService.ServiceImpl.MZBC;
 using Service.WebService.ServiceImpl.RJZ;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.Services;
@@ -64,7 +67,7 @@ namespace ApiMonitor.pages
             }
             catch (Exception ex)
             {
-                XnhLogger.log(this.GetType().ToString() + " " + ex.ToString());
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
                 retVal = "";
             }
 
@@ -145,7 +148,7 @@ namespace ApiMonitor.pages
             }
             catch (Exception ex)
             {
-                XnhLogger.log(this.GetType().ToString() + " " + ex.ToString());
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
             }
 
             return retVal;
@@ -169,7 +172,7 @@ namespace ApiMonitor.pages
 
             }catch(Exception ex)
             {
-                XnhLogger.log(this.GetType().ToString() + " getBCLB " + ex.ToString());
+                XnhLogger.log(this.GetType().ToString() + " getBCLB " + ex.StackTrace);
             }
 
             return "";
@@ -242,7 +245,7 @@ namespace ApiMonitor.pages
             }
             catch (Exception ex)
             {
-                XnhLogger.log(this.GetType().ToString() + " tryCalculate " + ex.ToString());
+                XnhLogger.log(this.GetType().ToString() + " tryCalculate " + ex.StackTrace);
             }
             return "fail";
         }
@@ -290,7 +293,7 @@ namespace ApiMonitor.pages
             }
             catch (Exception ex)
             {
-                XnhLogger.log(this.GetType().ToString() + " diagnosisCheck " + ex.ToString());
+                XnhLogger.log(this.GetType().ToString() + " diagnosisCheck " + ex.StackTrace);
             }
             
             return null;
@@ -324,7 +327,7 @@ namespace ApiMonitor.pages
             }
             catch (Exception ex)
             {
-                XnhLogger.log(this.GetType().ToString() + " " + ex.ToString());
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
             }
 
             return retStr;
@@ -347,7 +350,7 @@ namespace ApiMonitor.pages
             }
             catch (Exception ex)
             {
-                XnhLogger.log(this.GetType().ToString() + " " + ex.ToString());
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
             }
             return retStr;
         }
@@ -368,7 +371,34 @@ namespace ApiMonitor.pages
             }
             catch (Exception ex)
             {
-                XnhLogger.log(this.GetType().ToString() + " " + ex.ToString());
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+            }
+            return retStr;
+        }
+
+        /// <summary>
+        /// 输入住院号查询HIS结果
+        /// </summary>
+        /// <param name="zyh"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public string zhyChaxun(string zyh)
+        {
+            string retStr = "";
+            try
+            {
+                //todo:查询HIS
+                string sql = ""; //查询HIS的SQL
+                DataTable dt = new DataTable();
+                dt = DBUtil.queryExecute(sql);
+
+                //todo:返回的DataTable数据，可以通过调用DataTable2Json转为JSON格式，方便前台JavaScript处理和绑定
+                retStr = DataConvert.DataTable2Json(dt);
+                
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
             }
             return retStr;
         }
