@@ -498,5 +498,95 @@ namespace ApiMonitor.pages
             XnhLogger.log(retStr);
             return retStr;
         }
+
+        /// <summary>
+        ///列表信息从HIS查，HIS提供接口
+        ///明细（也是从HIS取）
+        ///加个输入框筛选，字段由HIS定；
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod]
+        public string ydjwjs(string query)
+        {
+            string retStr = "";
+            try
+            {
+                //todo:由HIS提供视图或查询字段绑定
+                retStr = DataConvert.getReturnJson("-1", "query=" + query + "　待由HIS提供视图或查询字段完成数据绑定");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+
+        /// <summary>
+        ///批量传明细
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod]
+        public string plcmx(string data)
+        {
+            string retStr = "";
+            try
+            {
+                //todo:由HIS提供字段信息
+                retStr = DataConvert.getReturnJson("-1", "data=" + data + "　待由HIS提供字段数据");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+
+        /// <summary>
+        ///冲正理赔查询
+        ///列表信息从HIS查，HIS提供接口
+        ///明细（也是从HIS取）
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod]
+        public string czlpcx(string query)
+        {
+            string retStr = "";
+            try
+            {
+                //todo:由HIS提供视图或查询字段绑定
+                retStr = DataConvert.getReturnJson("-1", "query=" + query + "　冲正理赔查询待由HIS提供视图或查询字段完成数据绑定");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+
+        /// <summary>
+        /// 患者姓名查询HIS
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod]
+        public string hzxmcx(string date,string query)
+        {
+            string retStr = "";
+            try
+            {
+                //todo:由HIS提供视图或查询字段绑定
+                retStr = DataConvert.getReturnJson("-1","date=" + date +  " query=" + query + "　患者姓名查询待由HIS提供视图或查询字段完成数据绑定");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+
+        
     }
 }
