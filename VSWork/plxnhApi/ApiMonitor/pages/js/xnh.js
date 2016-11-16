@@ -109,3 +109,7 @@ function conPosition() {
 
 $(window).resize(function () { conPosition(); });
 /***********************遮罩相关 end********************/
+
+function getJsonObj(str) {
+    return eval("(" + str + ")");
+}

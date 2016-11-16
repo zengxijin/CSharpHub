@@ -6,6 +6,7 @@ using Service.Util;
 using Service.WebService.ServiceImpl.login;
 using Service.WebService.ServiceImpl.MZBC;
 using Service.WebService.ServiceImpl.RJZ;
+using Service.WebService.ServiceImpl.ZYBC;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -59,8 +60,12 @@ namespace ApiMonitor.pages
                 }
                 else
                 {
-                    //登录成功，缓存用户信息
-                    BufferUtil.setBuffer(responseDict["USER_ID"], "DEP_ID", responseDict["DEP_ID"]);
+                    //登录成功，缓存用户信息，服务器缓存以每个用户的user_id作为区分的cookie
+                    string user_id = responseDict["USER_ID"];
+                    foreach (KeyValuePair<string, string> item in responseDict)
+                    {
+                        BufferUtil.setBuffer(user_id, item.Key, item.Value);
+                    }
 
                     retVal = MsgConvert.Dict2Json(responseDict);
                 }
@@ -86,11 +91,13 @@ namespace ApiMonitor.pages
         /// <param name="M_MM"></param>
         /// <returns></returns>
         [WebMethod]
-        public string readCard(string USER_ID,string AREA_NO, string M_MM)
+        public string readCard(string USER_ID,string AREA_NO)
         {
             string retVal = "";
 
             //todo:M_MM 读卡的加密串 此值的获取需要接口
+            string M_MM = "";
+
             try
             {
                 //(1)调用验证此卡号是否存在交易
@@ -153,7 +160,13 @@ namespace ApiMonitor.pages
 
             return retVal;
         }
-    
+        
+        [WebMethod]
+        public string getMemberInfo(string USER_ID, string AREA_NO,string D401_10,string D401_21)
+        {
+            return null;
+        }
+
         /// <summary>
         /// 获取某个地区的补偿类别
         /// </summary>
@@ -393,13 +406,96 @@ namespace ApiMonitor.pages
                 dt = DBUtil.queryExecute(sql);
 
                 //todo:返回的DataTable数据，可以通过调用DataTable2Json转为JSON格式，方便前台JavaScript处理和绑定
-                retStr = DataConvert.DataTable2Json(dt);
+                string msg = DataConvert.DataTable2Json(dt);
+                retStr = DataConvert.getReturnJson("0", msg);
                 
             }
             catch (Exception ex)
             {
                 XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
             }
+            return retStr;
+        }
+
+        /// <summary>
+        /// 住院登记
+        ///(1)验证输入疾病是否在疾病库中存在，存在可以继续登记
+        ///(2)调用验证住院号是否重复交易，如果重复说明已经登记，此时调用修改住院登记交易；
+        ///(3)如果不重复调用保存入院登记交易进行入院登记，入院登记成功修改HIS端标志并保存农合信息。
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod]
+        public string zydj(string user_id)
+        {
+            string retStr = "";
+            try
+            {
+                ZYBC_PROC_NEW_NOTICE newNotice = new ZYBC_PROC_NEW_NOTICE();
+                Dictionary<string, string> paramDict = new Dictionary<string, string>();
+                //todo:参数需要HIS传值
+                paramDict.Add("COME_AREA", "");//医疗机构所在地区编码(取用户所在机构地区编码AREA_CODE)
+                paramDict.Add("AREA_CODE", "");//地区代码(病人所在地区编码)取前台选择的地区编码
+                paramDict.Add("D401_10", "");//医疗证号
+                paramDict.Add("D504_02", "");//个人编号
+                paramDict.Add("D504_03", "");//姓名
+                paramDict.Add("D504_04", "");//性别（1：男 2：女）传代码
+                paramDict.Add("D504_05", "");//身份证号
+                paramDict.Add("D504_06", "");//年龄
+                paramDict.Add("D504_21", "");//疾病代码
+                paramDict.Add("D504_09", "");//住院号
+                paramDict.Add("D504_10", "");//就诊类型代码（对应s301_05.xls）
+                paramDict.Add("D504_11", "");//入院时间(格式为YYYY-MM-DD)
+                paramDict.Add("D504_14", "");//就医机构代码=DEP_ID
+                paramDict.Add("D504_19", "");//入院状态代码 (对应S301-02.xls)
+                paramDict.Add("D504_16", "");//入院科室代码（对应S201-03.xls）
+                paramDict.Add("D504_28", "");//病人联系电话
+
+                newNotice.executeSql(paramDict);
+                if (newNotice.getExecuteStatus() == true)
+                {
+                    //保存成功：S_Returns= 0;D504_01
+                    //D504_01：VARCHAR2(24)  住院登记流水号
+                    //保存失败： S_Returns= 1;错误信息  （分号分隔）
+                    Dictionary<string, string> dictRet = newNotice.getResponseResultWrapperMap();
+                    string D504_01 = dictRet["D504_01"];
+                    //缓存住院登记流水号D504_01
+                    BufferUtil.setBuffer(user_id, "D504_01", D504_01);
+                    retStr = DataConvert.getReturnJson("0","success");
+                }
+                else
+                {
+                    retStr = DataConvert.getReturnJson("-1", "fail"); 
+                }
+
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString()); 
+            }
+            return retStr;
+        }
+
+        /// <summary>
+        /// 取消入院登记
+        /// </summary>
+        /// <param name="user_id">用户登录缓存的ID</param>
+        /// <returns></returns>
+        [WebMethod]
+        public string qxzydj(string user_id)
+        {
+            string retStr = "";
+            try
+            {
+                //retStr = DataConvert.getReturnJson("0", user_id);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString()); 
+            }
+            XnhLogger.log(retStr);
             return retStr;
         }
     }

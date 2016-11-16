@@ -43,5 +43,15 @@ namespace ApiMonitor.DataConvertUtil
 
             return retVal;
         }
+
+        public static string getReturnJson(string flag, string msg)
+        {
+            string msgTemp = msg;
+            if (!string.IsNullOrEmpty(msgTemp))
+            {
+                msgTemp = msgTemp.Replace(System.Environment.NewLine, ""); //防止回车符导致JSON无法解析
+            }
+            return "{\"flag\":\"" + flag + "\",\"msg\":\"" + msgTemp + "\"}";
+        }
     }
 }

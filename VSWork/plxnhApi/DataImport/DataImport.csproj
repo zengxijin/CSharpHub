@@ -68,6 +68,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DB\CreateTable.sql" />
     <Content Include="NPOI\ICSharpCode.SharpZipLib.dll" />
     <Content Include="NPOI\NPOI.dll" />
     <Content Include="NPOI\NPOI.OOXML.dll" />
