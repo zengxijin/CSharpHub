@@ -587,6 +587,40 @@ namespace ApiMonitor.pages
             return retStr;
         }
 
+        [WebMethod]
+        public string getRYZD(string query)
+        {
+            string retStr = "";
+            try
+            {
+                //触发模糊查询的语句
+                string sql = "select t.BZ_CODE from XCYB_ML_ZG_BZML t where t.bz_name like '%" + query + "%'"
+                    + " or t.py_code like '%" + query + "%'";
+
+                //如果要限制返回结果的条数，比如限制每次返回前10条
+                //select t.BZ_CODE from XCYB_ML_ZG_BZML t where ( t.bz_name like '%1%' or t.py_code like '%1%') and rownum < 11
+                string sqlLimit = "select t.BZ_CODE from XCYB_ML_ZG_BZML t where (t.bz_name like '%" + query + "%'"
+                   + " or t.py_code like '%" + query + "%') and rownum < 11";
+
+                //返回查询结果，供前台绑定
+                DataTable dt = DBUtil.queryExecute(sql);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                   foreach(DataRow dr in dt.Rows)
+                   {
+                       retStr += dr["BZ_CODE"].ToString() + ","; 
+                   }
+
+                   retStr = retStr.Substring(0, retStr.Length - 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
         
     }
 }
