@@ -1,0 +1,2 @@
+﻿#background {position:absolute; z-index:998; top:0px; left:0px; background:rgb(50,50,50);background:rgba(0,0,0,0.5); display:none;}
+#content {position:absolute; width:500px; z-index:999; padding:10px; background:#fff; border-radius:5px; display:none;}

@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soapenc12="http://www.w3.org/2003/05/soap-encoding" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope" xmlns:tns="http://Data_Update.sjpt" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap11="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soapenc11="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="http://Data_Update.sjpt" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://Data_Update.sjpt">
+      <xsd:element name="Diagnosis_Check">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="in0" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in1" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in2" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Diagnosis_CheckResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="out" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Update_Data">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="in0" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in1" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in2" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Update_DataResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="out" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Execute_Sql">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="in0" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in1" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in2" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Execute_SqlResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="out" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Check_Ylzh_Bulsh">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="in0" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in1" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Check_Ylzh_BulshResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="out" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:complexType name="ArrayOfString">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="Find_Member1">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="in0" nillable="true" type="tns:ArrayOfString" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in1" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Find_Member1Response">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="out" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Zyh_Check">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="in0" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in1" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in2" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Zyh_CheckResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="out" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetYljgjb">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="in0" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in1" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetYljgjbResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="out" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Get_Is_Hops_Sk">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="in0" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in1" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Get_Is_Hops_SkResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="out" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Get_New_Ylzh">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="in0" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in1" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Get_New_YlzhResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="out" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Get_Member">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="in0" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in1" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Get_MemberResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="out" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Update_Data_String">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="in0" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in1" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in2" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Update_Data_StringResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="out" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Get_Is_Sk">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="in0" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in1" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Get_Is_SkResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="out" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Update_Data1">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="in0" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in1" nillable="true" type="xsd:string" />
+            <xsd:element minOccurs="1" maxOccurs="1" name="in2" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Update_Data1Response">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="out" nillable="true" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="Diagnosis_CheckRequest">
+    <wsdl:part name="parameters" element="tns:Diagnosis_Check" />
+  </wsdl:message>
+  <wsdl:message name="Diagnosis_CheckResponse">
+    <wsdl:part name="parameters" element="tns:Diagnosis_CheckResponse" />
+  </wsdl:message>
+  <wsdl:message name="Update_DataRequest">
+    <wsdl:part name="parameters" element="tns:Update_Data" />
+  </wsdl:message>
+  <wsdl:message name="Update_DataResponse">
+    <wsdl:part name="parameters" element="tns:Update_DataResponse" />
+  </wsdl:message>
+  <wsdl:message name="Execute_SqlRequest">
+    <wsdl:part name="parameters" element="tns:Execute_Sql" />
+  </wsdl:message>
+  <wsdl:message name="Execute_SqlResponse">
+    <wsdl:part name="parameters" element="tns:Execute_SqlResponse" />
+  </wsdl:message>
+  <wsdl:message name="Check_Ylzh_BulshRequest">
+    <wsdl:part name="parameters" element="tns:Check_Ylzh_Bulsh" />
+  </wsdl:message>
+  <wsdl:message name="Check_Ylzh_BulshResponse">
+    <wsdl:part name="parameters" element="tns:Check_Ylzh_BulshResponse" />
+  </wsdl:message>
+  <wsdl:message name="Find_Member1Request">
+    <wsdl:part name="parameters" element="tns:Find_Member1" />
+  </wsdl:message>
+  <wsdl:message name="Find_Member1Response">
+    <wsdl:part name="parameters" element="tns:Find_Member1Response" />
+  </wsdl:message>
+  <wsdl:message name="Zyh_CheckRequest">
+    <wsdl:part name="parameters" element="tns:Zyh_Check" />
+  </wsdl:message>
+  <wsdl:message name="Zyh_CheckResponse">
+    <wsdl:part name="parameters" element="tns:Zyh_CheckResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetYljgjbRequest">
+    <wsdl:part name="parameters" element="tns:GetYljgjb" />
+  </wsdl:message>
+  <wsdl:message name="GetYljgjbResponse">
+    <wsdl:part name="parameters" element="tns:GetYljgjbResponse" />
+  </wsdl:message>
+  <wsdl:message name="Get_Is_Hops_SkRequest">
+    <wsdl:part name="parameters" element="tns:Get_Is_Hops_Sk" />
+  </wsdl:message>
+  <wsdl:message name="Get_Is_Hops_SkResponse">
+    <wsdl:part name="parameters" element="tns:Get_Is_Hops_SkResponse" />
+  </wsdl:message>
+  <wsdl:message name="Get_New_YlzhRequest">
+    <wsdl:part name="parameters" element="tns:Get_New_Ylzh" />
+  </wsdl:message>
+  <wsdl:message name="Get_New_YlzhResponse">
+    <wsdl:part name="parameters" element="tns:Get_New_YlzhResponse" />
+  </wsdl:message>
+  <wsdl:message name="Get_MemberRequest">
+    <wsdl:part name="parameters" element="tns:Get_Member" />
+  </wsdl:message>
+  <wsdl:message name="Get_MemberResponse">
+    <wsdl:part name="parameters" element="tns:Get_MemberResponse" />
+  </wsdl:message>
+  <wsdl:message name="Update_Data_StringRequest">
+    <wsdl:part name="parameters" element="tns:Update_Data_String" />
+  </wsdl:message>
+  <wsdl:message name="Update_Data_StringResponse">
+    <wsdl:part name="parameters" element="tns:Update_Data_StringResponse" />
+  </wsdl:message>
+  <wsdl:message name="Get_Is_SkRequest">
+    <wsdl:part name="parameters" element="tns:Get_Is_Sk" />
+  </wsdl:message>
+  <wsdl:message name="Get_Is_SkResponse">
+    <wsdl:part name="parameters" element="tns:Get_Is_SkResponse" />
+  </wsdl:message>
+  <wsdl:message name="Update_Data1Request">
+    <wsdl:part name="parameters" element="tns:Update_Data1" />
+  </wsdl:message>
+  <wsdl:message name="Update_Data1Response">
+    <wsdl:part name="parameters" element="tns:Update_Data1Response" />
+  </wsdl:message>
+  <wsdl:portType name="Data_Update_IPortType">
+    <wsdl:operation name="Diagnosis_Check">
+      <wsdl:input name="Diagnosis_CheckRequest" message="tns:Diagnosis_CheckRequest" />
+      <wsdl:output name="Diagnosis_CheckResponse" message="tns:Diagnosis_CheckResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="Update_Data">
+      <wsdl:input name="Update_DataRequest" message="tns:Update_DataRequest" />
+      <wsdl:output name="Update_DataResponse" message="tns:Update_DataResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="Execute_Sql">
+      <wsdl:input name="Execute_SqlRequest" message="tns:Execute_SqlRequest" />
+      <wsdl:output name="Execute_SqlResponse" message="tns:Execute_SqlResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="Check_Ylzh_Bulsh">
+      <wsdl:input name="Check_Ylzh_BulshRequest" message="tns:Check_Ylzh_BulshRequest" />
+      <wsdl:output name="Check_Ylzh_BulshResponse" message="tns:Check_Ylzh_BulshResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="Find_Member1">
+      <wsdl:input name="Find_Member1Request" message="tns:Find_Member1Request" />
+      <wsdl:output name="Find_Member1Response" message="tns:Find_Member1Response" />
+    </wsdl:operation>
+    <wsdl:operation name="Zyh_Check">
+      <wsdl:input name="Zyh_CheckRequest" message="tns:Zyh_CheckRequest" />
+      <wsdl:output name="Zyh_CheckResponse" message="tns:Zyh_CheckResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="GetYljgjb">
+      <wsdl:input name="GetYljgjbRequest" message="tns:GetYljgjbRequest" />
+      <wsdl:output name="GetYljgjbResponse" message="tns:GetYljgjbResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="Get_Is_Hops_Sk">
+      <wsdl:input name="Get_Is_Hops_SkRequest" message="tns:Get_Is_Hops_SkRequest" />
+      <wsdl:output name="Get_Is_Hops_SkResponse" message="tns:Get_Is_Hops_SkResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="Get_New_Ylzh">
+      <wsdl:input name="Get_New_YlzhRequest" message="tns:Get_New_YlzhRequest" />
+      <wsdl:output name="Get_New_YlzhResponse" message="tns:Get_New_YlzhResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="Get_Member">
+      <wsdl:input name="Get_MemberRequest" message="tns:Get_MemberRequest" />
+      <wsdl:output name="Get_MemberResponse" message="tns:Get_MemberResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="Update_Data_String">
+      <wsdl:input name="Update_Data_StringRequest" message="tns:Update_Data_StringRequest" />
+      <wsdl:output name="Update_Data_StringResponse" message="tns:Update_Data_StringResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="Get_Is_Sk">
+      <wsdl:input name="Get_Is_SkRequest" message="tns:Get_Is_SkRequest" />
+      <wsdl:output name="Get_Is_SkResponse" message="tns:Get_Is_SkResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="Update_Data1">
+      <wsdl:input name="Update_Data1Request" message="tns:Update_Data1Request" />
+      <wsdl:output name="Update_Data1Response" message="tns:Update_Data1Response" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Data_Update_IHttpBinding" type="tns:Data_Update_IPortType">
+    <wsdlsoap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Diagnosis_Check">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="Diagnosis_CheckRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="Diagnosis_CheckResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Update_Data">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="Update_DataRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="Update_DataResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Execute_Sql">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="Execute_SqlRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="Execute_SqlResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Check_Ylzh_Bulsh">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="Check_Ylzh_BulshRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="Check_Ylzh_BulshResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Find_Member1">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="Find_Member1Request">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="Find_Member1Response">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Zyh_Check">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="Zyh_CheckRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="Zyh_CheckResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetYljgjb">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="GetYljgjbRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="GetYljgjbResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Get_Is_Hops_Sk">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="Get_Is_Hops_SkRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="Get_Is_Hops_SkResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Get_New_Ylzh">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="Get_New_YlzhRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="Get_New_YlzhResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Get_Member">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="Get_MemberRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="Get_MemberResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Update_Data_String">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="Update_Data_StringRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="Update_Data_StringResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Get_Is_Sk">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="Get_Is_SkRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="Get_Is_SkResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Update_Data1">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="Update_Data1Request">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="Update_Data1Response">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Data_Update_I">
+    <wsdl:port name="Data_Update_IHttpPort" binding="tns:Data_Update_IHttpBinding">
+      <wsdlsoap:address location="http://10.85.32.253:7001/sjpt_his_village/Data_Update_M.ws" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

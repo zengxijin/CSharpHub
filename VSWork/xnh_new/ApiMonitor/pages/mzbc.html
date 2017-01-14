@@ -1,0 +1,539 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>门诊补偿</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" media="screen" href="css/bootstrap.min.css">
+        <link rel="stylesheet" media="screen" href="css/bootstrap-theme.min.css">
+
+        <!-- Bootstrap Admin Theme -->
+        <link rel="stylesheet" media="screen" href="css/bootstrap-admin-theme.css">
+        <link rel="stylesheet" media="screen" href="css/bootstrap-admin-theme-change-size.css">
+        <link rel="stylesheet" media="screen" href="calendar/datepicker.min.css">
+        <link rel="stylesheet" media="screen" href="calendar/css/main.css">
+
+        <!-- Custom styles -->
+        <style type="text/css">
+            @font-face {
+                font-family: Ubuntu;
+                src: url('fonts/Ubuntu-Regular.ttf');
+            }
+            .bs-docs-masthead{
+                background-color: #6f5499;
+                background-image: linear-gradient(to bottom, #563d7c 0px, #6f5499 100%);
+                background-repeat: repeat-x;
+            }
+            .bs-docs-masthead{
+                padding: 0;
+            }
+            .bs-docs-masthead h1{
+                color: #fff;
+                font-size: 40px;
+                margin: 0;
+                padding: 34px 0;
+                text-align: center;
+            }
+            .bs-docs-masthead a:hover{
+                text-decoration: none;
+            }
+            .meritoo-logo a{
+                background-color: #fff;
+                border: 1px solid rgba(66, 139, 202, 0.4);
+                display: block;
+                font-family: Ubuntu;
+                padding: 22px 0;
+                text-align: center;
+            }
+            .meritoo-logo a,
+            .meritoo-logo a:hover,
+            .meritoo-logo a:focus{
+                text-decoration: none;
+            }
+            .meritoo-logo a img{
+                display: block;
+                margin: 0 auto;
+            }
+            .meritoo-logo a span{
+                color: #4e4b4b;
+                font-size: 18px;
+            }
+            .row-urls{
+                margin-top: 4px;
+            }
+            .row-urls .col-md-6{
+                text-align: center;
+            }
+            .row-urls .col-md-6 a{
+                font-size: 14px;
+            }
+
+#mask_background {position:absolute; z-index:998; top:0px; left:0px; background:rgb(50,50,50);background:rgba(0,0,0,0.5); display:none;}
+#mask_content {position:absolute; width:500px; z-index:999; padding:10px; background:#fff; border-radius:5px; display:none;}
+        </style>
+        
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+           <script type="text/javascript" src="js/html5shiv.js"></script>
+           <script type="text/javascript" src="js/respond.min.js"></script>
+        <![endif]-->
+        <script type="text/javascript" src="js/bootstrap-datepicke r.js"></script>
+    </head>
+<body class="bootstrap-admin-with-small-navbar" onload="checkLogin();">
+    <div id="mask_background"></div>
+    <div id="mask_content"></div>
+    <!-- small navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top bootstrap-admin-navbar-sm" role="navigation">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav navbar-left bootstrap-admin-theme-change-size">
+                            <li style="float:left;">使用单位:<span id="loginInfo_DEP_NAME"></span></li>
+                            <li style="float:left;padding-left:10px;">当前登录人:<span id="loginInfo_USER_CODE"></span></li>
+                            <li style="float:left;padding-left:10px;">所在单位ID:<span id="loginInfo_DEP_ID"></span></li>
+                            <li style="float:left;padding-left:10px;">当前时间:<span id="loginInfo_dateTime"></span></li>
+                            <li><a class="size-changer large active" onclick="javascript: exit();">退出</a></li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- main / large navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top bootstrap-admin-navbar bootstrap-admin-navbar-under-small" role="navigation">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".main-navbar-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+
+                    </div>
+                    <div class="collapse navbar-collapse main-navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="rydj.html">住院业务</a></li>
+                            <li class="active"><a href="mzbc.html">门诊补偿</a></li>
+                            <li><a href="zymxsc.html">住院费用上传</a></li>
+                            <li><a href="czlp.html">发票打印</a></li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-hover="dropdown">其他 <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li role="presentation" class="dropdown-header">#1</li>
+                                    <li><a href="#">菜单1</a></li>
+
+                                    <li role="presentation" class="divider"></li>
+                                    <li role="presentation" class="dropdown-header">#2</li>
+                                    <li><a href="#">菜单2</a></li>
+
+                                </ul>
+                            </li>
+                        </ul>
+                    </div><!-- /.navbar-collapse -->
+                </div>
+            </div>
+        </div><!-- /.container -->
+    </nav>
+
+    <div class="container">
+        <!-- left, vertical navbar & content -->
+        <form class="form-inline" role="form">
+            
+
+            <div class="form-group">
+                结算日期：<label class="sr-only" for="exampleInputEmail2"></label>
+                <input type="text" id="date" class="form-control docs-date" name="date" placeholder="选择日期">
+            </div>
+
+            <div class="form-group">
+                患者姓名：<label class="sr-only" for="exampleInputPassword2"></label>
+                <input type="text" class="form-control" id="hzxm" placeholder="回车查询">
+            </div>
+        </form>
+
+        <p></p>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+
+                    <div class="bootstrap-admin-panel-content">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>门诊流水号</th>
+                                    <th>处方号</th>
+                                    <th>结算日期</th>
+                                    <th>结算金额</th>
+                                    <th>处方金额</th>
+                                    <th>结算人</th>
+                                    <th>患者姓名</th>
+                                    <th>处方医生</th>
+                                    <th>农合结算</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bclist">
+                                <!--<tr>
+                                    <td>1234</td>
+                                    <td>K4455</td>
+                                    <td>2016-10-31</td>
+                                    <td>150.12</td>
+                                    <td>255.12</td>
+                                    <td>刘德华</td>
+                                    <td>郭富城</td>
+                                    <td>张学友</td>
+                                    <td>522.11</td>
+                                    <td>
+                                        <input type="checkbox" value="1234" />
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>2346</td>
+                                    <td>K4455</td>
+                                    <td>2016-10-31</td>
+                                    <td>150.12</td>
+                                    <td>255.12</td>
+                                    <td>刘德华</td>
+                                    <td>郭富城</td>
+                                    <td>张学友</td>
+                                    <td>522.11</td>
+                                    <td>
+                                        <input type="checkbox" value="2346" />
+                                    </td>
+                                </tr>-->
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table>
+            <tr>
+                <td>地区编码：</td>
+                <td>
+                    <select id="areaNo" name="">
+                        <option value="">请选择</option>
+                        <option value="620000">甘肃省(620000)</option>
+                        <option value="620100">兰州市(620100)</option>
+                        <option value="620103">七里河区(620103)</option>
+                        <option value="620104">西固区(620104)</option>
+                        <option value="620105">安宁区(620105)</option>
+                        <option value="620111">红古区(620111)</option>
+                        <option value="620121">永登县(620121)</option>
+                        <option value="620122">皋兰县(620122)</option>
+                        <option value="620123">榆中县(620123)</option>
+                        <option value="620200">嘉峪关市(620200)</option>
+                        <option value="620300">金昌市(620300)</option>
+                        <option value="620302">金川区(620302)</option>
+                        <option value="620321">永昌县(620321)</option>
+                        <option value="620400">白银市(620400)</option>
+                        <option value="620402">白银区(620402)</option>
+                        <option value="620403">平川区(620403)</option>
+                        <option value="620421">靖远县(620421)</option>
+                        <option value="620422">会宁县(620422)</option>
+                        <option value="620423">景泰县(620423)</option>
+                        <option value="620500">天水市(620500)</option>
+                        <option value="620502">秦州区(620502)</option>
+                        <option value="620503">麦积区(620503)</option>
+                        <option value="620521">清水县(620521)</option>
+                        <option value="620522">秦安县(620522)</option>
+                        <option value="620523">甘谷县(620523)</option>
+                        <option value="620524">武山县(620524)</option>
+                        <option value="620525">张家川回族自治县(620525)</option>
+                        <option value="620600">武威市(620600)</option>
+                        <option value="620602">凉州区(620602)</option>
+                        <option value="620621">民勤县(620621)</option>
+                        <option value="620622">古浪县(620622)</option>
+                        <option value="620623">天祝县(620623)</option>
+                        <option value="620700">张掖市(620700)</option>
+                        <option value="620702">甘州区(620702)</option>
+                        <option value="620721">肃南县(620721)</option>
+                        <option value="620722">民乐县(620722)</option>
+                        <option value="620723">临泽县(620723)</option>
+                        <option value="620724">高台县(620724)</option>
+                        <option value="620725">山丹县(620725)</option>
+                        <option value="620800">平凉市(620800)</option>
+                        <option value="620802">崆峒区(620802)</option>
+                        <option value="620821">泾川县(620821)</option>
+                        <option value="620822">灵台县(620822)</option>
+                        <option value="620823">崇信县(620823)</option>
+                        <option value="620824">华亭县(620824)</option>
+                        <option value="620825">庄浪县(620825)</option>
+                        <option value="620826">静宁县(620826)</option>
+                        <option value="620900">酒泉市(620900)</option>
+                        <option value="620902">肃州区(620902)</option>
+                        <option value="620921">金塔县(620921)</option>
+                        <option value="620922">安西县(620922)</option>
+                        <option value="620923">肃北蒙古族自治县(620923)</option>
+                        <option value="620924">阿克塞哈萨克族自治县(620924)</option>
+                        <option value="620981">玉门市(620981)</option>
+                        <option value="620982">敦煌市(620982)</option>
+                        <option value="621000">庆阳市(621000)</option>
+                        <option value="621002">西峰区(621002)</option>
+                        <option value="621021">庆城县(621021)</option>
+                        <option value="621022">环县(621022)</option>
+                        <option value="621023">华池县(621023)</option>
+                        <option value="621024">合水县(621024)</option>
+                        <option value="621025">正宁县(621025)</option>
+                        <option value="621026">宁县(621026)</option>
+                        <option value="621027">镇原县(621027)</option>
+                        <option value="621100">定西市(621100)</option>
+                        <option value="621102">安定区(621102)</option>
+                        <option value="621121">通渭县(621121)</option>
+                        <option value="621122">陇西县(621122)</option>
+                        <option value="621123">渭源县(621123)</option>
+                        <option value="621124">临洮县(621124)</option>
+                        <option value="621125">漳县(621125)</option>
+                        <option value="621126">岷县(621126)</option>
+                        <option value="621200">陇南市(621200)</option>
+                        <option value="621202">武都区(621202)</option>
+                        <option value="621223">宕昌县(621223)</option>
+                        <option value="621221">成县(621221)</option>
+                        <option value="621224">康县(621224)</option>
+                        <option value="621222">文县(621222)</option>
+                        <option value="621225">西和县(621225)</option>
+                        <option value="621226">礼县(621226)</option>
+                        <option value="621228">两当县(621228)</option>
+                        <option value="621227">徽县(621227)</option>
+                        <option value="622900">临夏回族自治州(622900)</option>
+                        <option value="622901">临夏市(622901)</option>
+                        <option value="622921">临夏县(622921)</option>
+                        <option value="622922">康乐县(622922)</option>
+                        <option value="622923">永靖县(622923)</option>
+                        <option value="622924">广河县(622924)</option>
+                        <option value="622925">和政县(622925)</option>
+                        <option value="622926">东乡县(622926)</option>
+                        <option value="622927">积石山保安族东乡族撒拉族自治县(622927)</option>
+                        <option value="623000">甘南藏族自治州(623000)</option>
+                        <option value="623001">合作市(623001)</option>
+                        <option value="623021">临潭县(623021)</option>
+                        <option value="623022">卓尼县(623022)</option>
+                        <option value="623023">舟曲县(623023)</option>
+                        <option value="623024">迭部县(623024)</option>
+                        <option value="623025">玛曲县(623025)</option>
+                        <option value="623026">碌曲县(623026)</option>
+                        <option value="623027">夏河县(623027)</option>
+                        <option value="620201">嘉峪关市(620201)</option>
+
+                    </select>
+                </td>
+                <td style="padding-left:30px;"><button class="btn btn-success">读卡</button></td>
+                <td style="padding-left:30px;">医疗证号：</td>
+                <td><input style="width:200px;" placeholder=""></td>
+            </tr>
+        </table>
+
+        <p></p>
+
+        <table>
+            <tr>
+                <td>补偿类别：</td>
+                <td>
+                    <select id="bclb" name="" style="width:290px;">
+                        <option value="">请选择</option>
+                        <option value="1">家庭帐户</option>
+                        <option value="2">个人帐户</option>
+                        <option value="3">统筹帐户</option>
+                        <option value="9">其他</option>
+                     </select>
+                </td>
+                <td style="padding-left:30px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td style="padding-left:30px;">门诊疾病编码：</td>
+                <td><input style="width:200px;" placeholder=""></td>
+            </tr>
+        </table>
+
+        <p></p>
+
+        <div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="text-muted bootstrap-admin-box-title">农合基本信息</div>
+                        </div>
+                        <div class="bootstrap-admin-panel-content">
+                            <table class="table">
+
+                                <tbody>
+                                    <tr>
+                                        <td>登录名：刘德华</td>
+                                        <td>所在单位ID：xxxx</td>
+                                        <td>电话：123456789</td>
+                                        <td>单位名称：4564687631xxadas</td>
+                                    </tr>
+                                    <tr>
+                                        <td>机构详细地址编码：1235</td>
+                                        <td>机构类型：乡</td>
+                                        <td>机构级别：村卫生室</td>
+                                        <td>机构地区编码：5464</td>
+                                    </tr>
+                                    <tr>
+                                        <td>补偿年度：2016</td>
+                                        <td>本县芯片卡刷卡授权：有刷卡权限</td>
+                                        <td>本县刷卡标志是够开启：开启</td>
+                                        <td>此医疗机构刷卡权限是否开启：刷</td>
+                                    </tr>
+                                    <tr>
+                                        <td>是否开启药品最高限价：开启</td>
+                                        <td>日记账药品删除期限：22</td>
+                                        <td>本县保障起始时间：2016-10-10</td>
+                                        <td>本县保障结束时间：2016-12-10</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>打印明细是否汇总：汇总</td>
+                                        <td>是否启用单次刷卡时间限制：不启用</td>
+                                        <td>单次刷卡时间：10</td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p></p>
+
+        <div>
+            <ul style="list-style:none;">
+                <li style="float:left;width:20%;"><button class="btn btn-default" onclick="javacript: tryCal();">试算</button></li>
+                <li style="float:left;width:20%;"><button class="btn btn-default">收费</button></li>
+                <li style="float:left;width:20%;"><button class="btn btn-default">冲正</button></li>
+                <li style="float:left;width:20%;"><button class="btn btn-default">打印补偿票据</button></li>
+                
+            </ul>
+        </div>
+
+        <p></p>
+
+    </div>
+
+    
+
+    <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/twitter-bootstrap-hover-dropdown.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-admin-theme-change-size.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="js/xnh.js"></script>
+    <script type="text/javascript" src="calendar/datepicker.min.js"></script>
+    <script type="text/javascript" src="calendar/datepicker.zh-CN.js"></script>
+    <script type="text/javascript" src="calendar/js/main.js"></script>
+    
+    <script type="text/javascript">
+        //试算
+        function tryCal() {
+            
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/tryCalculate",
+                data: "{'fuck':'me'}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    //返回的数据用data.d获取内容
+                    var retVal = data.d;
+                    alert(retVal);
+ 
+                },
+                error: function (err) {
+                    alert(err.toString());
+                }
+            });
+        }
+        //患者姓名回车查询
+        $('#hzxm').bind('keyup', function (event) {
+            if (event.keyCode == "13") {
+                var query = $("#hzxm").val();
+                if (query == '') {
+                    alert("请输入信息查询");
+                    return;
+                }
+
+                showMask("正在查询，请稍后...");
+
+                var pMap = {};
+                pMap["date"] = $("#date").val();
+                pMap["query"] = query;
+                var pJson = map2Json(pMap);
+
+                $.ajax({
+                    type: "Post",
+                    url: "xnhservice.asmx/hzxmcx",
+                    data: pJson,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        closeMask();
+                        //返回的数据用data.d获取内容
+                        var retVal = data.d;
+                        //遍历json数组操作
+                        var retJson = getJsonObj(retVal);
+                        if (retJson.flag == '0') {
+                            var json = retJson.msg;
+                            for (var item in json.data) {
+                                var row = json.data[item];
+                       
+                                var trStr = '<tr class="example">';//动态拼接table
+                                // var html = '';
+                                //for (var key in row) {//
+                                trStr += '<td>' + row['REC_NO'] + '</td>';//数据表的主键值                                      
+                                //}
+                                trStr += '<td>' + row['REG_NO'] + '</td>';
+                                trStr += '<td>' + row['REC_TIME'] + '</td>';
+                                trStr += '<td>' + row['TOTAL'] + '</td>';
+                                trStr += '<td>' + row['TOTAL_REC'] + '</td>';
+                                trStr += '<td>' + row['OPER_NAME'] + '</td>';
+                                trStr += '<td>' + row['NAME'] + '</td>';
+                                trStr += '<td>' + row['IP_DR'] + '</td>';
+                                trStr += '<td>' + row['FEE_CODE'] + '</td>';
+                                trStr += '<td>' +'<input type="checkbox" value="2346" />'+ '</td>';
+                                trStr += '</tr>';
+                                $(trStr).appendTo("#bclist");
+                                //$("#bclist").html(trStr);
+
+                                //for (var key in row) {
+                                    
+                                //    //document.getElementById(key).value = row[key];
+                                //    //todo：根据需要绑定解析和绑定前台数据
+                                //}
+                            }
+                            //todo：根据需要绑定解析和绑定前台数据
+
+                        } else {
+                            alert("查询失败：" + retJson.msg);
+                        }
+
+                    },
+                    error: function (err) {
+                        closeMask();
+                        alert(err.toString());
+                    }
+                });
+            }
+        });
+    </script>
+    <script>
+        //中文语种日期
+        $(".docs-date").datepicker({
+            language: 'zh-CN'
+        });
+    </script>
+</body>
+
+</html>

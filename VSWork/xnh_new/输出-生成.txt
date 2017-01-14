@@ -1,0 +1,13 @@
+﻿1>------ 已启动全部重新生成:  项目: ApiMonitor, 配置: Debug Any CPU ------
+1>C:\Users\Administrator\Desktop\jk\jk\ApiMonitor\DB\DBUtil.cs(24,13,24,29): warning CS0618: “System.Data.OracleClient.OracleConnection”已过时:“OracleConnection has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
+1>C:\Users\Administrator\Desktop\jk\jk\ApiMonitor\DB\DBUtil.cs(25,13,25,26): warning CS0618: “System.Data.OracleClient.OracleCommand”已过时:“OracleCommand has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
+1>C:\Users\Administrator\Desktop\jk\jk\ApiMonitor\DB\DBUtil.cs(28,28,28,44): warning CS0618: “System.Data.OracleClient.OracleConnection”已过时:“OracleConnection has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
+1>C:\Users\Administrator\Desktop\jk\jk\ApiMonitor\DB\DBUtil.cs(30,27,30,40): warning CS0618: “System.Data.OracleClient.OracleCommand”已过时:“OracleCommand has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
+1>C:\Users\Administrator\Desktop\jk\jk\ApiMonitor\DB\DBUtil.cs(31,17,31,34): warning CS0618: “System.Data.OracleClient.OracleDataAdapter”已过时:“OracleDataAdapter has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
+1>C:\Users\Administrator\Desktop\jk\jk\ApiMonitor\DB\DBUtil.cs(31,45,31,62): warning CS0618: “System.Data.OracleClient.OracleDataAdapter”已过时:“OracleDataAdapter has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
+1>C:\Users\Administrator\Desktop\jk\jk\ApiMonitor\DB\DBUtil.cs(62,13,62,29): warning CS0618: “System.Data.OracleClient.OracleConnection”已过时:“OracleConnection has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
+1>C:\Users\Administrator\Desktop\jk\jk\ApiMonitor\DB\DBUtil.cs(63,13,63,26): warning CS0618: “System.Data.OracleClient.OracleCommand”已过时:“OracleCommand has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
+1>C:\Users\Administrator\Desktop\jk\jk\ApiMonitor\DB\DBUtil.cs(66,28,66,44): warning CS0618: “System.Data.OracleClient.OracleConnection”已过时:“OracleConnection has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
+1>C:\Users\Administrator\Desktop\jk\jk\ApiMonitor\DB\DBUtil.cs(68,27,68,40): warning CS0618: “System.Data.OracleClient.OracleCommand”已过时:“OracleCommand has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
+1>  ApiMonitor -> C:\Users\Administrator\Desktop\jk\jk\ApiMonitor\bin\ApiMonitor.dll
+========== 全部重新生成:  成功 1 个，失败 0 个，跳过 0 个 ==========
