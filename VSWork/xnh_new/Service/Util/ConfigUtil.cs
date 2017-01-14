@@ -15,6 +15,21 @@ namespace Service.Util
         private static JObject json   = null;
         private static object lockObj = new object();
         private static string configPath = ConfigurationManager.AppSettings["configPath"];
+        private static string envCfg = ConfigurationManager.AppSettings["env"];
+
+        /// <summary>
+        /// 是否接口配置的是生产环境
+        /// 由于农合接口没有测试环境，默认测试使用测试模拟环境接口
+        /// </summary>
+        /// <returns></returns>
+        public static bool isEnvPrd()
+        {
+            if (envCfg.Equals("prd"))
+                return true;
+            else
+                return false;
+        }
+
         /// <summary>
         /// 初始化配置文件，加锁
         /// </summary>
