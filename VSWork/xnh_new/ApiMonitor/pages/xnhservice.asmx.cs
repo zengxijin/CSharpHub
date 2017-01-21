@@ -34,7 +34,7 @@ namespace ApiMonitor.pages
         /// <param name="pwd">密码</param>
         /// <returns>验证失败返回空</returns>
         [WebMethod]
-        public string login(string name,string pwd)
+        public string login(string name, string pwd)
         {
             string retVal = "";
             try
@@ -64,7 +64,7 @@ namespace ApiMonitor.pages
                     return "";
                 }
                 */
-               // return "0;10011;admin;admin;刘德华;8881122;18012345678;天泰医院;DEP_AREA;USER_JG;DEP_LEVEL;AREA_CODE;T_IS_FLASH_AUTHORIZED;T_YEARS;T_IS_SK;T_IS_SK_HOSP;T_IS_XJ;T_RJZ_DATE;T_CH_START_DATE;T_CH_END_DATE;T_DY_MX_IS_HZ;T_IS_BLUSH_DAY;T_BLUSH_DAY;";
+                // return "0;10011;admin;admin;刘德华;8881122;18012345678;天泰医院;DEP_AREA;USER_JG;DEP_LEVEL;AREA_CODE;T_IS_FLASH_AUTHORIZED;T_YEARS;T_IS_SK;T_IS_SK_HOSP;T_IS_XJ;T_RJZ_DATE;T_CH_START_DATE;T_CH_END_DATE;T_DY_MX_IS_HZ;T_IS_BLUSH_DAY;T_BLUSH_DAY;";
 
                 //调用接口认证
                 LoginAuth service = new LoginAuth();
@@ -75,12 +75,12 @@ namespace ApiMonitor.pages
                 requestParam.Add("USER_PASS", pwd);
 
                 //使用executeSql重载的Dictionary参数方法
-                string response = service.executeSql("",requestParam,"&");
+                string response = service.executeSql("", requestParam, "&");
                 Dictionary<string, string> responseDict = service.getResponseResultWrapperMap();
                 //登录失败
                 if (service.getExecuteStatus() == false)
-                { 
-                    retVal = ""; 
+                {
+                    retVal = "";
                     //记日志
                     XnhLogger.log(this.GetType().ToString() + service.getExecuteResultPlainString());
                 }
@@ -122,12 +122,12 @@ namespace ApiMonitor.pages
         /// <param name="M_MM"></param>
         /// <returns></returns>
         [WebMethod]
-        public string readCard(string USER_ID,string AREA_NO)
+        public string readCard(string USER_ID, string M_MM, string AREA_NO)
         {
             string retVal = "";
 
             //todo:M_MM 读卡的加密串 此值的获取需要接口
-            string M_MM = "";
+            //string M_MM = ""; //由前台的ActiveX控件获取提供
 
             try
             {
@@ -136,6 +136,11 @@ namespace ApiMonitor.pages
                 string retStr = check.executeSql(
                     new Dictionary<string, string>() { { "AREA_NO", AREA_NO }, { "M_MM", M_MM } }
                     );
+
+                if (check.getExecuteStatus() == false)
+                {
+                    retStr = DataConvert.getReturnJson("-1", "不存在此卡号交易");
+                }
 
                 //卡号存在交易
                 if (check.getExecuteStatus() == true)
@@ -157,30 +162,31 @@ namespace ApiMonitor.pages
                         //成员序号：D401_21  CHAR(2)
                         //成员姓名：D401_02  VARCHAR2(24)
                         string retMember = (string)getMember.getResponseResultOtherWrapper();
+                        retVal = DataConvert.getReturnJson("0", retMember);
                         //todo:家庭成员信息存储
 
                         //(3)根据医疗证号和序号调用查询基础人员信息交易，将信息显示到用户画面。
-                        string[] memberArray = retMember.Split(new string[]{";"},StringSplitOptions.None);
-                        foreach (string one in memberArray)
-                        {
-                            string D401_21 = one.Split(new string[] { "/" }, StringSplitOptions.None)[0]; //成员序号
-                            //查询成员基本信息
-                            MZBC_Get_Member_Information getMemberInfo = new MZBC_Get_Member_Information();
-                            getMemberInfo.executeSql(
-                                new Dictionary<string, string>() { { "AREA_NO", AREA_NO }, { "D401_10", D401_10 }, { "D401_21", D401_21 } }
-                                );
-                            Dictionary<string,string> memberBaseInfo = getMemberInfo.getResponseResultWrapperMap(); //成员基本信息
-                            //(4)成员基本信息显示在用户界面 todo
+                        //string[] memberArray = retMember.Split(new string[]{";"},StringSplitOptions.None);
+                        //foreach (string one in memberArray)
+                        //{
+                        //    string D401_21 = one.Split(new string[] { "/" }, StringSplitOptions.None)[0]; //成员序号
+                        //    //查询成员基本信息
+                        //    MZBC_Get_Member_Information getMemberInfo = new MZBC_Get_Member_Information();
+                        //    getMemberInfo.executeSql(
+                        //        new Dictionary<string, string>() { { "AREA_NO", AREA_NO }, { "D401_10", D401_10 }, { "D401_21", D401_21 } }
+                        //        );
+                        //    Dictionary<string,string> memberBaseInfo = getMemberInfo.getResponseResultWrapperMap(); //成员基本信息
+                        //    //(4)成员基本信息显示在用户界面 todo
 
-                            //(5)验证本人是否已经住院（注：应该是住院状态不允许门诊报销）
-                            //AREA_NO&D401_10&D401_21&DEP_ID
-                            MZBC_PROC_ZYBZ_NOTICE_CHECK zy = new MZBC_PROC_ZYBZ_NOTICE_CHECK();
-                             //从缓存获取信息
-                            string DEP_ID = BufferUtil.getBufferByKey(USER_ID, "DEP_ID");
-                            zy.executeSql(
-                                new Dictionary<string, string>() { { "AREA_NO", AREA_NO }, { "D401_10", D401_10 }, { "D401_21", D401_21 }, { "DEP_ID", DEP_ID } }
-                                );
-                        }
+                        //    //(5)验证本人是否已经住院（注：应该是住院状态不允许门诊报销）
+                        //    //AREA_NO&D401_10&D401_21&DEP_ID
+                        //    MZBC_PROC_ZYBZ_NOTICE_CHECK zy = new MZBC_PROC_ZYBZ_NOTICE_CHECK();
+                        //     //从缓存获取信息
+                        //    string DEP_ID = BufferUtil.getBufferByKey(USER_ID, "DEP_ID");
+                        //    zy.executeSql(
+                        //        new Dictionary<string, string>() { { "AREA_NO", AREA_NO }, { "D401_10", D401_10 }, { "D401_21", D401_21 }, { "DEP_ID", DEP_ID } }
+                        //        );
+                        //}
                     }
                 }
             }
@@ -191,12 +197,206 @@ namespace ApiMonitor.pages
 
             return retVal;
         }
+
+
+        #region
+
+        /// <summary>
+        /// 获取家庭成员基本信息
+        /// </summary>
+        /// <param name="USER_ID">当前登录用户USER_ID</param>
+        /// <param name="AREA_NO">地区号</param>
+        /// <param name="D401_21">家庭成员家庭序号</param>
+        /// <returns></returns>
+        [WebMethod]
+        public string getMemberInfoDetail(string USER_ID, string AREA_NO, string D401_21)
+        {
+            string retStr = "";
+            try
+            {
+                //根据USER_ID获取缓存的新医疗卡号信息
+                string D401_10 = BufferUtil.getBufferByKey(USER_ID, "D401_10");
+                //查询成员基本信息
+                MZBC_Get_Member_Information getMemberInfo = new MZBC_Get_Member_Information();
+                getMemberInfo.executeSql(
+                    new Dictionary<string, string>() { { "AREA_NO", AREA_NO }, { "D401_10", D401_10 }, { "D401_21", D401_21 } }
+                 );
+                Dictionary<string, string> memberBaseInfo = getMemberInfo.getResponseResultWrapperMap(); //成员基本信息
+                retStr = DataConvert.Dict2Json(memberBaseInfo);
+                retStr = DataConvert.getReturnJson("0", retStr);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+
         
         [WebMethod]
-        public string getMemberInfo(string USER_ID, string AREA_NO,string D401_10,string D401_21)
+        public string rydj(string USER_ID, string PARAM)
         {
-            return null;
+            string retStr = "";
+            try
+            {
+                //根据USER_ID获取缓存的新医疗卡号信息
+                string D401_10 = BufferUtil.getBufferByKey(USER_ID, "D401_10");
+                //(1)验证输入疾病是否在疾病库中存在，存在可以继续登记
+                MZBC_PROC_DIAGNOSIS_CHECK check = new MZBC_PROC_DIAGNOSIS_CHECK();
+                string DIAGNOSIS_CODE = ""; //疾病代码
+                check.executeSql(
+                    new Dictionary<string, string>() { { "DIAGNOSIS_CODE", DIAGNOSIS_CODE } }
+                 );
+                
+                //0	成功
+                //1	此疾病在疾病库中不存在
+                //2	程序异常
+                if (check.getExecuteResultPlainString() != null && check.getExecuteResultPlainString().Length >= 1
+                    && check.getExecuteResultPlainString().Substring(0,1) !="0")
+                {
+                    if (check.getExecuteResultPlainString().Substring(0, 1) == "1")
+                    {
+                        retStr = DataConvert.getReturnJson("-1", "此疾病在疾病库中不存在");
+                    }
+                    if (check.getExecuteResultPlainString().Substring(0, 1) == "2")
+                    {
+                        retStr = DataConvert.getReturnJson("-1", check.getExecuteResultPlainString());
+                    }
+                    return retStr;
+                }
+
+                //疾病代码存在，可以继续登记
+                //(2)检查是否可以做入院登记
+                //调用验证住院号是否重复交易，如果重复说明已经登记，此时调用修改住院登记交易；
+                //如果不重复调用保存入院登记交易进行入院登记，入院登记成功修改HIS端标志并保存农合信息。
+                MZBC_PROC_ZYBZ_NOTICE_CHECK zydjCheck = new MZBC_PROC_ZYBZ_NOTICE_CHECK();
+                string AREA_NO = "";
+                string D401_21 = "";
+                string DEP_ID = "";
+                zydjCheck.executeSql(
+                    new Dictionary<string, string>() { { "AREA_NO", AREA_NO }, { "D401_10", D401_10 }, { "D401_21", D401_21 }, { "DEP_ID", DEP_ID } }
+                 );
+                //0	成功
+                //1	此病人在本院已经做过入院登记
+                //2	此病人在其他医院已经做过入院登记
+                //3	程序异常
+                //此病人在其他医院已经做过入院登记：  2;医院名称（分号分隔）
+                //程序异常： 						  3;错误信息（分号分隔）
+                string flag = zydjCheck.getExecuteResultPlainString().Substring(0, 1);
+                if (flag == "2")
+                {
+                    retStr = DataConvert.getReturnJson("-1", "此病人在其他医院已经做过入院登记:" + zydjCheck.getExecuteResultPlainString());
+                }
+                if (flag == "3")
+                {
+                    retStr = DataConvert.getReturnJson("-1", "程序异常:" + zydjCheck.getExecuteResultPlainString());
+                }
+
+                if (flag == "0")
+                {
+                    //保存入院登记
+                    ZYBC_PROC_NEW_NOTICE newNotice = new ZYBC_PROC_NEW_NOTICE();
+                    Dictionary<string, string> param = new Dictionary<string, string>();
+                    param.Add("COME_AREA", ""); //医疗机构所在地区编码(取用户所在机构地区编码AREA_CODE)
+                    param.Add("AREA_CODE", ""); //地区代码(病人所在地区编码)取前台选择的地区编码
+                    param.Add("D401_10", ""); //医疗证号
+                    param.Add("D504_02", ""); //个人编号
+                    param.Add("D504_03", ""); //姓名
+                    param.Add("D504_04", ""); //性别（1：男 2：女）传代码
+                    param.Add("D504_05", ""); //身份证号
+                    param.Add("D504_06", ""); //年龄
+                    param.Add("D504_21", ""); //疾病代码
+                    param.Add("D504_09", ""); //住院号
+                    param.Add("D504_10", ""); //就诊类型代码（对应s301_05.xls）
+                    param.Add("D504_11", ""); //入院时间(格式为YYYY-MM-DD)
+                    param.Add("D504_14", ""); //就医机构代码=DEP_ID
+                    param.Add("D504_19", ""); //入院状态代码 (对应S301-02.xls)
+                    param.Add("D504_16", ""); //入院科室代码（对应S201-03.xls）
+                    param.Add("D504_28", ""); //病人联系电话
+
+                    newNotice.executeSql(param);
+
+                    //0	成功
+                    //1	失败 
+                    //保存成功：S_Returns= 0;D504_01
+                    //D504_01：VARCHAR2(24)  住院登记流水号
+                    //保存失败： S_Returns= 1;错误信息  （分号分隔)
+                    if (newNotice.getExecuteStatus() == true)
+                    {
+                        retStr = DataConvert.getReturnJson("0", "保存住院登记成功");
+                    }
+                    else
+                    {
+                        retStr = DataConvert.getReturnJson("-1", newNotice.getExecuteResultPlainString());
+                    }
+                }
+
+                if (flag == "1")
+                {
+                    //修改住院登记
+                    ZYBC_PROC_UPDATE_NOTICE updateNotice = new ZYBC_PROC_UPDATE_NOTICE();
+                    Dictionary<string, string> param = new Dictionary<string, string>();
+                    param.Add("AREA_CODE", ""); //病人地区编码(取前台选择的地区编码)
+                    param.Add("D504_01", ""); //住院登记流水号
+                    param.Add("D504_21", ""); //疾病代码
+                    param.Add("D504_09", ""); //住院号
+                    param.Add("D504_10", ""); //就诊类型
+                    param.Add("D504_19", ""); //入院状态代码(对应S301-02.xls)
+                    param.Add("D504_16", ""); //入院科室代码（对应S201-03.xls）
+                    param.Add("D504_11", ""); //入院时间(格式为YYYY-MM-DD)
+                    param.Add("D504_28", ""); //联系电话
+
+                    updateNotice.executeSql(param);
+                    if (updateNotice.getExecuteStatus() == true)
+                    {
+                        retStr = DataConvert.getReturnJson("0", "修改住院登记成功");
+                    }
+                    else
+                    {
+                        retStr = DataConvert.getReturnJson("-1", updateNotice.getExecuteResultPlainString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
         }
+
+
+        public string qxrydj(string AREA_NO, string D504_01)
+        {
+            string retStr = "";
+            try
+            {
+                ZYBC_PROC_DELETE_NOTICE deleteNotice = new ZYBC_PROC_DELETE_NOTICE();
+                deleteNotice.executeSql(new Dictionary<string, string>() { { "AREA_NO", AREA_NO }, { "D504_01", D504_01 } });
+                //0	成功
+                //1	失败 
+                //删除成功： S_Returns= 0
+                //删除失败：S_Returns= 1;错误信息   （分号分隔）
+                if (deleteNotice.getExecuteStatus() == true)
+                {
+                    retStr = DataConvert.getReturnJson("0", "删除入院登记成功");
+                }
+                else
+                {
+                    retStr = DataConvert.getReturnJson("-1", deleteNotice.getExecuteResultPlainString());
+                }
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+
+        #endregion
+
 
         /// <summary>
         /// 获取某个地区的补偿类别
@@ -214,7 +414,8 @@ namespace ApiMonitor.pages
                 //返回格式ITEM_CODE/ITEM_NAME;ITEM_CODE/ITEM_NAME
                 return (string)s301.getResponseResultOtherWrapper();
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 XnhLogger.log(this.GetType().ToString() + " getBCLB " + ex.StackTrace);
             }
@@ -231,7 +432,7 @@ namespace ApiMonitor.pages
         [WebMethod]
         public string tryCalculate(string user_id, string DIAGNOSIS_CODE)
         {
-            try 
+            try
             {
                 //(1)根据用户选择的疾病编码调用 验证输入疾病是否在疾病库中存在交易，判断是否存在，不存在提示报错，中断试算；存在进行试算业务交易。
                 MZBC_PROC_DIAGNOSIS_CHECK dCheck = new MZBC_PROC_DIAGNOSIS_CHECK();
@@ -262,7 +463,7 @@ namespace ApiMonitor.pages
                     param.Add("S701_01", "");//是否是中途结算(相关数据代码标准:S701-01)
 
                     shisuan.executeSql(param);
-                    if(shisuan.getExecuteStatus() == true) //试算成功
+                    if (shisuan.getExecuteStatus() == true) //试算成功
                     {
                         //需要存储试算结果，进行收费交易
                         Dictionary<string, string> retDict = shisuan.getResponseResultWrapperMap();
@@ -301,7 +502,7 @@ namespace ApiMonitor.pages
         /// <param name="DIAGNOSIS_CODE"></param>
         /// <returns></returns>
         [WebMethod]
-        public string charge(string user_id,string DIAGNOSIS_CODE)
+        public string charge(string user_id, string DIAGNOSIS_CODE)
         {
             try
             {
@@ -339,7 +540,7 @@ namespace ApiMonitor.pages
             {
                 XnhLogger.log(this.GetType().ToString() + " diagnosisCheck " + ex.StackTrace);
             }
-            
+
             return null;
         }
 
@@ -376,7 +577,7 @@ namespace ApiMonitor.pages
 
             return retStr;
         }
-    
+
         public string delete_item()
         {
             string retStr = "";
@@ -398,7 +599,7 @@ namespace ApiMonitor.pages
             }
             return retStr;
         }
-    
+
         public string zuofei()
         {
             string retStr = "";
@@ -432,18 +633,18 @@ namespace ApiMonitor.pages
             try
             {
                 //todo:查询HIS
-                string sql = "select a.name,(select fee_name from CODE_FEE where CODE_FEE.fee_code = a.FEE_CODE) as fee_name, "+
+                string sql = "select a.name,(select fee_name from CODE_FEE where CODE_FEE.fee_code = a.FEE_CODE) as fee_name, " +
                               "a.ip_no, a.reg_no,(select name from CODE_SEX where CODE_SEX.code = a.sex) as sex, " +
-                              "a.birth,a.age,a.cont_tel,a.cont_addr,a.op_time, "+
+                              "a.birth,a.age,a.cont_tel,a.cont_addr,a.op_time, " +
                               "(select oper_name from code_operator where oper_code = a.ip_dr) as ip_dr, " +
-                              "a.ip_time,(select dept_name from code_department where dept_code = a.ip_dept) as dept "+
+                              "a.ip_time,(select dept_name from code_department where dept_code = a.ip_dept) as dept " +
                               "from ip_register a " +
-                              "where a.ip_no ='" + zyh + "'"; 
-            
+                              "where a.ip_no ='" + zyh + "'";
+
                 DataTable dt = new DataTable();
                 dt = DBUtil.queryExecute(sql);
 
-                if ((dt == null) || (dt.Rows.Count==0))
+                if ((dt == null) || (dt.Rows.Count == 0))
                 {
                     retStr = DataConvert.getReturnJson("-1", "住院号不存在!");
                     return retStr;
@@ -452,7 +653,7 @@ namespace ApiMonitor.pages
                 //todo:返回的DataTable数据，可以通过调用DataTable2Json转为JSON格式，方便前台JavaScript处理和绑定
                 string msg = DataConvert.DataTable2Json(dt);
                 retStr = DataConvert.getReturnJson("0", msg);
-               
+
             }
             catch (Exception ex)
             {
@@ -491,7 +692,7 @@ namespace ApiMonitor.pages
                         {
                             retStr += BZ_CODE.Trim() + "|" + BZ_NAME + "|" + PY_CODE + ",";
                         }
-                    }                    
+                    }
                     retStr = retStr.Substring(0, retStr.Length - 1);
                 }
                 //XnhLogger.log(retStr);
@@ -546,18 +747,18 @@ namespace ApiMonitor.pages
                     string D504_01 = dictRet["D504_01"];
                     //缓存住院登记流水号D504_01
                     BufferUtil.setBuffer(user_id, "D504_01", D504_01);
-                    retStr = DataConvert.getReturnJson("0","success");
+                    retStr = DataConvert.getReturnJson("0", "success");
                 }
                 else
                 {
-                    retStr = DataConvert.getReturnJson("-1", "fail"); 
+                    retStr = DataConvert.getReturnJson("-1", "fail");
                 }
 
             }
             catch (Exception ex)
             {
                 XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
-                retStr = DataConvert.getReturnJson("-1", ex.ToString()); 
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
             }
             return retStr;
         }
@@ -578,7 +779,7 @@ namespace ApiMonitor.pages
             catch (Exception ex)
             {
                 XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
-                retStr = DataConvert.getReturnJson("-1", ex.ToString()); 
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
             }
             XnhLogger.log(retStr);
             return retStr;
@@ -678,8 +879,8 @@ namespace ApiMonitor.pages
       "CL_CHARGE.REC_FLAG ,CL_CHARGE.FEE_CODE ,CL_CHARGE.STATUS,d.dept_name " +
       "order by cl_CHARGE_RECIPE.REC_NO ";
                 DataTable dt = DBUtil.queryExecute(sql);
-               // XnhLogger.log(dt.ReadXml);
-               
+                // XnhLogger.log(dt.ReadXml);
+
                 if ((dt == null) || (dt.Rows.Count == 0))
                 {
                     retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
@@ -723,8 +924,8 @@ namespace ApiMonitor.pages
             XnhLogger.log(retStr);
             //MessageBox.Show(retStr);
             return retStr;
-           
-           
+
+
         }
 
 

@@ -119,6 +119,9 @@
         <![endif]-->
     </head>
 <body class="bootstrap-admin-with-small-navbar" onload="checkLogin();">
+    <!--读卡驱动-->
+    <object classid=clsid:8A5B3626-40FC-4563-AF78-C9C4AC2ECFD6 width=0 height=0 align="center" id="CIccardCtrl" hspace=0 vspace=0></object>
+
     <div id="mask_background"></div>
     <div id="mask_content"></div>
     <!-- small navbar -->
@@ -192,7 +195,7 @@
 
             <div class="form-group" style="margin-left:10px;">
                 医疗证号：<label class="sr-only" for="exampleInputPassword2"></label>
-                <input type="password" class="form-control" id="exampleInputPassword2" placeholder="">
+                <input type="text" class="form-control" id="ylzh" placeholder="">
             </div>
 
             <div class="form-group" style="margin-left:10px;">
@@ -333,7 +336,7 @@
                                     <td>电话：<input id="CONT_TEL" name="CONT_TEL" type="text" style="width:80px;"/></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="4">地址<input id="CONT_ADDR" name="CONT_ADDR" type="text" readonly /></td>
+                                    <td colspan="4">地址：<input id="CONT_ADDR" name="CONT_ADDR" type="text" readonly /></td>
                                   
                                 </tr>
                             </tbody>
@@ -399,7 +402,7 @@
                         <div class="text-muted bootstrap-admin-box-title">家庭成员</div>
                     </div>
                     <div class="bootstrap-admin-panel-content">
-                        <table class="table">
+                        <table class="table" id="familyMember">
                             <thead>
                                 <tr>
                                     <th>成员序号</th>
@@ -409,30 +412,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>
-                                        1
-                                    </td>
-                                    <td>
-                                        刘德华
-                                    </td>
-                                    <td>
-                                        <a href="">查看基本信息</a>
-                                    </td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        2
-                                    </td>
-                                    <td>
-                                        郭富城
-                                    </td>
-                                    <td>
-                                        <a href="">查看基本信息</a>
-                                    </td>
-                                    <td></td>
-                                </tr>
                                 
                             </tbody>
                         </table>
@@ -453,36 +432,24 @@
 
                                 <tbody>
                                     <tr>
-                                        <td>登录名：刘德华</td>
-                                        <td>所在单位ID：xxxx</td>
-                                        <td>电话：123456789</td>
-                                        <td>单位名称：4564687631xxadas</td>
+                                        <td>成员姓名：<span id="D401_02"></span></td>
+                                        <td>身份证号：<span id="D401_01"></span></td>
+                                        <td>性别：<span id="SEX"></span></td>
+                                        <td>年龄：<span id="AGE"></span></td>
                                     </tr>
                                     <tr>
-                                        <td>机构详细地址编码：1235</td>
-                                        <td>机构类型：乡</td>
-                                        <td>机构级别：村卫生室</td>
-                                        <td>机构地区编码：5464</td>
+                                        <td>家庭地址：<span id="D401_13"></span></td>
+                                        <td>民族：<span id="NAME NATIONAL"></span></td>
+                                        <td>当前家庭账户余额：<span id="D601_17"></span></td>
+                                        <td>上补时间：<span id="D503_17"></span></td>
                                     </tr>
                                     <tr>
-                                        <td>补偿年度：2016</td>
-                                        <td>本县芯片卡刷卡授权：有刷卡权限</td>
-                                        <td>本县刷卡标志是够开启：开启</td>
-                                        <td>此医疗机构刷卡权限是否开启：刷</td>
+                                        <td>统筹余额：<span id="D601_17"></span></td>
+                                        <td>门诊个人累补：<span id="GRLB"></span></td>
+                                        <td>门诊家庭累补：<span id="JTLB"></span></td>
+                                        <td>出生日期：<span id="D401_04"></span></td>
                                     </tr>
-                                    <tr>
-                                        <td>是否开启药品最高限价：开启</td>
-                                        <td>日记账药品删除期限：22</td>
-                                        <td>本县保障起始时间：2016-10-10</td>
-                                        <td>本县保障结束时间：2016-12-10</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>打印明细是否汇总：汇总</td>
-                                        <td>是否启用单次刷卡时间限制：不启用</td>
-                                        <td>单次刷卡时间：10</td>
-                                        <td></td>
-                                    </tr>
+                                    
                                 </tbody>
                             </table>
                         </div>
@@ -520,7 +487,7 @@
     <script type="text/javascript">
         //住院号回车触发查询HIS
         $('#zyh').bind('keyup', function (event) {
-            if (event.keyCode == "8") {
+            if (event.keyCode == "13") {
                 var zyhVal = $("#zyh").val();
                 if (zyhVal == '') {
                     alert("请输入住院号查询");
@@ -561,22 +528,29 @@
                     error: function (err) {
                         closeMask();
                         alert(err.toString());
-                        alert("测试");
                     }
                 });
             }
         });
+
+        //当前选择的家庭成员用户
+        var currentMemberSelected = null;
     
         //入院登记按钮触发事件
         function rydjClk() {
-            showMask("正在处理，请稍后...");
-
+            
             var user_id = getCookie("USER_ID");
+            var PARAM = "一大堆参数信息，再BASE64编码";
+            var pMap = {};
+            pMap["USER_ID"] = USER_ID;
+            pMap["PARAM"] = PARAM;
+            var pJson = map2Json(pMap);
 
+            showMask("正在处理，请稍后...");
             $.ajax({
                 type: "Post",
                 url: "xnhservice.asmx/rydj",
-                data: "{'user_id':'" + user_id + "'}",
+                data: pJson,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (data) {
@@ -598,13 +572,16 @@
 
         //取消登记按钮触发事件
         function qxdjClk() {
-            showMask("正在处理，请稍后...");
-            var user_id = getCookie("USER_ID");
+            var pMap = {};
+            pMap["AREA_CODE"] = $("#areaNo").val();
+            pMap["D504_01"] = $("#REG_NO").val(); //住院登记流水号
+            var pJson = map2Json(pMap);
 
+            showMask("正在处理，请稍后...");
             $.ajax({
                 type: "Post",
-                url: "xnhservice.asmx/qxzydj",
-                data: "{'user_id':'" + user_id + "'}",
+                url: "xnhservice.asmx/qxrydj",
+                data: pJson,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (data) {
@@ -625,23 +602,61 @@
         }
 
         function readCardClk() {
-            showMask("正在处理，请稍后...");
-            var user_id = getCookie("USER_ID");
+            var AREA_NO = $("#areaNo").val(); //获取选中的地区编码
+            if (AREA_NO == '') {
+                alert("请选择好地区");
+                return;
+            }
 
+            var M_MM = '';
+            try {
+                M_MM = GetCardinfo(); //开始读取卡号
+                if (M_MM == null || M_MM == '') {
+                    alert("读取卡信息失败，请检查读卡驱动是否成功安装...");
+                    return;
+                }
+                $("#ylzh").val(M_MM);
+            } catch (e) {
+                alert("读取卡信息失败,请检查读卡驱动是否正确安装:\n" + e.name + " :  " + e.message);
+                return;
+            }
+
+            var USER_ID = getCookie("USER_ID");
+            var pMap = {};
+            pMap["USER_ID"] = USER_ID;
+            pMap["M_MM"] = M_MM;
+            pMap["AREA_NO"] = AREA_NO;
+            var pJson = map2Json(pMap);
+
+            showMask("正在处理，请稍后...");
             $.ajax({
                 type: "Post",
                 url: "xnhservice.asmx/readCard",
-                data: "{'user_id':'" + user_id + "'}",
+                data: pJson,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (data) {
                     closeMask();
-                    //返回的数据用data.d获取内容
+                    //返回的数据用data.d获取内容，返回D401_21/D401_02;D401_21/D401_02
+                    //成员序号：D401_21  CHAR(2)
+                    //成员姓名：D401_02  VARCHAR2(24)
                     var retJson = getJsonObj(data.d);
                     if (retJson.flag == '0') {
-                        //alert("");
+                        //绑定家庭成员信息
+                        $("#familyMember tbody tr").detach();
+                        var memberInfo = retJson.msg;
+                        var memberArray = memberInfo.split(';');
+                        for(var i=0; i<memberArray.length; i++){
+                            var member = memberArray[i].split('/');
+                            var D401_21 = member[0];
+                            var D401_02 = member[1];
+                            var param = '\'' + USER_ID + '\',' + '\'' + AREA_NO + '\',' + '\'' + D401_21 + '\'';
+                            $("#familyMember tbody").append('<tr><td>' + D401_21 + '</td><td>' + D401_02 +
+                                '</td><td><a href="javascript:getMemberInfo(' + param + ');">查看信息并入院登记</a></td><td></td></tr>');
+                        }
+                        
                     } else {
-                        alert("读卡失败:" + retJson.msg);
+                        alert("提示:" + retJson.msg);
                     }
                 },
                 error: function (err) {
@@ -651,9 +666,51 @@
             });
         }
 
+        
+
+        //查看某个成员详细信息
+        //地区号、序号，医疗证号由后台缓存获取
+        function getMemberInfo(USER_ID, AREA_NO, D401_21) {
+            var pMap = {};
+            pMap["USER_ID"] = USER_ID;
+            pMap["AREA_NO"] = AREA_NO;
+            pMap["D401_21"] = D401_21;
+            var pJson = map2Json(pMap);
+
+            //设置当前做入院登记的用户
+            currentMemberSelected = pMap;
+
+            showMask("正在处理，请稍后...");
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/getMemberInfoDetail",
+                data: pJson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    closeMask();
+                    var retJson = getJsonObj(data.d);
+                    if (retJson.flag == '0') {
+                        //绑定家庭成员基本信息
+                        var info = retJson.msg;
+                        for (var item in info) {
+                            $("#" + item).html(obj.msg[item]);
+                        }
+
+                    } else {
+                        alert("提示:" + retJson.msg);
+                    }
+                },
+                error: function (err) {
+                    closeMask();
+                    alert(err.toString());
+                }
+            });
+        }
 
     </script>  
-     
+    
+
     <script type="text/javascript">
         var $$ = function (id) {
             return "string" == typeof id ? document.getElementById(id) : id;

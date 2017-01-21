@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -57,11 +58,48 @@ namespace ApiMonitor.DataConvertUtil
             string str_temp;
 
             if (msgTemp.Substring(0, 1) == "{")
-                str_temp = "{\"flag\":\"" + flag + "\",\"msg\":" + msgTemp + "}";
+                str_temp = "{\"flag\":\"" + flag + "\",\"msg\":" + msgTemp + "}"; //msgTemp是json字符串的情况
             else
-                str_temp = "{\"flag\":\"" + flag + "\",\"msg\":\"" + msgTemp + "\"}";
+                str_temp = "{\"flag\":\"" + flag + "\",\"msg\":\"" + msgTemp + "\"}"; //msgTemp是值的情况
 
             return str_temp;
+        }
+
+        /// <summary>
+        /// 将Dictionary<string,string>转为json格式输出，方便前台使用
+        /// </summary>
+        /// <param name="srcDict">输入Dictionary<string,string></param>
+        /// <returns>json字符串</returns>
+        public static string Dict2Json(Dictionary<string, string> srcDict)
+        {
+            if (srcDict != null && srcDict.Count > 0)
+            {
+                return JsonConvert.SerializeObject(srcDict);
+            }
+
+            return "";
+        }
+
+        /// <summary>
+        /// Base64编码
+        /// </summary>
+        /// <param name="src">明文</param>
+        /// <returns></returns>
+        public static string Base64Encode(string src)
+        {
+            byte[] bytes = Encoding.Default.GetBytes(src);
+            return Convert.ToBase64String(bytes);
+        }
+
+        /// <summary>
+        /// Base64解码
+        /// </summary>
+        /// <param name="src">密文</param>
+        /// <returns></returns>
+        public static string Base64Decode(string src)
+        {
+            byte[] outputb = Convert.FromBase64String(src);
+            return Encoding.Default.GetString(outputb);
         }
     }
 }
