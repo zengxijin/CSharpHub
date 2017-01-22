@@ -82,6 +82,7 @@
     <Content Include="pages\iccard.ocx" />
     <Content Include="pages\images\welcomePic.jpg" />
     <Content Include="pages\js\bootstrap-datepicker.js" />
+    <Content Include="pages\js\jquery.base64.js" />
     <Content Include="pages\js\jquery.confirm.min.js" />
     <Content Include="pages\js\jquery.cookie.js" />
     <Content Include="pages\js\xnh.js">
@@ -178,6 +179,7 @@
     </Compile>
     <Compile Include="log\XnhLogger.cs" />
     <Compile Include="DataConvertUtil\DataConvert.cs" />
+    <Compile Include="pages\BizService.cs" />
     <Compile Include="pages\xnhservice.asmx.cs">
       <DependentUpon>xnhservice.asmx</DependentUpon>
       <SubType>Component</SubType>

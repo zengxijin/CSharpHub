@@ -539,7 +539,7 @@
         //入院登记按钮触发事件
         function rydjClk() {
             
-            var user_id = getCookie("USER_ID");
+            var USER_ID = getCookie("USER_ID");
             var PARAM = "一大堆参数信息，再BASE64编码";
             var pMap = {};
             pMap["USER_ID"] = USER_ID;
@@ -563,9 +563,9 @@
                         alert("登记失败：" + retJson.msg);
                     }
                 },
-                error: function (err) {
+                error: function (XMLHttpRequest, textStatus, errorThrown){
                     closeMask();
-                    alert(err);
+                    alert(textStatus + ":" +errorThrown );
                 }
             });
         }
