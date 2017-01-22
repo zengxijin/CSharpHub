@@ -207,7 +207,7 @@ namespace ApiMonitor.pages
         }
 
 
-        #region
+        #region 入院登记
 
         /// <summary>
         /// 获取家庭成员基本信息
@@ -958,7 +958,37 @@ namespace ApiMonitor.pages
 
         }
 
+        [WebMethod]
+        public string bclb(string AREA_NO)
+        {
+            string retStr = "";
+            try
+            {
+                RJZ_Get_S301_06_Zy zy = new RJZ_Get_S301_06_Zy();
+                zy.executeSql(new Dictionary<string, string>() { { "AREA_NO", AREA_NO } });
 
+                if (zy.getExecuteStatus() == true && zy.getExecuteResultPlainString().Length > 2)
+                {
+                    // 0	成功
+                    // 1	失败  未找到该信息
+                    // 成功返回：
+                    // S_Returns=0;ITEM_CODE/ ITEM_NAME; ITEM_CODE/ ITEM_NAME
+                    // ITEM_CODE：VARCHAR2(3)   补偿类别编码
+                    // ITEM_NAME：VARCHAR2(64)  补偿类别名称
+                    retStr = DataConvert.getReturnJson("0",zy.getExecuteResultPlainString().Substring(2));
+                }
+                else
+                {
+                    retStr = DataConvert.getReturnJson("-1", zy.getExecuteResultPlainString());
+                }
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
 
     }
 }

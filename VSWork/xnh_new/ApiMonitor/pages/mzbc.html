@@ -186,35 +186,7 @@
                                 </tr>
                             </thead>
                             <tbody id="bclist">
-                                <!--<tr>
-                                    <td>1234</td>
-                                    <td>K4455</td>
-                                    <td>2016-10-31</td>
-                                    <td>150.12</td>
-                                    <td>255.12</td>
-                                    <td>刘德华</td>
-                                    <td>郭富城</td>
-                                    <td>张学友</td>
-                                    <td>522.11</td>
-                                    <td>
-                                        <input type="checkbox" value="1234" />
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>2346</td>
-                                    <td>K4455</td>
-                                    <td>2016-10-31</td>
-                                    <td>150.12</td>
-                                    <td>255.12</td>
-                                    <td>刘德华</td>
-                                    <td>郭富城</td>
-                                    <td>张学友</td>
-                                    <td>522.11</td>
-                                    <td>
-                                        <input type="checkbox" value="2346" />
-                                    </td>
-                                </tr>-->
+                               
 
                             </tbody>
                         </table>
@@ -346,11 +318,7 @@
                 <td>补偿类别：</td>
                 <td>
                     <select id="bclb" name="" style="width:290px;">
-                        <option value="">请选择</option>
-                        <option value="1">家庭帐户</option>
-                        <option value="2">个人帐户</option>
-                        <option value="3">统筹帐户</option>
-                        <option value="9">其他</option>
+                        
                      </select>
                 </td>
                 <td style="padding-left:30px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
@@ -373,36 +341,24 @@
 
                                 <tbody>
                                     <tr>
-                                        <td>登录名：刘德华</td>
-                                        <td>所在单位ID：xxxx</td>
-                                        <td>电话：123456789</td>
-                                        <td>单位名称：4564687631xxadas</td>
+                                        <td>成员姓名：<span id="D401_02"></span></td>
+                                        <td>身份证号：<span id="D401_01"></span></td>
+                                        <td>性别：<span id="SEX"></span></td>
+                                        <td>年龄：<span id="AGE"></span></td>
                                     </tr>
                                     <tr>
-                                        <td>机构详细地址编码：1235</td>
-                                        <td>机构类型：乡</td>
-                                        <td>机构级别：村卫生室</td>
-                                        <td>机构地区编码：5464</td>
+                                        <td>家庭地址：<span id="D401_13"></span></td>
+                                        <td>民族：<span id="NAME NATIONAL"></span></td>
+                                        <td>当前家庭账户余额：<span id="D601_17"></span></td>
+                                        <td>上补时间：<span id="D503_17"></span></td>
                                     </tr>
                                     <tr>
-                                        <td>补偿年度：2016</td>
-                                        <td>本县芯片卡刷卡授权：有刷卡权限</td>
-                                        <td>本县刷卡标志是够开启：开启</td>
-                                        <td>此医疗机构刷卡权限是否开启：刷</td>
+                                        <td>统筹余额：<span id="D601_17"></span></td>
+                                        <td>门诊个人累补：<span id="GRLB"></span></td>
+                                        <td>门诊家庭累补：<span id="JTLB"></span></td>
+                                        <td>出生日期：<span id="D401_04"></span></td>
                                     </tr>
-                                    <tr>
-                                        <td>是否开启药品最高限价：开启</td>
-                                        <td>日记账药品删除期限：22</td>
-                                        <td>本县保障起始时间：2016-10-10</td>
-                                        <td>本县保障结束时间：2016-12-10</td>
 
-                                    </tr>
-                                    <tr>
-                                        <td>打印明细是否汇总：汇总</td>
-                                        <td>是否启用单次刷卡时间限制：不启用</td>
-                                        <td>单次刷卡时间：10</td>
-                                        <td></td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -455,8 +411,9 @@
                     alert(retVal);
  
                 },
-                error: function (err) {
-                    alert(err.toString());
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
                 }
             });
         }
@@ -524,13 +481,69 @@
                         }
 
                     },
-                    error: function (err) {
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
                         closeMask();
-                        alert(err.toString());
+                        alert(textStatus + ":" + errorThrown);
                     }
                 });
             }
         });
+
+        //根据选择的地区获取补偿类别数据
+        function bclbInfo(AREA_NO) {
+            if (AREA_NO == '') {
+                alert("提示：请选择地区代码");
+                return;
+            }
+
+            showMask("正在加载补偿类别...");
+
+            var pMap = {};
+            pMap["AREA_NO"] = AREA_NO;
+            var pJson = map2Json(pMap);
+
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/bclb",
+                data: pJson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    //返回的数据用data.d获取内容
+                    $("#bclb option").detach();
+                    $("#bclb").append('<option value="">请选择</option>');
+                    var retJson = getJsonObj(data.d);
+                    if (retJson.flag == '0') {
+                        //ITEM_CODE / ITEM_NAME; ITEM_CODE / ITEM_NAME
+                        var itemArray = retJson.msg.split(";");
+                        for (var i = 0; i < itemArray.length; i++) {
+                            var member = itemArray[i].split('/');
+                            var ITEM_CODE = member[0];
+                            var ITEM_NAME = member[1];
+                            $("#bclb").append('<option value="' + ITEM_CODE + '">' + ITEM_NAME + '</option>');
+                        }
+                    } else {
+                        alert("加载失败:" + retJson.msg);
+                    }
+
+                    closeMask();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
+                }
+            });
+        }
+
+        $(document).ready(
+            function () {
+                $("#areaNo").change(function () {
+                    var AREA_NO = $("#areaNo").val();
+                    bclbInfo(AREA_NO);
+                });
+            }
+        );
+
     </script>
     <script>
         //中文语种日期
