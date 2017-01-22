@@ -185,9 +185,9 @@ html,body {
                     }
 
                 },
-                error: function (err) {
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
                     closeMask();
-                    alert(err.toString());
+                    alert(textStatus + ":" + errorThrown);
                 }
             });
         }

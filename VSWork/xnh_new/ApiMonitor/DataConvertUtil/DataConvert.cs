@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -74,7 +73,7 @@ namespace ApiMonitor.DataConvertUtil
         {
             if (srcDict != null && srcDict.Count > 0)
             {
-                return JsonConvert.SerializeObject(srcDict);
+                return Newtonsoft.Json.JsonConvert.SerializeObject(srcDict);
             }
 
             return "";
@@ -87,7 +86,7 @@ namespace ApiMonitor.DataConvertUtil
         /// <returns></returns>
         public static string Base64Encode(string src)
         {
-            byte[] bytes = Encoding.Default.GetBytes(src);
+            byte[] bytes = Encoding.UTF8.GetBytes(src);
             return Convert.ToBase64String(bytes);
         }
 
@@ -99,7 +98,7 @@ namespace ApiMonitor.DataConvertUtil
         public static string Base64Decode(string src)
         {
             byte[] outputb = Convert.FromBase64String(src);
-            return Encoding.Default.GetString(outputb);
+            return Encoding.UTF8.GetString(outputb);
         }
     }
 }

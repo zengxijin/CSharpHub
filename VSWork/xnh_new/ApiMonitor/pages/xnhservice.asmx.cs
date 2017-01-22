@@ -93,7 +93,7 @@ namespace ApiMonitor.pages
                         BufferUtil.setBuffer(user_id, item.Key, item.Value);
                     }
 
-                    retVal = MsgConvert.Dict2Json(responseDict);
+                    retVal = DataConvert.Dict2Json(responseDict);
                 }
             }
             catch (Exception ex)
@@ -162,8 +162,16 @@ namespace ApiMonitor.pages
                         //成员序号：D401_21  CHAR(2)
                         //成员姓名：D401_02  VARCHAR2(24)
                         string retMember = (string)getMember.getResponseResultOtherWrapper();
-                        retVal = DataConvert.getReturnJson("0", retMember);
-                        //todo:家庭成员信息存储
+                        retVal =  DataConvert.Dict2Json(new Dictionary<string, string>() { { "lyzh", D401_10 }, { "data", retMember } });
+                        //家庭成员信息存储到HIS
+                        string[] memberArray = retMember.Split(new string[]{";"},StringSplitOptions.None);
+                        foreach (string one in memberArray)
+                        {
+                            string D401_21 = one.Split(new string[] { "/" }, StringSplitOptions.None)[0]; //成员序号
+                            Dictionary<string, string> record = new Dictionary<string, string>() { { "D401_10", D401_10 }, { "D401_21", D401_21 } };
+                            HIS.insertMZBC(record);
+                            HIS.insertZYBC(record);
+                        }
 
                         //(3)根据医疗证号和序号调用查询基础人员信息交易，将信息显示到用户画面。
                         //string[] memberArray = retMember.Split(new string[]{";"},StringSplitOptions.None);
@@ -286,35 +294,38 @@ namespace ApiMonitor.pages
                 string flag = zydjCheck.getExecuteResultPlainString().Substring(0, 1);
                 if (flag == "2")
                 {
-                    retStr = DataConvert.getReturnJson("-1", "此病人在其他医院已经做过入院登记:" + zydjCheck.getExecuteResultPlainString());
+                    return retStr = DataConvert.getReturnJson("-1", "此病人在其他医院已经做过入院登记:" + zydjCheck.getExecuteResultPlainString());
                 }
                 if (flag == "3")
                 {
-                    retStr = DataConvert.getReturnJson("-1", "程序异常:" + zydjCheck.getExecuteResultPlainString());
+                    return retStr = DataConvert.getReturnJson("-1", "程序异常:" + zydjCheck.getExecuteResultPlainString());
                 }
+
+                string decodeParam = DataConvert.Base64Decode(PARAM); //解码
+                Dictionary<string, string> jsonDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(decodeParam);
 
                 if (flag == "0")
                 {
+                    Dictionary<string, string> param = new Dictionary<string, string>();
+                    param.Add("COME_AREA", jsonDict["COME_AREA"]); //医疗机构所在地区编码(取用户所在机构地区编码AREA_CODE)
+                    param.Add("AREA_CODE", jsonDict["AREA_CODE"]); //地区代码(病人所在地区编码)取前台选择的地区编码
+                    param.Add("D401_10", jsonDict["D401_10"]); //医疗证号
+                    param.Add("D504_02", jsonDict["D504_02"]); //个人编号
+                    param.Add("D504_03", jsonDict["D504_03"]); //姓名
+                    param.Add("D504_04", jsonDict["D504_04"]); //性别（1：男 2：女）传代码
+                    param.Add("D504_05", jsonDict["D504_05"]); //身份证号
+                    param.Add("D504_06", jsonDict["D504_06"]); //年龄
+                    param.Add("D504_21", jsonDict["D504_21"]); //疾病代码
+                    param.Add("D504_09", jsonDict["D504_09"]); //住院号
+                    param.Add("D504_10", jsonDict["D504_10"]); //就诊类型代码（对应s301_05.xls）
+                    param.Add("D504_11", jsonDict["D504_11"]); //入院时间(格式为YYYY-MM-DD)
+                    param.Add("D504_14", jsonDict["D504_14"]); //就医机构代码=DEP_ID
+                    param.Add("D504_19", jsonDict["D504_19"]); //入院状态代码 (对应S301-02.xls)
+                    param.Add("D504_16", jsonDict["D504_16"]); //入院科室代码（对应S201-03.xls）
+                    param.Add("D504_28", jsonDict["D504_28"]); //病人联系电话
+
                     //保存入院登记
                     ZYBC_PROC_NEW_NOTICE newNotice = new ZYBC_PROC_NEW_NOTICE();
-                    Dictionary<string, string> param = new Dictionary<string, string>();
-                    param.Add("COME_AREA", ""); //医疗机构所在地区编码(取用户所在机构地区编码AREA_CODE)
-                    param.Add("AREA_CODE", ""); //地区代码(病人所在地区编码)取前台选择的地区编码
-                    param.Add("D401_10", ""); //医疗证号
-                    param.Add("D504_02", ""); //个人编号
-                    param.Add("D504_03", ""); //姓名
-                    param.Add("D504_04", ""); //性别（1：男 2：女）传代码
-                    param.Add("D504_05", ""); //身份证号
-                    param.Add("D504_06", ""); //年龄
-                    param.Add("D504_21", ""); //疾病代码
-                    param.Add("D504_09", ""); //住院号
-                    param.Add("D504_10", ""); //就诊类型代码（对应s301_05.xls）
-                    param.Add("D504_11", ""); //入院时间(格式为YYYY-MM-DD)
-                    param.Add("D504_14", ""); //就医机构代码=DEP_ID
-                    param.Add("D504_19", ""); //入院状态代码 (对应S301-02.xls)
-                    param.Add("D504_16", ""); //入院科室代码（对应S201-03.xls）
-                    param.Add("D504_28", ""); //病人联系电话
-
                     newNotice.executeSql(param);
 
                     //0	成功
@@ -324,6 +335,16 @@ namespace ApiMonitor.pages
                     //保存失败： S_Returns= 1;错误信息  （分号分隔)
                     if (newNotice.getExecuteStatus() == true)
                     {
+                        //保存住院登记流水号到HIS
+                        string D504_01 = newNotice.getResponseResultWrapperMap()["D504_01"];
+                        Dictionary<string, string> record = new Dictionary<string, string>(){
+                        { "D401_10", D401_10 }, 
+                        { "D401_21", D401_21 },
+                        { "D504_21", jsonDict["D504_21"] },
+                        { "D504_01", D504_01 },
+                        };
+                        HIS.bcZYBC(record);
+
                         retStr = DataConvert.getReturnJson("0", "保存住院登记成功");
                     }
                     else
@@ -337,19 +358,26 @@ namespace ApiMonitor.pages
                     //修改住院登记
                     ZYBC_PROC_UPDATE_NOTICE updateNotice = new ZYBC_PROC_UPDATE_NOTICE();
                     Dictionary<string, string> param = new Dictionary<string, string>();
-                    param.Add("AREA_CODE", ""); //病人地区编码(取前台选择的地区编码)
-                    param.Add("D504_01", ""); //住院登记流水号
-                    param.Add("D504_21", ""); //疾病代码
-                    param.Add("D504_09", ""); //住院号
-                    param.Add("D504_10", ""); //就诊类型
-                    param.Add("D504_19", ""); //入院状态代码(对应S301-02.xls)
-                    param.Add("D504_16", ""); //入院科室代码（对应S201-03.xls）
-                    param.Add("D504_11", ""); //入院时间(格式为YYYY-MM-DD)
-                    param.Add("D504_28", ""); //联系电话
+                    param.Add("AREA_CODE", jsonDict["AREA_CODE"]); //病人地区编码(取前台选择的地区编码)
+                    param.Add("D504_01", jsonDict["D504_01"]); //住院登记流水号
+                    param.Add("D504_21", jsonDict["D504_21"]); //疾病代码
+                    param.Add("D504_09", jsonDict["D504_09"]); //住院号
+                    param.Add("D504_10", jsonDict["D504_10"]); //就诊类型
+                    param.Add("D504_19", jsonDict["D504_19"]); //入院状态代码(对应S301-02.xls)
+                    param.Add("D504_16", jsonDict["D504_16"]); //入院科室代码（对应S201-03.xls）
+                    param.Add("D504_11", jsonDict["D504_11"]); //入院时间(格式为YYYY-MM-DD)
+                    param.Add("D504_28", jsonDict["D504_28"]); //联系电话
 
                     updateNotice.executeSql(param);
                     if (updateNotice.getExecuteStatus() == true)
                     {
+                        //保存修改到HIS
+                        Dictionary<string, string> record = new Dictionary<string, string>() { 
+                            { "D401_10", D401_10 }, 
+                            { "D401_21", D401_21 },
+                            { "D504_21", jsonDict["D504_21"] }
+                        };
+                        HIS.xgZYBC(record);
                         retStr = DataConvert.getReturnJson("0", "修改住院登记成功");
                     }
                     else
@@ -380,6 +408,8 @@ namespace ApiMonitor.pages
                 //删除失败：S_Returns= 1;错误信息   （分号分隔）
                 if (deleteNotice.getExecuteStatus() == true)
                 {
+                    //删除HIS的登记信息
+                    HIS.scZYBC(new Dictionary<string, string>() { { "D504_01", D504_01 } });
                     retStr = DataConvert.getReturnJson("0", "删除入院登记成功");
                 }
                 else

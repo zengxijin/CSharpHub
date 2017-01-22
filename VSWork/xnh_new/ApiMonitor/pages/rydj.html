@@ -382,7 +382,216 @@
                                         <input type="text" style="width:300px;height:20px;font-size:14pt;" placeholder="请输入值查询" id="ryzd" onkeyup="autoComplete.start(event)">
                                     <span style="color:red;">*</span>
                                     </td>
-                                    <td>当前科室：<input id="dqks" type="text" />
+                                    <td>
+                                        <div class="form-group">
+                                            当前科室：<label class="sr-only" for="exampleInputPassword2"></label>
+                                            <div class="btn-group">
+                                                <select id="dqks" name="">
+                                                    <option value="">请选择</option>
+                                                    <option value="01">预防保健科</option>
+                                                    <option value="02">全科医疗科</option>
+                                                    <option value="03">内科</option>
+                                                    <option value="0301">呼吸内科专业</option>
+                                                    <option value="0302">消化内科专业</option>
+                                                    <option value="0303">神经内科专业</option>
+                                                    <option value="0304">心血管内科专业</option>
+                                                    <option value="0305">血液内科专业</option>
+                                                    <option value="0306">肾病学专业</option>
+                                                    <option value="0307">内分泌专业</option>
+                                                    <option value="0308">免疫学专业</option>
+                                                    <option value="0309">变态反应专业</option>
+                                                    <option value="0310">老年病专业</option>
+                                                    <option value="0399">其他</option>
+                                                    <option value="0312">重症监护(内科)</option>
+                                                    <option value="04">外科</option>
+                                                    <option value="0401">普通外科专业</option>
+                                                    <option value="0402">神经外科专业</option>
+                                                    <option value="0403">骨科专业</option>
+                                                    <option value="0404">泌尿外科专业</option>
+                                                    <option value="0405">胸外科专业</option>
+                                                    <option value="0406">心脏大血管外科专业</option>
+                                                    <option value="0407">烧伤科专业</option>
+                                                    <option value="0408">整形外科专业</option>
+                                                    <option value="0499">其他</option>
+                                                    <option value="0410">重症监护(外科)</option>
+                                                    <option value="05">妇产科</option>
+                                                    <option value="0501">妇科专业</option>
+                                                    <option value="0502">产科专业</option>
+                                                    <option value="0503">计划生育专业</option>
+                                                    <option value="0504">优生学专业</option>
+                                                    <option value="0505">生殖健康与不孕症专业</option>
+                                                    <option value="0599">其他</option>
+                                                    <option value="06">妇女保健科</option>
+                                                    <option value="0601">青春期保健专业</option>
+                                                    <option value="0602">围产期保健专业</option>
+                                                    <option value="0603">更年期保健专业</option>
+                                                    <option value="0604">妇女心理卫生专业</option>
+                                                    <option value="0605">妇女营养专业</option>
+                                                    <option value="0699">其他</option>
+                                                    <option value="07">儿科</option>
+                                                    <option value="0701">新生儿专业</option>
+                                                    <option value="0702">小儿传染病专业</option>
+                                                    <option value="0703">小儿消化专业</option>
+                                                    <option value="0704">小儿呼吸专业</option>
+                                                    <option value="0705">小儿心脏病专业</option>
+                                                    <option value="0706">小儿肾病专业</option>
+                                                    <option value="0707">小儿血液病专业</option>
+                                                    <option value="0708">小儿神经病学专业</option>
+                                                    <option value="0709">小儿内分泌专业</option>
+                                                    <option value="0710">小儿遗传病专业</option>
+                                                    <option value="0711">小儿免疫专业</option>
+                                                    <option value="0799">其他</option>
+                                                    <option value="08">小儿外科</option>
+                                                    <option value="0801">小儿普通外科专业</option>
+                                                    <option value="0802">小儿骨科专业</option>
+                                                    <option value="0803">小儿泌尿外科专业</option>
+                                                    <option value="0804">小儿胸心外科专业</option>
+                                                    <option value="0805">小儿神经外科专业</option>
+                                                    <option value="0899">其他</option>
+                                                    <option value="09">儿童保健科</option>
+                                                    <option value="0901">儿童生长发育专业</option>
+                                                    <option value="0902">儿童营养专业</option>
+                                                    <option value="0903">儿童心理卫生专业</option>
+                                                    <option value="0904">儿童五官保健专业</option>
+                                                    <option value="0905">儿童康复专业</option>
+                                                    <option value="0999">其他</option>
+                                                    <option value="10">眼科</option>
+                                                    <option value="11">耳鼻咽喉科</option>
+                                                    <option value="1101">耳科专业</option>
+                                                    <option value="1102">鼻科专业</option>
+                                                    <option value="1103">咽喉科专业</option>
+                                                    <option value="1199">其他</option>
+                                                    <option value="12">口腔科</option>
+                                                    <option value="1201">口腔内科专业</option>
+                                                    <option value="1202">口腔颌面外科专业</option>
+                                                    <option value="1203">正畸专业</option>
+                                                    <option value="1204">口腔修复专业</option>
+                                                    <option value="1205">口腔预防保健专业</option>
+                                                    <option value="1299">其他</option>
+                                                    <option value="13">皮肤科</option>
+                                                    <option value="1301">皮肤病专业</option>
+                                                    <option value="1302">性传播疾病专业</option>
+                                                    <option value="1399">其他</option>
+                                                    <option value="14">医疗美容科</option>
+                                                    <option value="15">精神科</option>
+                                                    <option value="1501">精神病专业</option>
+                                                    <option value="1502">精神卫生专业</option>
+                                                    <option value="1503">药物依赖专业</option>
+                                                    <option value="1504">精神康复专业</option>
+                                                    <option value="1505">社区防治专业</option>
+                                                    <option value="1506">临床心理专业</option>
+                                                    <option value="1507">司法精神专业</option>
+                                                    <option value="1599">其他</option>
+                                                    <option value="16">传染科</option>
+                                                    <option value="1601">肠道传染病专业</option>
+                                                    <option value="1602">呼吸道传染病专业</option>
+                                                    <option value="1603">肝炎专业</option>
+                                                    <option value="1604">虫媒传染病专业</option>
+                                                    <option value="1605">动物源性传染病专业</option>
+                                                    <option value="1606">蠕虫病专业</option>
+                                                    <option value="1699">其它</option>
+                                                    <option value="17">结核病科</option>
+                                                    <option value="18">地方病科</option>
+                                                    <option value="19">肿瘤科</option>
+                                                    <option value="20">急诊医学科</option>
+                                                    <option value="2001">重症监护(急诊)</option>
+                                                    <option value="21">康复医学科</option>
+                                                    <option value="22">运动医学科</option>
+                                                    <option value="23">职业病科</option>
+                                                    <option value="2301">职业中毒专业</option>
+                                                    <option value="2302">尘肺专业</option>
+                                                    <option value="2303">放射病专业</option>
+                                                    <option value="2304">物理因素损伤专业</option>
+                                                    <option value="2305">职业健康监护专业</option>
+                                                    <option value="2399">其他</option>
+                                                    <option value="24">临终关怀科</option>
+                                                    <option value="25">特种医学与军事医学科</option>
+                                                    <option value="26">麻醉科</option>
+                                                    <option value="30">医学检验科</option>
+                                                    <option value="3001">临床体液、血液专业</option>
+                                                    <option value="3002">临床微生物学专业</option>
+                                                    <option value="3003">临床生化检验专业</option>
+                                                    <option value="3004">临床免疫、血清学专业</option>
+                                                    <option value="3099">其他</option>
+                                                    <option value="31">病理科</option>
+                                                    <option value="32">医学影像科</option>
+                                                    <option value="3201">X线诊断专业</option>
+                                                    <option value="3202">CT诊断专业</option>
+                                                    <option value="3203">磁共振成像诊断专业</option>
+                                                    <option value="3204">核医学专业</option>
+                                                    <option value="3205">超声诊断专业</option>
+                                                    <option value="3206">心电诊断专业</option>
+                                                    <option value="3207">脑电及脑血流图诊断专业</option>
+                                                    <option value="3208">神经肌肉电图专业</option>
+                                                    <option value="3209">介入放射学专业</option>
+                                                    <option value="3210">放射治疗专业</option>
+                                                    <option value="3299">其他</option>
+                                                    <option value="50">中医科</option>
+                                                    <option value="5001">内科专业</option>
+                                                    <option value="5002">外科专业</option>
+                                                    <option value="5003">妇产科专业</option>
+                                                    <option value="5004">儿科专业</option>
+                                                    <option value="5005">皮肤科专业</option>
+                                                    <option value="5006">眼科专业</option>
+                                                    <option value="5007">耳鼻咽喉科专业</option>
+                                                    <option value="5008">口腔科专业</option>
+                                                    <option value="5009">肿瘤科专业</option>
+                                                    <option value="5010">骨伤科专业</option>
+                                                    <option value="5011">肛肠科专业</option>
+                                                    <option value="5012">老年病科专业</option>
+                                                    <option value="5013">针灸科专业</option>
+                                                    <option value="5014">推拿科专业</option>
+                                                    <option value="5015">康复医学专业</option>
+                                                    <option value="5016">急诊科专业</option>
+                                                    <option value="5017">预防保健科专业</option>
+                                                    <option value="5099">其他</option>
+                                                    <option value="51">民族医学科</option>
+                                                    <option value="5101">维吾尔医学</option>
+                                                    <option value="5102">藏医学</option>
+                                                    <option value="5103">蒙医学</option>
+                                                    <option value="5104">彝医学</option>
+                                                    <option value="5105">傣医学</option>
+                                                    <option value="5199">其他</option>
+                                                    <option value="52">中西医结合科</option>
+                                                    <option value="61">重症监护室(综合)</option>
+                                                    <option value="79">其它</option>
+                                                    <option value="99">管理科室</option>
+                                                    <option value="9901">感染(管理)科</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="form-group">
+                                            就诊类型：<label class="sr-only" for="exampleInputPassword2"></label>
+                                            <div class="btn-group">
+                                                <select id="jzlx" name="">
+                                                    <option value="2">住院</option>
+                                                    <option value="1">门诊</option>
+                                                    <option value="3">体格检查</option>
+                                                    <option value="4">预防接种</option>
+                                                    <option value="5">正常分娩住院</option>
+                                                    <option value="9">其他</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            入院状态：<label class="sr-only" for="exampleInputPassword2"></label>
+                                            <div class="btn-group">
+                                                <select id="ryzt" name="">
+                                                    <option value="3">一般</option>
+                                                    <option value="2">急</option>
+                                                    <option value="1">危</option>
+                                                    <option value="9">其他</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td></td>
                                     <td></td>
@@ -478,6 +687,7 @@
     <script type="text/javascript" src="calendar/datepicker.min.js"></script>
     <script type="text/javascript" src="calendar/datepicker.zh-CN.js"></script>
     <script type="text/javascript" src="calendar/js/main.js"></script>
+    <script type="text/javascript" src="js/jquery.base64.js"></script>
     <script>
         //中文语种日期
         $(".docs-date").datepicker({
@@ -525,9 +735,9 @@
                         }
                         
                     },
-                    error: function (err) {
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
                         closeMask();
-                        alert(err.toString());
+                        alert(textStatus + ":" + errorThrown);
                     }
                 });
             }
@@ -535,12 +745,46 @@
 
         //当前选择的家庭成员用户
         var currentMemberSelected = null;
+
+        //登记信息获取
+        function djxx() {
+            var rydjMap = {};
+            rydjMap["COME_AREA"] = $("#areaNo").val(); //医疗机构所在地区编码(取用户所在机构地区编码AREA_CODE)
+            rydjMap["AREA_CODE"] = $("#areaNo").val(); //地区代码(病人所在地区编码)取前台选择的地区编码
+            rydjMap["D401_10"] = $("#ylzh").val(); //医疗证号
+            rydjMap["D504_02"] = ""; //个人编号
+            rydjMap["D504_03"] = $("#D401_02").html(); //姓名
+            rydjMap["D504_04"] = $("#SEX").html(); //性别（1：男 2：女）传代码
+            rydjMap["D504_05"] = $("#D401_01").html(); //身份证号
+            rydjMap["D504_06"] = $("#AGE").html(); //年龄
+            rydjMap["D504_21"] = $("#ryzd").val(); //疾病代码 - 入院诊断代码？需要处理
+            rydjMap["D504_09"] = $("#IP_NO").val(); //住院号
+            rydjMap["D504_10"] = $("#jzlx").val(); //就诊类型代码（对应s301_05.xls）
+            rydjMap["D504_11"] = $("#IP_TIME").val(); //入院时间(格式为YYYY-MM-DD)
+            rydjMap["D504_14"] = getCookie("DEP_ID"); //就医机构代码=DEP_ID
+            rydjMap["D504_19"] = $("#ryzt").val(); //入院状态代码 (对应S301-02.xls)
+            rydjMap["D504_16"] = $("#dqks").val(); //入院科室代码（对应S201-03.xls）
+            rydjMap["D504_28"] = $("#CONT_TEL").val(); //病人联系电话
+
+            rydjMap["D504_01"] = $("#REG_NO").val(); //住院登记流水号
+
+            var p = $.base64.encode(map2Json(rydjMap), "utf8");
+            return p;
+
+        }
     
         //入院登记按钮触发事件
         function rydjClk() {
-            
+            if (confirm("确定对 " + $("#D401_02").html() + " 做入院登记吗？" )) {
+            } else {
+                return;
+            }
+
+            if (flag == false) return;
+
             var USER_ID = getCookie("USER_ID");
-            var PARAM = "一大堆参数信息，再BASE64编码";
+            var PARAM = djxx();
+            
             var pMap = {};
             pMap["USER_ID"] = USER_ID;
             pMap["PARAM"] = PARAM;
@@ -572,6 +816,11 @@
 
         //取消登记按钮触发事件
         function qxdjClk() {
+            if (confirm("确定对 " + $("#D401_02").html() + " 做取消登记吗？")) {
+            } else {
+                return;
+            }
+
             var pMap = {};
             pMap["AREA_CODE"] = $("#areaNo").val();
             pMap["D504_01"] = $("#REG_NO").val(); //住院登记流水号
@@ -594,9 +843,9 @@
                         alert("登记失败:" + retJson.msg);
                     }
                 },
-                error: function (err) {
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
                     closeMask();
-                    alert(err.toString());
+                    alert(textStatus + ":" + errorThrown);
                 }
             });
         }
@@ -615,7 +864,7 @@
                     alert("读取卡信息失败，请检查读卡驱动是否成功安装...");
                     return;
                 }
-                $("#ylzh").val(M_MM);
+                
             } catch (e) {
                 alert("读取卡信息失败,请检查读卡驱动是否正确安装:\n" + e.name + " :  " + e.message);
                 return;
@@ -644,7 +893,8 @@
                     if (retJson.flag == '0') {
                         //绑定家庭成员信息
                         $("#familyMember tbody tr").detach();
-                        var memberInfo = retJson.msg;
+                        $("#ylzh").val(retJson.msg.ylzh); //医疗证号
+                        var memberInfo = retJson.msg.data;
                         var memberArray = memberInfo.split(';');
                         for(var i=0; i<memberArray.length; i++){
                             var member = memberArray[i].split('/');
@@ -659,9 +909,9 @@
                         alert("提示:" + retJson.msg);
                     }
                 },
-                error: function (err) {
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
                     closeMask();
-                    alert(err.toString());
+                    alert(textStatus + ":" + errorThrown);
                 }
             });
         }
@@ -701,9 +951,9 @@
                         alert("提示:" + retJson.msg);
                     }
                 },
-                error: function (err) {
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
                     closeMask();
-                    alert(err.toString());
+                    alert(textStatus + ":" + errorThrown);
                 }
             });
         }

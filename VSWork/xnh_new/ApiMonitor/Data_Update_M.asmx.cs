@@ -30,13 +30,13 @@ namespace ApiMonitor
                 return "4;登录失败;";//"0;12344;zengxijin;";
             }
 
-            return proc_name + parames + split;
+            return "2;模拟测试接口，请连接真实测试环境:" + proc_name;
         }
 
         [WebMethod]
         public string Execute_Sql(string Sql_Str, string parames, string split)
         {
-            return Sql_Str + parames + split;
+            return "2;模拟测试接口，请连接真实测试环境:" + Sql_Str;
         }
     }
 }
