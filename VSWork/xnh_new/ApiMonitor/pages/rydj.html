@@ -191,7 +191,7 @@
                 <input type="text" class="form-control" id="zyh" name="zyh"  placeholder="输入回车查询">
             </div>
 
-            <button class="btn btn-success" style="margin-left:10px;" onclick="javascript: readCardClk();">读卡</button>
+            <button type="button" class="btn btn-success" style="margin-left:10px;" onclick="javascript: readCardClk();">读卡</button>
 
             <div class="form-group" style="margin-left:10px;">
                 医疗证号：<label class="sr-only" for="exampleInputPassword2"></label>
@@ -669,8 +669,8 @@
 
         <div style="padding-bottom:100px;">
             <ul style="list-style:none;">
-                <li style="float:left;width:33%;"><button class="btn btn-default" onclick="javascript: rydjClk();">入院登记</button></li>
-                <li style="float:left;width:33%;"><button class="btn btn-default" onclick="javascript: qxdjClk();">取消登记</button></li>
+                <li style="float:left;width:33%;"><button type="button" class="btn btn-default" onclick="javascript: rydjClk();">入院登记</button></li>
+                <li style="float:left;width:33%;"><button type="button" class="btn btn-default" onclick="javascript: qxdjClk();">取消登记</button></li>
             </ul>
         </div>
 
@@ -696,8 +696,8 @@
     </script>
     <script type="text/javascript">
         //住院号回车触发查询HIS
-        $('#zyh').bind('keyup', function (event) {
-            if (event.keyCode == "13") {
+        $('#zyh').bind('keydown', function (event) {
+            if (event.keyCode == 13) {
                 var zyhVal = $("#zyh").val();
                 if (zyhVal == '') {
                     alert("请输入住院号查询");
