@@ -142,6 +142,7 @@ namespace ApiMonitor.pages
                     retStr = DataConvert.getReturnJson("-1", "不存在此卡号交易");
                     XnhLogger.log("卡号" + M_MM + " 卡号不存在交易");
                     //哈哈，我也加了东西
+                    retVal = retStr;
                 }
 
                 //卡号存在交易
@@ -465,16 +466,18 @@ namespace ApiMonitor.pages
         /// <param name="key"></param>
         /// <returns></returns>
         [WebMethod]
-        public string tryCalculate(string user_id, string DIAGNOSIS_CODE)
+        public string tryCalculate(string USER_ID, string DIAGNOSIS_CODE,string PARAM)
         {
+            string retStr = "";
             try
             {
                 //(1)根据用户选择的疾病编码调用 验证输入疾病是否在疾病库中存在交易，判断是否存在，不存在提示报错，中断试算；存在进行试算业务交易。
                 MZBC_PROC_DIAGNOSIS_CHECK dCheck = new MZBC_PROC_DIAGNOSIS_CHECK();
-                string retStr = dCheck.executeSql(
+                string tmp = dCheck.executeSql(
                     new Dictionary<string, string>() { { "DIAGNOSIS_CODE", DIAGNOSIS_CODE } }
                     );
-                if (retStr == "0")
+
+                if (tmp == "0")
                 {
                     //(2)疾病存在，进行试算交易
                     RJZ_getShisuanResult shisuan = new RJZ_getShisuanResult();
@@ -513,9 +516,10 @@ namespace ApiMonitor.pages
                         //retDict["REDEEM_TOTAL"];//单次补偿合计
                     }
                 }
-                else if (retStr == "1")
+                else if (tmp == "1")
                 {
                     //疾病不存在
+                    XnhLogger.log(DIAGNOSIS_CODE + " " + "此疾病在疾病库中不存在");
                 }
                 else
                 {
@@ -527,7 +531,7 @@ namespace ApiMonitor.pages
             {
                 XnhLogger.log(this.GetType().ToString() + " tryCalculate " + ex.StackTrace);
             }
-            return "fail";
+            return retStr;
         }
 
         /// <summary>
@@ -901,6 +905,14 @@ namespace ApiMonitor.pages
         public string hzxmcx(string date, string query)
         {
             string retStr = "";
+
+            string dateSql = "";
+            //日期不为空
+            if (string.IsNullOrEmpty(date) ==  false)
+            {
+                dateSql = "AND (CL_CHARGE.CHRG_DATE >= '" + date.Replace("-",".") + "')";
+            }
+
             try
             {
                 string sql = " SELECT cl_CHARGE_RECIPE.REC_NO as REC_NO,CODE_OPERATOR.oper_name,PATIENTINFO.NAME ,CL_RECIPE.REC_TIME, " +
@@ -912,8 +924,9 @@ namespace ApiMonitor.pages
       "FROM CL_CHARGE , CL_CHARGE_INVOICE ,CL_CHARGE_RECIPE,CL_RECIPE , PATIENTINFO,CODE_OPERATOR , CODE_DEPARTMENT d " +
       "WHERE ( CL_CHARGE.CHRG_NO = CL_CHARGE_INVOICE.CHRG_NO(+)) and (CL_CHARGE.CHRG_NO = CL_CHARGE_RECIPE.CHRG_NO) AND " +
       "(CL_CHARGE_RECIPE.REC_NO = CL_RECIPE.REC_NO) AND (CL_RECIPE.PID = PATIENTINFO.PID) AND (CL_CHARGE_RECIPE.FLAG = '1') AND " +
-      "(CL_CHARGE.CLASS = '2' ) AND ((PATIENTINFO.NAME LIKE '%" + query + "%') or (INVO_NO like '%" + query + "%') ) AND " +
-      "(CL_CHARGE.CHRG_DATE >= '2016.01.01') AND (cl_CHARGE_RECIPE.TYPE = '2') and " +
+      "(CL_CHARGE.CLASS = '2' ) AND ((PATIENTINFO.NAME LIKE '%" + query + "%') or (INVO_NO like '%" + query + "%') ) " +
+      //"(CL_CHARGE.CHRG_DATE >= '2016.01.01') AND (cl_CHARGE_RECIPE.TYPE = '2') and " +
+      dateSql + " AND (cl_CHARGE_RECIPE.TYPE = '2') and " +
       "d.dept_code=CL_RECIPE.dept_code and CODE_OPERATOR.OPER_CODE=CL_RECIPE.dr_code " +
       "group by cl_CHARGE_RECIPE.REC_NO,CODE_OPERATOR.oper_name,PATIENTINFO.NAME ,CL_RECIPE.REC_TIME, " +
       "CL_RECIPE.UP_FLAG,CL_RECIPE.REG_NO,CL_CHARGE.CHRG_NO ,CL_CHARGE.CHRG_TIME ,CL_CHARGE.OPER_CODE ,CL_CHARGE.TYPE , " +
@@ -989,6 +1002,10 @@ namespace ApiMonitor.pages
                     // ITEM_CODE：VARCHAR2(3)   补偿类别编码
                     // ITEM_NAME：VARCHAR2(64)  补偿类别名称
                     retStr = DataConvert.getReturnJson("0", zy.getExecuteResultPlainString().Substring(2));
+                }
+                else if (zy.getExecuteResultPlainString() == "1")
+                {
+                    retStr = DataConvert.getReturnJson("-1", "未找到该地区补偿类别信息");
                 }
                 else
                 {

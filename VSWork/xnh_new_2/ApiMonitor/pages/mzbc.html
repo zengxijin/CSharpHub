@@ -198,7 +198,7 @@
                 <div class="panel panel-default">
 
                     <div class="bootstrap-admin-panel-content">
-                        <table class="table">
+                        <table class="table" id="zyls">
                             <thead>
                                 <tr>
                                     <th>门诊流水号</th>
@@ -346,7 +346,7 @@
                 </td>
                 <td style="padding-left:30px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                 <td style="padding-left:30px;">门诊疾病编码：</td>
-                <td><input style="width:200px;" placeholder=""></td>
+                <td><input style="width:200px;" placeholder="" id="jbbm"></td>
             </tr>
         </table>
 
@@ -440,13 +440,46 @@
     <script type="text/javascript" src="calendar/js/main.js"></script>
 
     <script type="text/javascript">
+
+        function getParam() {
+
+        }
+
         //试算
         function tryCal() {
+            var checked = getChecked();
+            if (checked == null || checked.length == 0) {
+                alert("请勾选门诊流水进行操作");
+                return;
+            }
+
+            var AREA_NO = $("#areaNo").val();
+            if (AREA_NO == "") {
+                alert("请选择正确地区");
+                return;
+            }
+
+            var info = "";
+            for (var i = 0; i < checked.length; i++) {
+                info += "流水:" + $("#" + checked[i] + "_REC_NO").html() + " 患者:" + $("#" + checked[i] + "_NAME").html() + "\n";
+            }
+
+            if (confirm("确定对\n\n" + info + "\n进行试算吗？")) {
+            } else {
+                return;
+            }
+
+            var USER_ID = getCookie("USER_ID");
+            var pMap = {};
+            pMap["USER_ID"] = USER_ID;
+            pMap["DIAGNOSIS_CODE"] = $("#jbbm").val(); //疾病代码
+            pMap["PARAM"] = ""; //试算的参数
+            var pJson = map2Json(pMap);
 
             $.ajax({
                 type: "Post",
                 url: "xnhservice.asmx/tryCalculate",
-                data: "{'fuck':'me'}",
+                data: pJson,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (data) {
@@ -491,23 +524,26 @@
                         var retJson = getJsonObj(retVal);
                         if (retJson.flag == '0') {
                             var json = retJson.msg;
+                            $("#zyls tbody tr").detach();
                             for (var item in json.data) {
                                 var row = json.data[item];
 
-                                var trStr = '<tr class="example">';//动态拼接table
+                                var trId = $.trim(row['REC_NO']);
+
+                                var trStr = '<tr class="example" id="' + trId + '" >';//动态拼接table
                                 // var html = '';
                                 //for (var key in row) {//
-                                trStr += '<td>' + row['REC_NO'] + '</td>';//数据表的主键值
+                                trStr += '<td id="' + trId + '_REC_NO">' + $.trim(row['REC_NO']) + '</td>';//数据表的主键值 门诊流水号
                                 //}
-                                trStr += '<td>' + row['REG_NO'] + '</td>';
-                                trStr += '<td>' + row['REC_TIME'] + '</td>';
-                                trStr += '<td>' + row['TOTAL'] + '</td>';
-                                trStr += '<td>' + row['TOTAL_REC'] + '</td>';
-                                trStr += '<td>' + row['OPER_NAME'] + '</td>';
-                                trStr += '<td>' + row['NAME'] + '</td>';
-                                trStr += '<td>' + row['IP_DR'] + '</td>';
-                                trStr += '<td>' + row['FEE_CODE'] + '</td>';
-                                trStr += '<td>' + '<input type="checkbox" value="2346" />' + '</td>';
+                                trStr += '<td id="' + trId + '_REG_NO">' + row['REG_NO'] + '</td>'; //处方号
+                                trStr += '<td id="' + trId + '_REC_TIME">' + row['REC_TIME'] + '</td>'; //结算日期
+                                trStr += '<td id="' + trId + '_TOTAL">' + row['TOTAL'] + '</td>'; //结算金额
+                                trStr += '<td id="' + trId + '_TOTAL_REC">' + row['TOTAL_REC'] + '</td>'; //处方金额
+                                trStr += '<td id="' + trId + '_OPER_NAME">' + row['OPER_NAME'] + '</td>'; //结算人
+                                trStr += '<td id="' + trId + '_NAME">' + row['NAME'] + '</td>'; //患者姓名
+                                trStr += '<td id="' + trId + '_IP_DR">' + row['IP_DR'] + '</td>'; //处方医生
+                                trStr += '<td id="' + trId + '_FEE_CODE">' + $.trim(row['FEE_CODE']) + '</td>'; //农合结算
+                                trStr += '<td id="' + trId + '_CHECKBOX">' + '<input name="lsCheckBox" type="checkbox" value="' + trId + '" />' + '</td>';
                                 trStr += '</tr>';
                                 $(trStr).appendTo("#bclist");
                                 //$("#bclist").html(trStr);
@@ -533,6 +569,16 @@
             }
         });
 
+        //检查选择了哪些流水
+        function getChecked() {
+            var allCheck = [];
+            $("input[name='lsCheckBox']:checkbox:checked").each(function () {
+                var val = $(this).val();
+                allCheck.push(val);
+            });
+            return allCheck;
+        }
+
         //根据选择的地区获取补偿类别数据
         function bclbInfo(AREA_NO) {
             if (AREA_NO == '') {
@@ -553,6 +599,7 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (data) {
+                    
                     //返回的数据用data.d获取内容
                     $("#bclb option").detach();
                     $("#bclb").append('<option value="">请选择</option>');
@@ -569,7 +616,6 @@
                     } else {
                         alert("加载失败:" + retJson.msg);
                     }
-
                     closeMask();
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
