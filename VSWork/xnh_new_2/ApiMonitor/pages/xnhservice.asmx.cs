@@ -164,11 +164,11 @@ namespace ApiMonitor.pages
                         //成员序号：D401_21  CHAR(2)
                         //成员姓名：D401_02  VARCHAR2(24)
                         string retMember = (string)getMember.getResponseResultOtherWrapper();
-                        retVal =  DataConvert.Dict2Json(new Dictionary<string, string>() { { "ylzh", D401_10 }, { "data", retMember } });
+                        retVal = DataConvert.Dict2Json(new Dictionary<string, string>() { { "ylzh", D401_10 }, { "data", retMember } });
                         retVal = DataConvert.getReturnJson("0", retVal);
 
                         //家庭成员信息存储到HIS
-                        string[] memberArray = retMember.Split(new string[]{";"},StringSplitOptions.None);
+                        string[] memberArray = retMember.Split(new string[] { ";" }, StringSplitOptions.None);
                         foreach (string one in memberArray)
                         {
                             string D401_21 = one.Split(new string[] { "/" }, StringSplitOptions.None)[0]; //成员序号
@@ -245,7 +245,7 @@ namespace ApiMonitor.pages
             return retStr;
         }
 
-        
+
         [WebMethod]
         public string rydj(string USER_ID, string PARAM)
         {
@@ -254,18 +254,22 @@ namespace ApiMonitor.pages
             {
                 //根据USER_ID获取缓存的新医疗卡号信息
                 string D401_10 = BufferUtil.getBufferByKey(USER_ID, "D401_10");
+
+                string decodeParam = DataConvert.Base64Decode(PARAM); //解码
+                Dictionary<string, string> jsonDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(decodeParam);
+
                 //(1)验证输入疾病是否在疾病库中存在，存在可以继续登记
                 MZBC_PROC_DIAGNOSIS_CHECK check = new MZBC_PROC_DIAGNOSIS_CHECK();
-                string DIAGNOSIS_CODE = ""; //疾病代码
+                string DIAGNOSIS_CODE = jsonDict["D504_21"]; //疾病代码
                 check.executeSql(
                     new Dictionary<string, string>() { { "DIAGNOSIS_CODE", DIAGNOSIS_CODE } }
                  );
-                
+
                 //0	成功
                 //1	此疾病在疾病库中不存在
                 //2	程序异常
                 if (check.getExecuteResultPlainString() != null && check.getExecuteResultPlainString().Length >= 1
-                    && check.getExecuteResultPlainString().Substring(0,1) !="0")
+                    && check.getExecuteResultPlainString().Substring(0, 1) != "0")
                 {
                     if (check.getExecuteResultPlainString().Substring(0, 1) == "1")
                     {
@@ -304,9 +308,6 @@ namespace ApiMonitor.pages
                 {
                     return retStr = DataConvert.getReturnJson("-1", "程序异常:" + zydjCheck.getExecuteResultPlainString());
                 }
-
-                string decodeParam = DataConvert.Base64Decode(PARAM); //解码
-                Dictionary<string, string> jsonDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(decodeParam);
 
                 if (flag == "0")
                 {
@@ -987,7 +988,7 @@ namespace ApiMonitor.pages
                     // S_Returns=0;ITEM_CODE/ ITEM_NAME; ITEM_CODE/ ITEM_NAME
                     // ITEM_CODE：VARCHAR2(3)   补偿类别编码
                     // ITEM_NAME：VARCHAR2(64)  补偿类别名称
-                    retStr = DataConvert.getReturnJson("0",zy.getExecuteResultPlainString().Substring(2));
+                    retStr = DataConvert.getReturnJson("0", zy.getExecuteResultPlainString().Substring(2));
                 }
                 else
                 {
