@@ -942,7 +942,10 @@
                         //绑定家庭成员基本信息
                         var info = retJson.msg;
                         for (var item in info) {
-                            $("#" + item).html(obj.msg[item]);
+                            var objTest = $("#" + item);
+                            if (objTest != null) {
+                                $("#" + item).html(info[item]);
+                            }
                         }
 
                     } else {
