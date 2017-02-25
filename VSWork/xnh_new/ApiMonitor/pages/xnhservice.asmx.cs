@@ -140,6 +140,7 @@ namespace ApiMonitor.pages
                 if (check.getExecuteStatus() == false)
                 {
                     retStr = DataConvert.getReturnJson("-1", "不存在此卡号交易");
+                    XnhLogger.log("卡号：" + M_MM + " " + "不存在此卡号交易");
                 }
 
                 //卡号存在交易
