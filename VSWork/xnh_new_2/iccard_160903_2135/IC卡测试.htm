@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>TEST</title>
+
+<script language="javascript">
+
+function GetCardinfo()
+{
+	var cport;
+	var cseat;
+	
+var str1;
+cport=parseInt(document.form1.T1.value);
+cseat=parseInt(document.form1.T2.value);
+str1=document.getElementById("CIccardCtrl").GetCardinfo(cport,cseat);
+document.form1.cardinfo.value=str1;
+}
+
+</script>
+
+</head> 
+
+<body>
+<OBJECT classid=clsid:8A5B3626-40FC-4563-AF78-C9C4AC2ECFD6  width=0 height=0 align="center"  id="CIccardCtrl" HSPACE=0 VSPACE=0>
+</OBJECT>
+
+
+
+<form name="form1">
+<p>´®¿ÚºÅ<input type="text" name="T1" size="20" value="1">
+<p>¿¨×ùºÅ(1:ÏÂ¿¨×ù 2:ÉÏ¿¨×ù)<input type="text" name="T2" size="20" value="1">
+<p><input type="text"  name="cardinfo" size="60">
+<input type="button" onclick="javascript:GetCardinfo()" value="¶Á¿¨ÐÅÏ¢" >
+</form>
+</body>
+</html>
