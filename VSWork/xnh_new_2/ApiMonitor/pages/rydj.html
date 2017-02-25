@@ -1,0 +1,1134 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>入院登记</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" media="screen" href="css/bootstrap.min.css">
+        <link rel="stylesheet" media="screen" href="css/bootstrap-theme.min.css">
+
+        <!-- Bootstrap Admin Theme -->
+        <link rel="stylesheet" media="screen" href="css/bootstrap-admin-theme.css">
+        <link rel="stylesheet" media="screen" href="css/bootstrap-admin-theme-change-size.css">
+        <link rel="stylesheet" media="screen" href="calendar/datepicker.min.css">
+        <link rel="stylesheet" media="screen" href="calendar/css/main.css">
+
+        <!-- Custom styles -->
+        <style type="text/css">
+            @font-face {
+                font-family: Ubuntu;
+                src: url('fonts/Ubuntu-Regular.ttf');
+            }
+            .bs-docs-masthead{
+                background-color: #6f5499;
+                background-image: linear-gradient(to bottom, #563d7c 0px, #6f5499 100%);
+                background-repeat: repeat-x;
+            }
+            .bs-docs-masthead{
+                padding: 0;
+            }
+            .bs-docs-masthead h1{
+                color: #fff;
+                font-size: 40px;
+                margin: 0;
+                padding: 34px 0;
+                text-align: center;
+            }
+            .bs-docs-masthead a:hover{
+                text-decoration: none;
+            }
+            .meritoo-logo a{
+                background-color: #fff;
+                border: 1px solid rgba(66, 139, 202, 0.4);
+                display: block;
+                font-family: Ubuntu;
+                padding: 22px 0;
+                text-align: center;
+            }
+            .meritoo-logo a,
+            .meritoo-logo a:hover,
+            .meritoo-logo a:focus{
+                text-decoration: none;
+            }
+            .meritoo-logo a img{
+                display: block;
+                margin: 0 auto;
+            }
+            .meritoo-logo a span{
+                color: #4e4b4b;
+                font-size: 18px;
+            }
+            .row-urls{
+                margin-top: 4px;
+            }
+            .row-urls .col-md-6{
+                text-align: center;
+            }
+            .row-urls .col-md-6 a{
+                font-size: 14px;
+            }
+
+            #mask_background {position:absolute; z-index:998; top:0px; left:0px; background:rgb(50,50,50);background:rgba(0,0,0,0.5); display:none;}
+            #mask_content {position:absolute; width:500px; z-index:999; padding:10px; background:#fff; border-radius:5px; display:none;}
+           /*此处加*/
+           
+        </style>
+
+        <style type="text/css">
+
+            .auto_hidden {
+                width: 204px;
+                border-top: 1px solid #333;
+                border-bottom: 1px solid #333;
+                border-left: 1px solid #333;
+                border-right: 1px solid #333;
+                position: absolute;
+                display: none;
+            }
+
+            .auto_show {
+                width: 204px;
+                border-top: 1px solid #333;
+                border-bottom: 1px solid #333;
+                border-left: 1px solid #333;
+                border-right: 1px solid #333;
+                position: absolute;
+                z-index: 9999; /* 设置对象的层叠顺序 */
+                display: block;
+            }
+
+            .auto_onmouseover {
+                color: #ffffff;
+                background-color: highlight;
+                width: 100%;
+            }
+
+            .auto_onmouseout {
+                color: #000000;
+                width: 100%;
+                background-color: #ffffff;
+            }
+        </style>
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+           <script type="text/javascript" src="js/html5shiv.js"></script>
+           <script type="text/javascript" src="js/respond.min.js"></script>
+        <![endif]-->
+    </head>
+<body class="bootstrap-admin-with-small-navbar" onload="checkLogin();">
+    <!--读卡驱动-->
+    <object classid=clsid:8A5B3626-40FC-4563-AF78-C9C4AC2ECFD6 width=0 height=0 align="center" id="CIccardCtrl" hspace=0 vspace=0></object>
+
+    <div id="mask_background"></div>
+    <div id="mask_content"></div>
+    <!-- small navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top bootstrap-admin-navbar-sm" role="navigation">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav navbar-left bootstrap-admin-theme-change-size">
+                            <li style="float:left;">使用单位:<span id="loginInfo_DEP_NAME"></span></li>
+                            <li style="float:left;padding-left:10px;">当前登录人:<span id="loginInfo_USER_CODE"></span></li>
+                            <li style="float:left;padding-left:10px;">所在单位ID:<span id="loginInfo_DEP_ID"></span></li>
+                            <li style="float:left;padding-left:10px;">当前时间:<span id="loginInfo_dateTime"></span></li>
+                            <li><a class="size-changer large active" onclick="javascript: exit();">退出</a></li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- main / large navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top bootstrap-admin-navbar bootstrap-admin-navbar-under-small" role="navigation">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".main-navbar-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+
+                    </div>
+                    <div class="collapse navbar-collapse main-navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li class="active"><a href="rydj.html">住院业务</a></li>
+                            <li><a href="mzbc.html">门诊补偿</a></li>
+                            <li><a href="zymxsc.html">住院费用上传</a></li>
+                            <li><a href="czlp.html">发票打印</a></li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-hover="dropdown">其他 <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li role="presentation" class="dropdown-header">#1</li>
+                                    <li><a href="#">菜单1</a></li>
+
+                                    <li role="presentation" class="divider"></li>
+                                    <li role="presentation" class="dropdown-header">#2</li>
+                                    <li><a href="#">菜单2</a></li>
+
+                                </ul>
+                            </li>
+                        </ul>
+                    </div><!-- /.navbar-collapse -->
+                </div>
+            </div>
+        </div><!-- /.container -->
+    </nav>
+
+    <div class="container">
+        <!-- left, vertical navbar & content -->
+        <div class="form-inline" role="form">
+            <div class="form-group">
+                住院号：<label class="sr-only" for="exampleInputEmail2"></label>
+                <input type="text" class="form-control" id="zyh" name="zyh"  placeholder="输入回车查询">
+            </div>
+
+            <button type="button"class="btn btn-success" style="margin-left:10px;" onclick="javascript: readCardClk();">读卡</button>
+
+            <div class="form-group" style="margin-left:10px;">
+                医疗证号：<label class="sr-only" for="exampleInputPassword2"></label>
+                <input type="text" class="form-control" id="ylzh" placeholder="">
+            </div>
+
+            <div class="form-group" style="margin-left:10px;">
+                地区编码：<label class="sr-only" for="exampleInputPassword2"></label>
+                <div class="btn-group">
+                    <select id="areaNo" name="">
+                        <option value="">请选择</option>
+                        <option value="620000">甘肃省(620000)</option>
+                        <option value="620100">兰州市(620100)</option>
+                        <option value="620103">七里河区(620103)</option>
+                        <option value="620104">西固区(620104)</option>
+                        <option value="620105">安宁区(620105)</option>
+                        <option value="620111">红古区(620111)</option>
+                        <option value="620121">永登县(620121)</option>
+                        <option value="620122">皋兰县(620122)</option>
+                        <option value="620123">榆中县(620123)</option>
+                        <option value="620200">嘉峪关市(620200)</option>
+                        <option value="620300">金昌市(620300)</option>
+                        <option value="620302">金川区(620302)</option>
+                        <option value="620321">永昌县(620321)</option>
+                        <option value="620400">白银市(620400)</option>
+                        <option value="620402">白银区(620402)</option>
+                        <option value="620403">平川区(620403)</option>
+                        <option value="620421">靖远县(620421)</option>
+                        <option value="620422">会宁县(620422)</option>
+                        <option value="620423">景泰县(620423)</option>
+                        <option value="620500">天水市(620500)</option>
+                        <option value="620502">秦州区(620502)</option>
+                        <option value="620503">麦积区(620503)</option>
+                        <option value="620521">清水县(620521)</option>
+                        <option value="620522">秦安县(620522)</option>
+                        <option value="620523">甘谷县(620523)</option>
+                        <option value="620524">武山县(620524)</option>
+                        <option value="620525">张家川回族自治县(620525)</option>
+                        <option value="620600">武威市(620600)</option>
+                        <option value="620602">凉州区(620602)</option>
+                        <option value="620621">民勤县(620621)</option>
+                        <option value="620622">古浪县(620622)</option>
+                        <option value="620623">天祝县(620623)</option>
+                        <option value="620700">张掖市(620700)</option>
+                        <option value="620702">甘州区(620702)</option>
+                        <option value="620721">肃南县(620721)</option>
+                        <option value="620722">民乐县(620722)</option>
+                        <option value="620723">临泽县(620723)</option>
+                        <option value="620724">高台县(620724)</option>
+                        <option value="620725">山丹县(620725)</option>
+                        <option value="620800">平凉市(620800)</option>
+                        <option value="620802">崆峒区(620802)</option>
+                        <option value="620821">泾川县(620821)</option>
+                        <option value="620822">灵台县(620822)</option>
+                        <option value="620823">崇信县(620823)</option>
+                        <option value="620824">华亭县(620824)</option>
+                        <option value="620825">庄浪县(620825)</option>
+                        <option value="620826">静宁县(620826)</option>
+                        <option value="620900">酒泉市(620900)</option>
+                        <option value="620902">肃州区(620902)</option>
+                        <option value="620921">金塔县(620921)</option>
+                        <option value="620922">安西县(620922)</option>
+                        <option value="620923">肃北蒙古族自治县(620923)</option>
+                        <option value="620924">阿克塞哈萨克族自治县(620924)</option>
+                        <option value="620981">玉门市(620981)</option>
+                        <option value="620982">敦煌市(620982)</option>
+                        <option value="621000">庆阳市(621000)</option>
+                        <option value="621002">西峰区(621002)</option>
+                        <option value="621021">庆城县(621021)</option>
+                        <option value="621022">环县(621022)</option>
+                        <option value="621023">华池县(621023)</option>
+                        <option value="621024">合水县(621024)</option>
+                        <option value="621025">正宁县(621025)</option>
+                        <option value="621026">宁县(621026)</option>
+                        <option value="621027">镇原县(621027)</option>
+                        <option value="621100">定西市(621100)</option>
+                        <option value="621102">安定区(621102)</option>
+                        <option value="621121">通渭县(621121)</option>
+                        <option value="621122">陇西县(621122)</option>
+                        <option value="621123">渭源县(621123)</option>
+                        <option value="621124">临洮县(621124)</option>
+                        <option value="621125">漳县(621125)</option>
+                        <option value="621126">岷县(621126)</option>
+                        <option value="621200">陇南市(621200)</option>
+                        <option value="621202">武都区(621202)</option>
+                        <option value="621223">宕昌县(621223)</option>
+                        <option value="621221">成县(621221)</option>
+                        <option value="621224">康县(621224)</option>
+                        <option value="621222">文县(621222)</option>
+                        <option value="621225">西和县(621225)</option>
+                        <option value="621226">礼县(621226)</option>
+                        <option value="621228">两当县(621228)</option>
+                        <option value="621227">徽县(621227)</option>
+                        <option value="622900">临夏回族自治州(622900)</option>
+                        <option value="622901">临夏市(622901)</option>
+                        <option value="622921">临夏县(622921)</option>
+                        <option value="622922">康乐县(622922)</option>
+                        <option value="622923">永靖县(622923)</option>
+                        <option value="622924">广河县(622924)</option>
+                        <option value="622925">和政县(622925)</option>
+                        <option value="622926">东乡县(622926)</option>
+                        <option value="622927">积石山保安族东乡族撒拉族自治县(622927)</option>
+                        <option value="623000">甘南藏族自治州(623000)</option>
+                        <option value="623001">合作市(623001)</option>
+                        <option value="623021">临潭县(623021)</option>
+                        <option value="623022">卓尼县(623022)</option>
+                        <option value="623023">舟曲县(623023)</option>
+                        <option value="623024">迭部县(623024)</option>
+                        <option value="623025">玛曲县(623025)</option>
+                        <option value="623026">碌曲县(623026)</option>
+                        <option value="623027">夏河县(623027)</option>
+                        <option value="620201">嘉峪关市(620201)</option>
+
+                    </select>
+                </div>
+            </div>
+            
+        </div>
+
+        <p></p>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="text-muted bootstrap-admin-box-title">HIS中病人信息</div>
+                    </div>
+                    <div class="bootstrap-admin-panel-content">
+                        <table class="table">
+
+                            <tbody>
+                                <tr>
+                                    <td>姓名：<input id="NAME" name="NAME" type="text" readonly  style="width:80px;" /></td>
+                                    <td>费别：<input id="FEE_NAME" name="FEE_NAME" type="text" readonly style="width:80px;" /></td>
+                                    <td>住院号：<input id="IP_NO" name="IP_NO" type="text" readonly style="width:80px;" /></td>
+                                    <td>住院流水：<input id="REG_NO" name="REG_NO" type="text" readonly style="width:100px;" /></td>
+                                </tr>
+                                <tr>
+                                    <td>性别：<input id="SEX" name="SEX" type="TEXT" readonly style="width:30px;"/></td>
+                                    <td>出生日期：<input id="BIRTH" name="BIRTH" type="datetime" readonly style="width:80px;"/></td>
+                                    <td>年龄：<input id="AGE" name="AGE" type="text" readonly style="width:30px;"/>岁</td>
+                                    <td>电话：<input id="CONT_TEL" name="CONT_TEL" type="text" style="width:80px;"/></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">地址：<input id="CONT_ADDR" name="CONT_ADDR" type="text" readonly /></td>
+                                  
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="text-muted bootstrap-admin-box-title"><p>
+                            入院诊断:<input list="BZ_NAME">
+                            </p> <datalist id="BZ_NAME"> 
+                            </datalist>
+                             </div> 
+
+                    </div>
+                    <div class="bootstrap-admin-panel-content">
+                        <table class="table">
+
+                            <tbody>
+                                <tr>
+                                    <td>入院科室：<input id="DEPT" name="DEPT" type="text" readonly style="width:90px;"/>
+                                    </td>
+                                    <td>入院时间：<input type="text" id="IP_TIME" class="docs-date" style="width:150px;" name="IP_TIME" placeholder="选择日期">
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>门诊医生：<input id="IP_DR" name="IP_DR" type="text" style="width:90px;" />
+                                    </td>
+                                    <td>出院时间：<input type="text" id="OP_TIME" class="docs-date" style="width:150px;"  name="OP_TIME" placeholder="选择日期">
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>入院诊断：
+                                        <input type="text" style="width:300px;height:20px;font-size:14pt;" placeholder="请输入值查询" id="ryzd" onkeyup="autoComplete.start(event)">
+                                    <span style="color:red;">*</span>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            当前科室：<label class="sr-only" for="exampleInputPassword2"></label>
+                                            <div class="btn-group">
+                                                <select id="dqks" name="">
+                                                    <option value="">请选择</option>
+                                                    <option value="01">预防保健科</option>
+                                                    <option value="02">全科医疗科</option>
+                                                    <option value="03">内科</option>
+                                                    <option value="0301">呼吸内科专业</option>
+                                                    <option value="0302">消化内科专业</option>
+                                                    <option value="0303">神经内科专业</option>
+                                                    <option value="0304">心血管内科专业</option>
+                                                    <option value="0305">血液内科专业</option>
+                                                    <option value="0306">肾病学专业</option>
+                                                    <option value="0307">内分泌专业</option>
+                                                    <option value="0308">免疫学专业</option>
+                                                    <option value="0309">变态反应专业</option>
+                                                    <option value="0310">老年病专业</option>
+                                                    <option value="0399">其他</option>
+                                                    <option value="0312">重症监护(内科)</option>
+                                                    <option value="04">外科</option>
+                                                    <option value="0401">普通外科专业</option>
+                                                    <option value="0402">神经外科专业</option>
+                                                    <option value="0403">骨科专业</option>
+                                                    <option value="0404">泌尿外科专业</option>
+                                                    <option value="0405">胸外科专业</option>
+                                                    <option value="0406">心脏大血管外科专业</option>
+                                                    <option value="0407">烧伤科专业</option>
+                                                    <option value="0408">整形外科专业</option>
+                                                    <option value="0499">其他</option>
+                                                    <option value="0410">重症监护(外科)</option>
+                                                    <option value="05">妇产科</option>
+                                                    <option value="0501">妇科专业</option>
+                                                    <option value="0502">产科专业</option>
+                                                    <option value="0503">计划生育专业</option>
+                                                    <option value="0504">优生学专业</option>
+                                                    <option value="0505">生殖健康与不孕症专业</option>
+                                                    <option value="0599">其他</option>
+                                                    <option value="06">妇女保健科</option>
+                                                    <option value="0601">青春期保健专业</option>
+                                                    <option value="0602">围产期保健专业</option>
+                                                    <option value="0603">更年期保健专业</option>
+                                                    <option value="0604">妇女心理卫生专业</option>
+                                                    <option value="0605">妇女营养专业</option>
+                                                    <option value="0699">其他</option>
+                                                    <option value="07">儿科</option>
+                                                    <option value="0701">新生儿专业</option>
+                                                    <option value="0702">小儿传染病专业</option>
+                                                    <option value="0703">小儿消化专业</option>
+                                                    <option value="0704">小儿呼吸专业</option>
+                                                    <option value="0705">小儿心脏病专业</option>
+                                                    <option value="0706">小儿肾病专业</option>
+                                                    <option value="0707">小儿血液病专业</option>
+                                                    <option value="0708">小儿神经病学专业</option>
+                                                    <option value="0709">小儿内分泌专业</option>
+                                                    <option value="0710">小儿遗传病专业</option>
+                                                    <option value="0711">小儿免疫专业</option>
+                                                    <option value="0799">其他</option>
+                                                    <option value="08">小儿外科</option>
+                                                    <option value="0801">小儿普通外科专业</option>
+                                                    <option value="0802">小儿骨科专业</option>
+                                                    <option value="0803">小儿泌尿外科专业</option>
+                                                    <option value="0804">小儿胸心外科专业</option>
+                                                    <option value="0805">小儿神经外科专业</option>
+                                                    <option value="0899">其他</option>
+                                                    <option value="09">儿童保健科</option>
+                                                    <option value="0901">儿童生长发育专业</option>
+                                                    <option value="0902">儿童营养专业</option>
+                                                    <option value="0903">儿童心理卫生专业</option>
+                                                    <option value="0904">儿童五官保健专业</option>
+                                                    <option value="0905">儿童康复专业</option>
+                                                    <option value="0999">其他</option>
+                                                    <option value="10">眼科</option>
+                                                    <option value="11">耳鼻咽喉科</option>
+                                                    <option value="1101">耳科专业</option>
+                                                    <option value="1102">鼻科专业</option>
+                                                    <option value="1103">咽喉科专业</option>
+                                                    <option value="1199">其他</option>
+                                                    <option value="12">口腔科</option>
+                                                    <option value="1201">口腔内科专业</option>
+                                                    <option value="1202">口腔颌面外科专业</option>
+                                                    <option value="1203">正畸专业</option>
+                                                    <option value="1204">口腔修复专业</option>
+                                                    <option value="1205">口腔预防保健专业</option>
+                                                    <option value="1299">其他</option>
+                                                    <option value="13">皮肤科</option>
+                                                    <option value="1301">皮肤病专业</option>
+                                                    <option value="1302">性传播疾病专业</option>
+                                                    <option value="1399">其他</option>
+                                                    <option value="14">医疗美容科</option>
+                                                    <option value="15">精神科</option>
+                                                    <option value="1501">精神病专业</option>
+                                                    <option value="1502">精神卫生专业</option>
+                                                    <option value="1503">药物依赖专业</option>
+                                                    <option value="1504">精神康复专业</option>
+                                                    <option value="1505">社区防治专业</option>
+                                                    <option value="1506">临床心理专业</option>
+                                                    <option value="1507">司法精神专业</option>
+                                                    <option value="1599">其他</option>
+                                                    <option value="16">传染科</option>
+                                                    <option value="1601">肠道传染病专业</option>
+                                                    <option value="1602">呼吸道传染病专业</option>
+                                                    <option value="1603">肝炎专业</option>
+                                                    <option value="1604">虫媒传染病专业</option>
+                                                    <option value="1605">动物源性传染病专业</option>
+                                                    <option value="1606">蠕虫病专业</option>
+                                                    <option value="1699">其它</option>
+                                                    <option value="17">结核病科</option>
+                                                    <option value="18">地方病科</option>
+                                                    <option value="19">肿瘤科</option>
+                                                    <option value="20">急诊医学科</option>
+                                                    <option value="2001">重症监护(急诊)</option>
+                                                    <option value="21">康复医学科</option>
+                                                    <option value="22">运动医学科</option>
+                                                    <option value="23">职业病科</option>
+                                                    <option value="2301">职业中毒专业</option>
+                                                    <option value="2302">尘肺专业</option>
+                                                    <option value="2303">放射病专业</option>
+                                                    <option value="2304">物理因素损伤专业</option>
+                                                    <option value="2305">职业健康监护专业</option>
+                                                    <option value="2399">其他</option>
+                                                    <option value="24">临终关怀科</option>
+                                                    <option value="25">特种医学与军事医学科</option>
+                                                    <option value="26">麻醉科</option>
+                                                    <option value="30">医学检验科</option>
+                                                    <option value="3001">临床体液、血液专业</option>
+                                                    <option value="3002">临床微生物学专业</option>
+                                                    <option value="3003">临床生化检验专业</option>
+                                                    <option value="3004">临床免疫、血清学专业</option>
+                                                    <option value="3099">其他</option>
+                                                    <option value="31">病理科</option>
+                                                    <option value="32">医学影像科</option>
+                                                    <option value="3201">X线诊断专业</option>
+                                                    <option value="3202">CT诊断专业</option>
+                                                    <option value="3203">磁共振成像诊断专业</option>
+                                                    <option value="3204">核医学专业</option>
+                                                    <option value="3205">超声诊断专业</option>
+                                                    <option value="3206">心电诊断专业</option>
+                                                    <option value="3207">脑电及脑血流图诊断专业</option>
+                                                    <option value="3208">神经肌肉电图专业</option>
+                                                    <option value="3209">介入放射学专业</option>
+                                                    <option value="3210">放射治疗专业</option>
+                                                    <option value="3299">其他</option>
+                                                    <option value="50">中医科</option>
+                                                    <option value="5001">内科专业</option>
+                                                    <option value="5002">外科专业</option>
+                                                    <option value="5003">妇产科专业</option>
+                                                    <option value="5004">儿科专业</option>
+                                                    <option value="5005">皮肤科专业</option>
+                                                    <option value="5006">眼科专业</option>
+                                                    <option value="5007">耳鼻咽喉科专业</option>
+                                                    <option value="5008">口腔科专业</option>
+                                                    <option value="5009">肿瘤科专业</option>
+                                                    <option value="5010">骨伤科专业</option>
+                                                    <option value="5011">肛肠科专业</option>
+                                                    <option value="5012">老年病科专业</option>
+                                                    <option value="5013">针灸科专业</option>
+                                                    <option value="5014">推拿科专业</option>
+                                                    <option value="5015">康复医学专业</option>
+                                                    <option value="5016">急诊科专业</option>
+                                                    <option value="5017">预防保健科专业</option>
+                                                    <option value="5099">其他</option>
+                                                    <option value="51">民族医学科</option>
+                                                    <option value="5101">维吾尔医学</option>
+                                                    <option value="5102">藏医学</option>
+                                                    <option value="5103">蒙医学</option>
+                                                    <option value="5104">彝医学</option>
+                                                    <option value="5105">傣医学</option>
+                                                    <option value="5199">其他</option>
+                                                    <option value="52">中西医结合科</option>
+                                                    <option value="61">重症监护室(综合)</option>
+                                                    <option value="79">其它</option>
+                                                    <option value="99">管理科室</option>
+                                                    <option value="9901">感染(管理)科</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="form-group">
+                                            就诊类型：<label class="sr-only" for="exampleInputPassword2"></label>
+                                            <div class="btn-group">
+                                                <select id="jzlx" name="">
+                                                    <option value="2">住院</option>
+                                                    <option value="1">门诊</option>
+                                                    <option value="3">体格检查</option>
+                                                    <option value="4">预防接种</option>
+                                                    <option value="5">正常分娩住院</option>
+                                                    <option value="9">其他</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            入院状态：<label class="sr-only" for="exampleInputPassword2"></label>
+                                            <div class="btn-group">
+                                                <select id="ryzt" name="">
+                                                    <option value="3">一般</option>
+                                                    <option value="2">急</option>
+                                                    <option value="1">危</option>
+                                                    <option value="9">其他</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="auto_hidden" id="auto"><!--自动完成 DIV--> </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="text-muted bootstrap-admin-box-title">家庭成员</div>
+                    </div>
+                    <div class="bootstrap-admin-panel-content">
+                        <table class="table" id="familyMember">
+                            <thead>
+                                <tr>
+                                    <th>成员序号</th>
+                                    <th>成员姓名</th>
+                                    <th>操作</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="text-muted bootstrap-admin-box-title">农合基本信息</div>
+                        </div>
+                        <div class="bootstrap-admin-panel-content">
+                            <table class="table">
+
+                                <tbody>
+                                    <tr>
+                                        <td>成员姓名：<span id="D401_02"></span></td>
+                                        <td>身份证号：<span id="D401_01"></span></td>
+                                        <td>性别：<span id="SEX"></span></td>
+                                        <td>年龄：<span id="AGE"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>家庭地址：<span id="D401_13"></span></td>
+                                        <td>民族：<span id="NAME NATIONAL"></span></td>
+                                        <td>当前家庭账户余额：<span id="D601_17"></span></td>
+                                        <td>上补时间：<span id="D503_17"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>统筹余额：<span id="D601_17"></span></td>
+                                        <td>门诊个人累补：<span id="GRLB"></span></td>
+                                        <td>门诊家庭累补：<span id="JTLB"></span></td>
+                                        <td>出生日期：<span id="D401_04"></span></td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding-bottom:100px;">
+            <ul style="list-style:none;">
+                <li style="float:left;width:33%;"><button type="button" class="btn btn-default" onclick="javascript: rydjClk();">入院登记</button></li>
+                <li style="float:left;width:33%;"><button type="button" class="btn btn-default" onclick="javascript: qxdjClk();">取消登记</button></li>
+            </ul>
+        </div>
+
+    </div>
+
+   
+
+    <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/twitter-bootstrap-hover-dropdown.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-admin-theme-change-size.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="js/xnh.js"></script>
+    <script type="text/javascript" src="calendar/datepicker.min.js"></script>
+    <script type="text/javascript" src="calendar/datepicker.zh-CN.js"></script>
+    <script type="text/javascript" src="calendar/js/main.js"></script>
+    <script type="text/javascript" src="js/jquery.base64.js"></script>
+    <script>
+        //中文语种日期
+        $(".docs-date").datepicker({
+            language: 'zh-CN'
+        });
+    </script>
+    <script type="text/javascript">
+        //住院号回车触发查询HIS
+        $('#zyh').bind('keydown', function (event) {
+            if (event.keyCode == "13") {
+                var zyhVal = $("#zyh").val();
+                if (zyhVal == '') {
+                    alert("请输入住院号查询");
+                    return;
+                }
+
+                showMask("正在查询，请稍后...");
+
+                $.ajax({
+                    type: "Post",
+                    url: "xnhservice.asmx/zhyChaxun",
+                    data: "{'zyh':'" + zyhVal + "'}",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        closeMask();
+                        //返回的数据用data.d获取内容
+                        var retVal = data.d;
+                        //遍历json数组操作
+                        var retJson = getJsonObj(retVal);
+                        if (retJson.flag == '0') {
+                            var json = retJson.msg;
+                            for (var item in json.data) {
+                                var row = json.data[item];
+                                for (var key in row) {
+                                    //alert(key + " " + row[key]);
+                                    //$('"#' + key + '"').value = row[key];
+                                    //$('"' + key + '"').value = row[key];
+                                    document.getElementById(key).value = row[key];
+                                    //todo：根据需要绑定解析和绑定前台数据
+                                }
+                            }
+                        } else {
+                            alert("查询失败：" + retJson.msg);
+                        }
+                        
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        closeMask();
+                        alert(textStatus + ":" + errorThrown);
+                    }
+                });
+            }
+        });
+
+        //当前选择的家庭成员用户
+        var currentMemberSelected = null;
+
+        //登记信息获取
+        function djxx() {
+            var rydjMap = {};
+            rydjMap["COME_AREA"] = $("#areaNo").val(); //医疗机构所在地区编码(取用户所在机构地区编码AREA_CODE)
+            rydjMap["AREA_CODE"] = $("#areaNo").val(); //地区代码(病人所在地区编码)取前台选择的地区编码
+            rydjMap["D401_10"] = $("#ylzh").val(); //医疗证号
+            rydjMap["D504_02"] = ""; //个人编号
+            rydjMap["D504_03"] = $("#D401_02").html(); //姓名
+            rydjMap["D504_04"] = $("#SEX").html(); //性别（1：男 2：女）传代码
+            rydjMap["D504_05"] = $("#D401_01").html(); //身份证号
+            rydjMap["D504_06"] = $("#AGE").html(); //年龄
+            rydjMap["D504_21"] = $("#ryzd").val(); //疾病代码 - 入院诊断代码？需要处理
+            rydjMap["D504_09"] = $("#IP_NO").val(); //住院号
+            rydjMap["D504_10"] = $("#jzlx").val(); //就诊类型代码（对应s301_05.xls）
+            rydjMap["D504_11"] = $("#IP_TIME").val(); //入院时间(格式为YYYY-MM-DD)
+            rydjMap["D504_14"] = getCookie("DEP_ID"); //就医机构代码=DEP_ID
+            rydjMap["D504_19"] = $("#ryzt").val(); //入院状态代码 (对应S301-02.xls)
+            rydjMap["D504_16"] = $("#dqks").val(); //入院科室代码（对应S201-03.xls）
+            rydjMap["D504_28"] = $("#CONT_TEL").val(); //病人联系电话
+
+            rydjMap["D504_01"] = $("#REG_NO").val(); //住院登记流水号
+
+            var p = $.base64.encode(map2Json(rydjMap), "utf8");
+            return p;
+
+        }
+    
+        //入院登记按钮触发事件
+        function rydjClk() {
+            if (confirm("确定对 " + $("#D401_02").html() + " 做入院登记吗？" )) {
+            } else {
+                return;
+            }
+
+            var USER_ID = getCookie("USER_ID");
+            var PARAM = djxx();
+            
+            var pMap = {};
+            pMap["USER_ID"] = USER_ID;
+            pMap["PARAM"] = PARAM;
+            var pJson = map2Json(pMap);
+
+            showMask("正在处理，请稍后...");
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/rydj",
+                data: pJson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    closeMask();
+                    //返回的数据用data.d获取内容
+                    var retJson = getJsonObj(data.d);
+                    if (retJson.flag == '0') {
+                        alert("登记成功");
+                    } else {
+                        alert("登记失败：" + retJson.msg);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown){
+                    closeMask();
+                    alert(textStatus + ":" +errorThrown );
+                }
+            });
+        }
+
+        //取消登记按钮触发事件
+        function qxdjClk() {
+            if (confirm("确定对 " + $("#D401_02").html() + " 做取消登记吗？")) {
+            } else {
+                return;
+            }
+
+            var pMap = {};
+            pMap["AREA_CODE"] = $("#areaNo").val();
+            pMap["D504_01"] = $("#REG_NO").val(); //住院登记流水号
+            var pJson = map2Json(pMap);
+
+            showMask("正在处理，请稍后...");
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/qxrydj",
+                data: pJson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    closeMask();
+                    //返回的数据用data.d获取内容
+                    var retJson = getJsonObj(data.d);
+                    if (retJson.flag == '0') {
+                        alert("登记成功");
+                    } else {
+                        alert("登记失败:" + retJson.msg);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
+                }
+            });
+        }
+
+        function readCardClk() {
+            var AREA_NO = $("#areaNo").val(); //获取选中的地区编码
+            if (AREA_NO == '') {
+                alert("请选择好地区");
+                return;
+            }
+
+            var M_MM = '';
+            try {
+                M_MM = GetCardinfo(); //开始读取卡号
+                if (M_MM == null || M_MM == '') {
+                    alert("读取卡信息失败，请检查读卡驱动是否成功安装...");
+                    return;
+                }
+                
+            } catch (e) {
+                alert("读取卡信息失败,请检查读卡驱动是否正确安装:\n" + e.name + " :  " + e.message);
+                return;
+            }
+
+            var USER_ID = getCookie("USER_ID");
+            var pMap = {};
+            pMap["USER_ID"] = USER_ID;
+            pMap["M_MM"] = M_MM;
+            pMap["AREA_NO"] = AREA_NO;  //定义一个对象a，a的内容为空  a["b"]={}; 在对象a中添加一个内容为空的元素，命名为"b"
+            var pJson = map2Json(pMap);
+
+            showMask("正在处理，请稍后...");
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/readCard",
+                data: pJson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    closeMask();
+                    //返回的数据用data.d获取内容，返回D401_21/D401_02;D401_21/D401_02
+                    //成员序号：D401_21  CHAR(2)
+                    //成员姓名：D401_02  VARCHAR2(24)
+                    var retJson = getJsonObj(data.d);
+                    if (retJson.flag == '0') {
+                        //绑定家庭成员信息
+                        $("#familyMember tbody tr").detach();
+                        $("#ylzh").val(retJson.msg.ylzh); //医疗证号
+                        var memberInfo = retJson.msg.data;
+                        var memberArray = memberInfo.split(';');
+                        for(var i=0; i<memberArray.length; i++){
+                            var member = memberArray[i].split('/');
+                            var D401_21 = member[0];
+                            var D401_02 = member[1];
+                            var param = '\'' + USER_ID + '\',' + '\'' + AREA_NO + '\',' + '\'' + D401_21 + '\'';
+                            $("#familyMember tbody").append('<tr><td>' + D401_21 + '</td><td>' + D401_02 +
+                                '</td><td><a href="javascript:getMemberInfo(' + param + ');">查看信息并入院登记</a></td><td></td></tr>');
+                        }
+                        
+                    } else {
+                        alert("提示:" + retJson.msg);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
+                }
+            });
+        }
+
+        
+
+        //查看某个成员详细信息
+        //地区号、序号，医疗证号由后台缓存获取
+        function getMemberInfo(USER_ID, AREA_NO, D401_21) {
+            var pMap = {};
+            pMap["USER_ID"] = USER_ID;
+            pMap["AREA_NO"] = AREA_NO;
+            pMap["D401_21"] = D401_21;
+            var pJson = map2Json(pMap);
+
+            //设置当前做入院登记的用户
+            currentMemberSelected = pMap;
+
+            showMask("正在处理，请稍后...");
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/getMemberInfoDetail",
+                data: pJson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    closeMask();
+                    var retJson = getJsonObj(data.d);
+                    if (retJson.flag == '0') {
+                        //绑定家庭成员基本信息
+                        var info = retJson.msg;
+                        for (var item in info) {
+                            $("#" + item).html(obj.msg[item]);
+                        }
+
+                    } else {
+                        alert("提示:" + retJson.msg);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
+                }
+            });
+        }
+
+    </script>  
+    
+
+    <script type="text/javascript">
+        var $$ = function (id) {
+            return "string" == typeof id ? document.getElementById(id) : id;
+        }
+        var Bind = function (object, fun) {
+            return function () {
+                return fun.apply(object, arguments);
+            }
+        }
+        function AutoComplete(obj, autoObj, arr) {
+            this.obj = $$(obj); //输入框
+            this.autoObj = $$(autoObj);//DIV的根节点
+            this.value_arr = arr; //不要包含重复值
+            this.index = -1; //当前选中的DIV的索引
+            this.search_value = ""; //保存当前搜索的字符
+        }
+        AutoComplete.prototype = {
+            //初始化DIV的位置
+            init: function () {
+                this.autoObj.style.left = this.obj.offsetLeft + "px";
+                this.autoObj.style.top = this.obj.offsetTop + this.obj.offsetHeight + "px";
+                this.autoObj.style.width = this.obj.offsetWidth - 2 + "px";//减去边框的长度2px
+            },
+            //删除自动完成需要的所有DIV
+            deleteDIV: function () {
+                while (this.autoObj.hasChildNodes()) {
+                    this.autoObj.removeChild(this.autoObj.firstChild);
+                }
+                this.autoObj.className = "auto_hidden";
+            },
+            //设置值
+            setValue: function (_this) {
+                return function () {
+                    _this.obj.value = this.seq;
+                    _this.autoObj.className = "auto_hidden";
+                }
+            },
+            //模拟鼠标移动至DIV时，DIV高亮
+            autoOnmouseover: function (_this, _div_index) {
+                return function () {
+                    _this.index = _div_index;
+                    var length = _this.autoObj.children.length;
+                    for (var j = 0; j < length; j++) {
+                        if (j != _this.index) {
+                            _this.autoObj.childNodes[j].className = 'auto_onmouseout';
+                        } else {
+                            _this.autoObj.childNodes[j].className = 'auto_onmouseover';
+                        }
+                    }
+                }
+            },
+            //更改classname
+            changeClassname: function (length) {
+                for (var i = 0; i < length; i++) {
+                    if (i != this.index) {
+                        this.autoObj.childNodes[i].className = 'auto_onmouseout';
+                    } else {
+                        this.autoObj.childNodes[i].className = 'auto_onmouseover';
+                        this.obj.value = this.autoObj.childNodes[i].seq;
+                    }
+                }
+            },
+
+            //响应键盘
+            pressKey: function (event) {
+
+                var length = this.autoObj.children.length;
+                //光标键"↓"
+                if (event.keyCode == 40) {
+                    ++this.index;
+                    if (this.index > length) {
+                        this.index = 0;
+                    } else if (this.index == length) {
+                        this.obj.value = this.search_value;
+                    }
+                    this.changeClassname(length);
+                }
+                    //光标键"↑"
+                else if (event.keyCode == 38) {
+                    this.index--;
+                    if (this.index < -1) {
+                        this.index = length - 1;
+                    } else if (this.index == -1) {
+                        this.obj.value = this.search_value;
+                    }
+                    this.changeClassname(length);
+                }
+                    //回车键
+                else if (event.keyCode == 13) {
+                    this.autoObj.className = "auto_hidden";
+                    this.index = -1;
+                } else {
+                    this.index = -1;
+                }
+
+
+
+
+            },
+            //程序入口
+            start: function (event) {
+
+                //其它正常输入值按钮事件
+                //重要：调用后台的service服务去查询结果，并显示在前台供选择
+                if (event.keyCode != 13 && event.keyCode != 38 && event.keyCode != 40) {
+                    var query = $('#ryzd').val();
+                    if (query != '') {
+                        $.ajax({
+                            type: "Post",
+                            async: false,
+                            url: "xnhservice.asmx/getRYZD",
+                            data: "{'query':'" + query + "'}",
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (data) {
+                                //返回的数据用data.d获取内容
+                                var retVal = data.d;
+                                //alert(retVal);
+                                if (retVal != '') {
+                                    var arr = [];
+                                    arr = retVal.toString().split(',');
+                                    autoComplete.value_arr = arr;
+                                }
+                            },
+                            error: function (err) {
+                                alert(err.toString());
+                            }
+                        });
+                    }
+                }
+
+                if (event.keyCode != 13 && event.keyCode != 38 && event.keyCode != 40) {
+                    this.init();
+                    this.deleteDIV();
+                    this.search_value = this.obj.value;
+                    var valueArr = this.value_arr;
+                    valueArr.sort();
+                    if (this.obj.value.replace(/(^\s*)|(\s*$)/g, '') == "") { return; }//值为空，退出
+                    try { var reg = new RegExp("(" + this.obj.value + ")", "i"); }
+                    catch (e) { return; }
+                    var div_index = 0;//记录创建的DIV的索引
+                    for (var i = 0; i < valueArr.length; i++) {
+                        if (reg.test(valueArr[i])) {
+                            var div = document.createElement("div");
+                            div.className = "auto_onmouseout";
+                            div.seq = valueArr[i];
+                            div.onclick = this.setValue(this);
+                            div.onmouseover = this.autoOnmouseover(this, div_index);
+                            div.innerHTML = valueArr[i].replace(reg, "<strong>$1</strong>");//搜索到的字符粗体显示
+                            this.autoObj.appendChild(div);
+                            this.autoObj.className = "auto_show";
+                            div_index++;
+                        }
+                    }
+                }
+
+                this.pressKey(event);
+                window.onresize = Bind(this, function () { this.init(); });
+            }
+        }
+
+        //注意:
+        //第一个参数是查询的输入框input的id，如这个样例中的ryzd
+        //第二个参数是查询结果下拉显示div的id，如这个样例是auto
+        //第三个参数是查询结果数组，初始化时随便赋值，这里为['*']
+        var autoComplete = new AutoComplete('ryzd', 'auto', ['0', '1']);
+    </script>
+
+    
+</body>
+
+
+</html>
