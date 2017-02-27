@@ -288,9 +288,9 @@ namespace ApiMonitor.pages
                 //调用验证住院号是否重复交易，如果重复说明已经登记，此时调用修改住院登记交易；
                 //如果不重复调用保存入院登记交易进行入院登记，入院登记成功修改HIS端标志并保存农合信息。
                 MZBC_PROC_ZYBZ_NOTICE_CHECK zydjCheck = new MZBC_PROC_ZYBZ_NOTICE_CHECK();
-                string AREA_NO = "";
-                string D401_21 = "";
-                string DEP_ID = "";
+                string AREA_NO = jsonDict["AREA_CODE"];
+                string D401_21 = jsonDict["D504_02"]; //取个人编号传的值
+                string DEP_ID = jsonDict["DEP_ID"];
                 zydjCheck.executeSql(
                     new Dictionary<string, string>() { { "AREA_NO", AREA_NO }, { "D401_10", D401_10 }, { "D401_21", D401_21 }, { "DEP_ID", DEP_ID } }
                  );
@@ -324,7 +324,8 @@ namespace ApiMonitor.pages
                     param.Add("D504_21", jsonDict["D504_21"]); //疾病代码
                     param.Add("D504_09", jsonDict["D504_09"]); //住院号
                     param.Add("D504_10", jsonDict["D504_10"]); //就诊类型代码（对应s301_05.xls）
-                    param.Add("D504_11", jsonDict["D504_11"]); //入院时间(格式为YYYY-MM-DD)
+                    //前台传进来的日期需要处理一下格式
+                    param.Add("D504_11", jsonDict["D504_11"] == "" ? "" : jsonDict["D504_11"].Split(' ')[0].Replace(".","-")); //入院时间(格式为YYYY-MM-DD)
                     param.Add("D504_14", jsonDict["D504_14"]); //就医机构代码=DEP_ID
                     param.Add("D504_19", jsonDict["D504_19"]); //入院状态代码 (对应S301-02.xls)
                     param.Add("D504_16", jsonDict["D504_16"]); //入院科室代码（对应S201-03.xls）

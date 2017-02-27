@@ -643,12 +643,12 @@
                                     <tr>
                                         <td>成员姓名：<span id="D401_02"></span></td>
                                         <td>身份证号：<span id="D401_01"></span></td>
-                                        <td>性别：<span id="SEX"></span></td>
-                                        <td>年龄：<span id="AGE"></span></td>
+                                        <td>性别：<span id="SEX_SPAN"></span></td>
+                                        <td>年龄：<span id="AGE_SPAN"></span></td>
                                     </tr>
                                     <tr>
                                         <td>家庭地址：<span id="D401_13"></span></td>
-                                        <td>民族：<span id="NAME NATIONAL"></span></td>
+                                        <td>民族：<span id="NAMENATIONAL"></span></td>
                                         <td>当前家庭账户余额：<span id="D601_17"></span></td>
                                         <td>上补时间：<span id="D503_17"></span></td>
                                     </tr>
@@ -754,9 +754,15 @@
             rydjMap["D401_10"] = $("#ylzh").val(); //医疗证号
             rydjMap["D504_02"] = currentMemberSelected["D401_21"]; //个人编号 取成员序号
             rydjMap["D504_03"] = $("#D401_02").html(); //姓名
-            rydjMap["D504_04"] = $("#SEX").html(); //性别（1：男 2：女）传代码
+            //性别（1：男 2：女）传代码
+            if ($("#SEX_SPAN").html() == "男性") {
+                rydjMap["D504_04"] = "1";
+            }else{
+                rydjMap["D504_04"] = "2";
+            }
+            
             rydjMap["D504_05"] = $("#D401_01").html(); //身份证号
-            rydjMap["D504_06"] = $("#AGE").html(); //年龄
+            rydjMap["D504_06"] = $("#AGE_SPAN").html(); //年龄
 
             //由于入院诊断需要搜索，因此，只需要取第一个的值即可
             var ryzd_code = $("#ryzd").val();
@@ -777,6 +783,8 @@
             rydjMap["D504_28"] = $("#CONT_TEL").val(); //病人联系电话
 
             rydjMap["D504_01"] = $("#REG_NO").val(); //住院登记流水号
+
+            rydjMap["DEP_ID"] = getCookie("DEP_ID"); //DEP_ID 检查是否可以做入院登记需要用到
 
             var p = $.base64.encode(map2Json(rydjMap), "utf8");
             return p;
@@ -963,7 +971,15 @@
                         for (var item in info) {
                             var objTest = $("#" + item);
                             if (objTest != null) {
-                                $("#" + item).html(info[item]);
+                                if (item == "AGE") {
+                                    $("#AGE_SPAN").html(info[item]);
+                                }
+                                if (item == "SEX") {
+                                    $("#SEX_SPAN").html(info[item]);
+                                } else {
+                                    $("#" + item).html(info[item]);
+                                }
+                                
                             }
                         }
 
