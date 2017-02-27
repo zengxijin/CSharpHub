@@ -351,8 +351,8 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <div class="text-muted bootstrap-admin-box-title"><p>
-                            入院诊断:<input list="BZ_NAME">
-                            </p> <datalist id="BZ_NAME"> 
+                            入院诊断:<input list="ZDMC">
+                            </p> <datalist id="ZDMC"> 
                             </datalist>
                              </div> 
 
@@ -379,7 +379,7 @@
                                 </tr>
                                 <tr>
                                     <td>入院诊断：
-                                        <input type="text" style="width:300px;height:20px;font-size:14pt;" placeholder="请输入值查询" id="ryzd" onkeyup="autoComplete.start(event)">
+                                        <input type="text" style="width:500px;height:30px;font-size:14pt;" placeholder="请输入值查询" id="ryzd" onkeyup="autoComplete.start(event)">
                                     <span style="color:red;">*</span>
                                     </td>
                                     <td>
@@ -752,12 +752,22 @@
             rydjMap["COME_AREA"] = $("#areaNo").val(); //医疗机构所在地区编码(取用户所在机构地区编码AREA_CODE)
             rydjMap["AREA_CODE"] = $("#areaNo").val(); //地区代码(病人所在地区编码)取前台选择的地区编码
             rydjMap["D401_10"] = $("#ylzh").val(); //医疗证号
-            rydjMap["D504_02"] = ""; //个人编号
+            rydjMap["D504_02"] = currentMemberSelected["D401_21"]; //个人编号 取成员序号
             rydjMap["D504_03"] = $("#D401_02").html(); //姓名
             rydjMap["D504_04"] = $("#SEX").html(); //性别（1：男 2：女）传代码
             rydjMap["D504_05"] = $("#D401_01").html(); //身份证号
             rydjMap["D504_06"] = $("#AGE").html(); //年龄
-            rydjMap["D504_21"] = $("#ryzd").val(); //疾病代码 - 入院诊断代码？需要处理
+
+            //由于入院诊断需要搜索，因此，只需要取第一个的值即可
+            var ryzd_code = $("#ryzd").val();
+            if (ryzd_code != "" && ryzd_code != null) {
+                var tmpCode = ryzd_code.split('|');
+                if (tmpCode != null && tmpCode.length > 0) {
+                    ryzd_code = tmpCode[0];
+                }
+            }
+            rydjMap["D504_21"] = ryzd_code; //疾病代码 - 入院诊断代码？需要处理
+
             rydjMap["D504_09"] = $("#IP_NO").val(); //住院号
             rydjMap["D504_10"] = $("#jzlx").val(); //就诊类型代码（对应s301_05.xls）
             rydjMap["D504_11"] = $("#IP_TIME").val(); //入院时间(格式为YYYY-MM-DD)
@@ -775,7 +785,12 @@
     
         //入院登记按钮触发事件
         function rydjClk() {
-            if (confirm("确定对 " + $("#D401_02").html() + " 做入院登记吗？" )) {
+            if (currentMemberSelected == null) {
+                alert("请选择需要进行操作的成员");
+                return;
+            }
+
+            if (confirm("确定对 " + $("#D401_02").html() + " 做入院登记吗？")) {
             } else {
                 return;
             }
@@ -814,6 +829,11 @@
 
         //取消登记按钮触发事件
         function qxdjClk() {
+            if (currentMemberSelected == null) {
+                alert("请选择需要进行操作的成员");
+                return;
+            }
+
             if (confirm("确定对 " + $("#D401_02").html() + " 做取消登记吗？")) {
             } else {
                 return;
@@ -915,7 +935,6 @@
         }
 
         
-
         //查看某个成员详细信息
         //地区号、序号，医疗证号由后台缓存获取
         function getMemberInfo(USER_ID, AREA_NO, D401_21) {

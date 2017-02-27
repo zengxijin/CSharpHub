@@ -710,12 +710,12 @@ namespace ApiMonitor.pages
             try
             {
                 //触发模糊查询的语句
-                string sql = "select t.BZ_CODE from XCYB_ML_ZG_BZML t where t.bz_name like '%" + trim(query) + "%'"
-                    + " or t.py_code like '%" + query + "%'";
+               // string sql = "select t.BZ_CODE from XCYB_ML_ZG_BZML t where t.bz_name like '%" + trim(query) + "%'"
+                  //  + " or t.py_code like '%" + query + "%'";
                 //如果要限制返回结果的条数，比如限制每次返回前10条
                 //select t.BZ_CODE from XCYB_ML_ZG_BZML t where ( t.bz_name like '%1%' or t.py_code like '%1%') and rownum < 11
-                string sqlLimit = "select t.BZ_CODE,t.BZ_NAME,t.PY_CODE from XCYB_ML_ZG_BZML t where (t.bz_name like '%" + query + "%'"
-                   + " or t.py_code like '%" + query + "%') and rownum < 21";
+                string sqlLimit = "select t.ZDDM,t.ZDMC,t.SRM from XNH_ZD_CODE t where (t.ZDMC like '%" + query + "%'"
+                   + " or t.SRM like '%" + query + "%') and rownum < 21";
                 //日志查询后台SQL
                 XnhLogger.log(sqlLimit);
                 //返回查询结果，供前台绑定
@@ -724,12 +724,12 @@ namespace ApiMonitor.pages
                 {
                     foreach (DataRow dr in dt.Rows)
                     {
-                        string BZ_CODE = dr["BZ_CODE"] as string;
-                        string BZ_NAME = dr["BZ_NAME"] as string;
-                        string PY_CODE = dr["PY_CODE"] as string;
-                        if (string.IsNullOrEmpty(BZ_CODE) == false && BZ_CODE.Trim() != "")
+                        string ZDDM = dr["ZDDM"] as string;
+                        string ZDMC = dr["ZDMC"] as string;
+                        string SRM = dr["SRM"] as string;
+                        if (string.IsNullOrEmpty(ZDDM) == false && ZDDM.Trim() != "")
                         {
-                            retStr += BZ_CODE.Trim() + "|" + BZ_NAME + "|" + PY_CODE + ",";
+                            retStr += ZDDM.Trim() + "|" + ZDMC + "|" + SRM + ",";
                         }
                     }
                     retStr = retStr.Substring(0, retStr.Length - 1);
