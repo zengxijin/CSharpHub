@@ -1,6 +1,7 @@
 ﻿using ApiMonitor.log;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 
@@ -69,6 +70,46 @@ namespace ApiMonitor.DB
                 XnhLogger.log(ex.ToString() + " SQL:" + sql);
             }
         }
+
+        public static DataTable getMZMX(Dictionary<string, string> sqlParam)
+        {
+            DataTable dt = null;
+            string sql = "";
+            try
+            {
+                //门诊明细信息
+                sql = 
+                "select"
+                + " a.rec_no,"	 //处方号
+                + " a.item_code,"	 //HIS项目编码
+                + " a.price,"	 //HIS项目单价
+                + " a.qty,"		 //项目数量
+                + " a.total,"	 //项目总金额
+                + " b.item_name,"	 //HIS项目名称
+                + " b.item_cls,"	 //项目类型(1,2,3:药品 4,5,6,7,8,9:其他)
+                + " c.standard,"	 //规格
+                + " c.small_unit," 	 //单位
+                + " d.DR_CODE,"	 //开单医生
+                + " (select oper_name from code_operator where oper_code=d.dr_code) as oper_name,"  //医生名称
+                + " d.dept_code,"	 //开单科室
+                + " (select dept_name from CODE_DEPARTMENT where dept_code=d.dept_code) as dept_name"  //科室名称
+                + " from CL_RECENTRY a,code_item b,plus_item c ,cl_recipe d"
+                + " where a.item_code<>'9999'"
+                + " and a.row_status='0' and a.rec_no='$REG_NO$' "
+                + " and a.rec_no = d.REC_NO"
+                + " and a.item_code=b.item_code and b.item_code=c.item_code and c.type=2";
+
+                dt = DBUtil.queryExecute(sql);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log("sql=" + sql + " 异常：" + ex.ToString());
+            }
+
+            return dt;
+        }
+        
+        
         #endregion
 
         #region zybc

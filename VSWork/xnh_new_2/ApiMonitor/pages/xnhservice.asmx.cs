@@ -467,7 +467,7 @@ namespace ApiMonitor.pages
         /// <param name="key"></param>
         /// <returns></returns>
         [WebMethod]
-        public string tryCalculate(string USER_ID, string DIAGNOSIS_CODE,string PARAM)
+        public string tryCalculate(string USER_ID, string DIAGNOSIS_CODE, string PARAM, string ROWS)
         {
             string retStr = "";
             try
@@ -480,26 +480,71 @@ namespace ApiMonitor.pages
 
                 if (tmp == "0")
                 {
+                    //参数解码
+                    string decodeParam = DataConvert.Base64Decode(PARAM);
+                    Dictionary<string, string> jsonDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(decodeParam);
+
+                    //选中的流水解码，多个流水$分割
+                    string selectedParam = DataConvert.Base64Decode(ROWS);
+
+                    string[] array = selectedParam.Split('$');
+                    foreach (string item in array)
+                    {
+                        if (string.IsNullOrEmpty(item) == true)
+                        {
+                            continue;
+                        }
+
+                        Dictionary<string, string> map = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(item);
+                        string REC_NO = map["REC_NO"] ;       //门诊流水号
+                        string REG_NO = map["REG_NO"];       //处方号
+                        string REC_TIME = map["REC_TIME"];   //结算日期
+                        string TOTAL = map["TOTAL"];         //结算金额
+                        string TOTAL_REC = map["TOTAL_REC"]; //处方金额
+                        string OPER_NAME = map["OPER_NAME"];  //结算人
+                        string NAME = map["NAME"];            //患者姓名
+                        //string REC_NO = map["IP_DR"];       //处方医生
+                        string FEE_CODE = map["FEE_CODE"];    //农合结算
+
+                        DataTable dt = HIS.getMZMX(map);
+;                        
+                    }
+                    
                     //(2)疾病存在，进行试算交易
-                    RJZ_getShisuanResult shisuan = new RJZ_getShisuanResult();
+                    MZBC_PROC_CALE_PRICE_LIST shisuan = new MZBC_PROC_CALE_PRICE_LIST();
                     Dictionary<string, string> param = new Dictionary<string, string>();
-                    param.Add("D505_02", "");//登记流水号
-                    param.Add("COME_AREA", "");//地区代码(支付单位)
-                    param.Add("AREA_CODE", "");//病人地区编码(取前台选择的地区编码)
-                    param.Add("D504_07", "");//家庭编号
-                    param.Add("D504_02", "");//成员序号
-                    param.Add("D504_14", "");//就医机构
-                    param.Add("D504_21", "");//入院诊断(疾病代码)
-                    param.Add("D504_11", "");//就诊日期(入院时间) (格式为YYYY-MM-DD)
-                    param.Add("D506_15", "");//补偿类别代码
-                    param.Add("D504_15", "");//就医机构级别(相关数据代码标准:S201-06)
-                    param.Add("D504_06", "");//年龄
-                    param.Add("D504_10", "");//就诊类型(相关数据代码标准:S301-05)
-                    param.Add("D504_12", "");//出院时间(格式为YYYY-MM-DD)
-                    param.Add("D504_29", "");//出院诊断（疾病代码）
-                    param.Add("D504_16_D", "");//入院科室(相关数据代码标准:S201-03)
-                    param.Add("D504_16_T", "");//出院科室(相关数据代码标准:S201-03)
-                    param.Add("S701_01", "");//是否是中途结算(相关数据代码标准:S701-01)
+                    param.Add("AREA_NO", jsonDict["AREA_NO"]); //病人地区编码(取前台选择的地区编码)
+                    param.Add("D401_10", jsonDict["D401_10"]); //取存储过的的新医疗证号
+                    param.Add("D401_21", jsonDict["D401_21"]); //取存储过的成员序号
+                    param.Add("DEP_ID", jsonDict["DEP_ID"]); //就医机构代码(取存储过的用户单位ID)=DEP_ID
+                    param.Add("D501_16", jsonDict["D501_16"]); //疾病代码
+                    param.Add("D503_15", jsonDict["D503_15"]); //补偿类别代码
+                    param.Add("DEP_LEVEL", jsonDict["DEP_LEVEL"]); //就医机构级别，从存储过的变量中取
+                    param.Add("D503_16", jsonDict["DEP_ID"]); //补偿机构代码(鉴于不做转外的，补偿机构代码和就医机构代码暂时一样)=DEP_ID
+                    param.Add("D501_10", "AA"); //就诊日期(前台是用户自己选择的)格式为(YYYY-MM-DD)
+                    param.Add("USER_ID", jsonDict["USER_ID"]); //取存储过的的用户ID
+                    param.Add("FLAG", "1"); //1 试算 2 收费
+                    param.Add("D502_04", "AA"); //药品编码字符串(用分号分隔)此处因药品可能是多个，药品编码和下一个药品编码用分号分隔(下面的数量、单价、比例也一样)
+                    param.Add("D502_09", "AA"); //药品数量字符串(用分号分隔)
+                    param.Add("D502_08", "AA"); //药品单价字符串(用分号分隔)
+                    param.Add("D502_10", jsonDict["D502_10"]); //药品比例字符串(用分号分隔)
+                    param.Add("D501_13", "AA"); //接诊科室(前台选择)对应S201-03.xls
+                    param.Add("D501_14", "AA"); //经治医生
+                    param.Add("D501_15", jsonDict["D501_15"]); //来院状态(前台选择)对应S301-02.xls
+                    param.Add("D503_03", jsonDict["D503_03"]); //总费用 (试算的时候传’NULL’)  收费时传(O_TOTAL_COSTS：总费用)
+                    param.Add("D503_08", jsonDict["D503_08"]); //可补偿门诊医药费(试算的时候传’NULL’) 收费时传(O_TOTAL_CHAGE：合理费用)
+                    param.Add("D503_09", jsonDict["D503_09"]); //核算补偿金额(试算的时候传’NULL’) 收费时传(O_D503_09：核算补偿金额(实际补偿合计额))
+                    param.Add("OUTP_FACC", jsonDict["OUTP_FACC"]); //账户补偿(试算的时候传’NULL’) 收费时传(O_OUTP_FACC：帐户补偿)
+                    param.Add("SELF_PAY", jsonDict["SELF_PAY"]); //自费金额(试算的时候传’NULL’)  收费时传(O_ZF_COSTS：自费费用)
+                    param.Add("D501_09", jsonDict["D501_09"]); //就诊类型（对应s301_05.xls）
+                    param.Add("D503_18", jsonDict["D503_18"]); //经办人(取用户姓名 USER_NAME)
+                    param.Add("HOSP_NAME", jsonDict["HOSP_NAME"]); //诊治单位名称(目前取用户所在单位名称DEP_NAME，以后可能存在诊治单位用户自己填的情况)
+                    param.Add("D601_17_OUT", jsonDict["D601_17_OUT"]); //家庭账户支出(试算的时候传’NULL’)  收费时传(D601_17_OUT：家庭账户支出)
+                    param.Add("XY_OUT", jsonDict["XY_OUT"]); //西药补偿金额(试算的时候传’NULL’)  收费时传(XY_OUT：西药补偿金额)
+                    param.Add("ZCAOY_OUT", jsonDict["ZCAOY_OUT"]); //中草药补偿金额(试算的时候传’NULL’)  收费时传(ZCAOY_OUT：中草药补偿金额)
+                    param.Add("ZCHENGY_OUT", jsonDict["ZCHENGY_OUT"]); //中成药补偿金额(试算的时候传’NULL’)  收费时传(ZCHENGY_OUT：中成药补偿金额)
+
+
 
                     shisuan.executeSql(param);
                     if (shisuan.getExecuteStatus() == true) //试算成功

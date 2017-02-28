@@ -387,13 +387,42 @@
                 <td style="padding-left:30px;">门诊疾病编码：
                     <input type="text" style="width:300px;height:30px;font-size:14pt;" placeholder="请输入值查询" id="jbbm" onkeyup="autoComplete.start(event)">
                     <span style="color:red;">*</span>
-                    
                 
                 </td>
                 
             </tr>
-
         </table>
+
+        <p></p>
+
+        <table>
+            <tr>
+                <td>就诊类型：</td>
+                <td>
+                    <select id="jzlx" name="">
+                        <option value="2">住院</option>
+                        <option value="1">门诊</option>
+                        <option value="3">体格检查</option>
+                        <option value="4">预防接种</option>
+                        <option value="5">正常分娩住院</option>
+                        <option value="9">其他</option>
+                    </select>
+                </td>
+                <td style="padding-left:30px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td style="padding-left:30px;">
+                    入院状态：
+                    <select id="ryzt" name="">
+                        <option value="3">一般</option>
+                        <option value="2">急</option>
+                        <option value="1">危</option>
+                        <option value="9">其他</option>
+                    </select>
+
+                </td>
+
+            </tr>
+        </table>
+
         <div class="auto_hidden" id="auto"><!--自动完成 DIV--> </div>
         
 
@@ -489,13 +518,59 @@
 
     <script type="text/javascript">
 
+        //获取试算的参数信息
         function getParam() {
+            var ssMap = {};
+
+            ssMap["AREA_NO"] = $("#areaNo").val(); //病人地区编码(取前台选择的地区编码)
+            ssMap["D401_10"] = $("#ylzh").val(); //取存储过的的新医疗证号
+            ssMap["D401_21"] = currentSelectedMember["D401_21"]; //取存储过的成员序号
+            ssMap["DEP_ID"] = getCookie("DEP_ID"); //就医机构代码(取存储过的用户单位ID)=DEP_ID
+
+            //由于门诊疾病编码需要搜索，因此，只需要取第一个的值即可
+            var ryzd_code = $("#jbbm").val();
+            if (ryzd_code != "" && ryzd_code != null) {
+                var tmpCode = ryzd_code.split('|');
+                if (tmpCode != null && tmpCode.length > 0) {
+                    ryzd_code = tmpCode[0];
+                }
+            }
+            ssMap["D501_16"] = ryzd_code; //疾病代码
+
+            ssMap["D503_15"] = $("#bclb").val(); //补偿类别代码
+            ssMap["DEP_LEVEL"] = getCookie("DEP_LEVEL"); //就医机构级别，从存储过的变量中取
+            ssMap["D503_16"] = getCookie("DEP_LEVEL"); //补偿机构代码(鉴于不做转外的，补偿机构代码和就医机构代码暂时一样)=DEP_ID
+            //ssMap["D501_10"] = ; //就诊日期(前台是用户自己选择的)格式为(YYYY-MM-DD)，可能选多个，传之后拼接
+            ssMap["USER_ID"] = getCookie("USER_ID"); //取存储过的的用户ID
+            ssMap["FLAG"] = "1"; //1 试算 2 收费
+            //ssMap["D502_04"] = 数据库取; //药品编码字符串(用分号分隔)此处因药品可能是多个，药品编码和下一个药品编码用分号分隔(下面的数量、单价、比例也一样)
+            //ssMap["D502_09"] = 数据库取; //药品数量字符串(用分号分隔)
+            //ssMap["D502_08"] = 数据库取; //药品单价字符串(用分号分隔)
+            ssMap["D502_10"] = ""; //药品比例字符串(用分号分隔) 暂时传空
+            //ssMap["D501_13"] = 数据库取; //接诊科室(前台选择)对应S201-03.xls 
+            //ssMap["D501_14"] = 数据库取; //经治医生
+            ssMap["D501_15"] = $("#ryzt").val(); //来院状态(前台选择)对应S301-02.xls
+            ssMap["D503_03"] = "NULL"; //总费用 (试算的时候传’NULL’)  收费时传(O_TOTAL_COSTS：总费用)
+            ssMap["D503_08"] = "NULL"; //可补偿门诊医药费(试算的时候传’NULL’) 收费时传(O_TOTAL_CHAGE：合理费用)
+            ssMap["D503_09"] = "NULL"; //核算补偿金额(试算的时候传’NULL’) 收费时传(O_D503_09：核算补偿金额(实际补偿合计额))
+            ssMap["OUTP_FACC"] = "NULL"; //账户补偿(试算的时候传’NULL’) 收费时传(O_OUTP_FACC：帐户补偿)
+            ssMap["SELF_PAY"] = "NULL"; //自费金额(试算的时候传’NULL’)  收费时传(O_ZF_COSTS：自费费用)
+            ssMap["D501_09"] = $("#jzlx").val();; //就诊类型（对应s301_05.xls）
+            ssMap["D503_18"] = getCookie("USER_NAME"); //经办人(取用户姓名 USER_NAME)
+            ssMap["HOSP_NAME"] = getCookie("DEP_NAME"); //诊治单位名称(目前取用户所在单位名称DEP_NAME，以后可能存在诊治单位用户自己填的情况)
+            ssMap["D601_17_OUT"] = "NULL"; //家庭账户支出(试算的时候传’NULL’)  收费时传(D601_17_OUT：家庭账户支出)
+            ssMap["XY_OUT"] = "NULL"; //西药补偿金额(试算的时候传’NULL’)  收费时传(XY_OUT：西药补偿金额)
+            ssMap["ZCAOY_OUT"] = "NULL"; //中草药补偿金额(试算的时候传’NULL’)  收费时传(ZCAOY_OUT：中草药补偿金额)
+            ssMap["ZCHENGY_OUT"] = "NULL"; //中成药补偿金额(试算的时候传’NULL’)  收费时传(ZCHENGY_OUT：中成药补偿金额)
+
+            var p = $.base64.encode(map2Json(ssMap), "utf8");
+            return p;
 
         }
 
         //试算
         function tryCal() {
-            var checked = getChecked();
+            var checked = getChecked(); //获取被选中的信息
             if (checked == null || checked.length == 0) {
                 alert("请勾选门诊流水进行操作");
                 return;
@@ -508,8 +583,21 @@
             }
 
             var info = "";
+            var selectedRows = "";
             for (var i = 0; i < checked.length; i++) {
-                info += "流水:" + $("#" + checked[i] + "_REC_NO").html() + " 患者:" + $("#" + checked[i] + "_NAME").html() + "\n";
+                info += "流水:" + $("#" + checked[i] + "_REG_NO").html() + " 患者:" + $("#" + checked[i] + "_NAME").html() + "\n";
+
+                var map = {};
+                map["REG_NO"] = $("#" + checked[i] + "_REG_NO").html();        //门诊流水号
+                map["REC_NO"] = $("#" + checked[i] + "_REC_NO").html();        //处方号
+                map["REC_TIME"] = $("#" + checked[i] + "_REC_TIME").html();    //结算日期
+                map["TOTAL"] = $("#" + checked[i] + "_TOTAL").html();          //结算金额
+                map["TOTAL_REC"] = $("#" + checked[i] + "_TOTAL_REC").html();  //处方金额
+                map["OPER_NAME"] = $("#" + checked[i] + "_OPER_NAME").html();  //结算人
+                map["NAME"] = $("#" + checked[i] + "_NAME").html();            //患者姓名
+                map["IP_DR"] = $("#" + checked[i] + "_IP_DR").html();          //处方医生
+                map["FEE_CODE"] = $("#" + checked[i] + "_FEE_CODE").html();    //农合结算
+                selectedRows += $.base64.encode(map2Json(map), "utf8") + "$"; //多个人用$分割
             }
 
             if (confirm("确定对\n\n" + info + "\n进行试算吗？")) {
@@ -521,7 +609,8 @@
             var pMap = {};
             pMap["USER_ID"] = USER_ID;
             pMap["DIAGNOSIS_CODE"] = $("#jbbm").val(); //疾病代码
-            pMap["PARAM"] = ""; //试算的参数
+            pMap["PARAM"] = getParam(); //试算的参数
+            pMap["ROWS"] = selectedRows; //选中的多个记录
             var pJson = map2Json(pMap);
 
             $.ajax({
@@ -581,15 +670,15 @@
                                 var trStr = '<tr class="example" id="' + trId + '" >';//动态拼接table
                                 // var html = '';
                                 //for (var key in row) {//
-                                trStr += '<td id="' + trId + '_REC_NO">' + $.trim(row['REC_NO']) + '</td>';//数据表的主键值 门诊流水号
+                                trStr += '<td id="' + trId + '_REG_NO">' + $.trim(row['REG_NO']) + '</td>';//数据表的主键值 门诊流水号
                                 //}
-                                trStr += '<td id="' + trId + '_REG_NO">' + row['REG_NO'] + '</td>'; //处方号
-                                trStr += '<td id="' + trId + '_REC_TIME">' + row['REC_TIME'] + '</td>'; //结算日期
-                                trStr += '<td id="' + trId + '_TOTAL">' + row['TOTAL'] + '</td>'; //结算金额
+                                trStr += '<td id="' + trId + '_REC_NO">' + row['REC_NO'] + '</td>';       //处方号
+                                trStr += '<td id="' + trId + '_REC_TIME">' + row['REC_TIME'] + '</td>';   //结算日期
+                                trStr += '<td id="' + trId + '_TOTAL">' + row['TOTAL'] + '</td>';         //结算金额
                                 trStr += '<td id="' + trId + '_TOTAL_REC">' + row['TOTAL_REC'] + '</td>'; //处方金额
                                 trStr += '<td id="' + trId + '_OPER_NAME">' + row['OPER_NAME'] + '</td>'; //结算人
-                                trStr += '<td id="' + trId + '_NAME">' + row['NAME'] + '</td>'; //患者姓名
-                                trStr += '<td id="' + trId + '_IP_DR">' + row['IP_DR'] + '</td>'; //处方医生
+                                trStr += '<td id="' + trId + '_NAME">' + row['NAME'] + '</td>';           //患者姓名
+                                trStr += '<td id="' + trId + '_IP_DR">' + row['IP_DR'] + '</td>';         //处方医生
                                 trStr += '<td id="' + trId + '_FEE_CODE">' + $.trim(row['FEE_CODE']) + '</td>'; //农合结算
                                 trStr += '<td id="' + trId + '_CHECKBOX">' + '<input name="lsCheckBox" type="checkbox" value="' + trId + '" />' + '</td>';
                                 trStr += '</tr>';
@@ -751,14 +840,20 @@
             });
         }
 
+
+
+        //当前选择中的成员
+        var currentSelectedMember = null;
+
         //查看某个成员详细信息
-        //地区号、序号，医疗证号由后台缓存获取
         function getMemberInfo(USER_ID, AREA_NO, D401_21) {
             var pMap = {};
             pMap["USER_ID"] = USER_ID;
             pMap["AREA_NO"] = AREA_NO;
             pMap["D401_21"] = D401_21;
             var pJson = map2Json(pMap);
+
+            currentSelectedMember = pMap;
 
             showMask("正在处理，请稍后...");
             $.ajax({
