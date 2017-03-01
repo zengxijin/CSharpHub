@@ -484,12 +484,9 @@ namespace ApiMonitor.pages
                     string decodeParam = DataConvert.Base64Decode(PARAM);
                     Dictionary<string, string> jsonDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(decodeParam);
 
-                    //选中的流水解码，多个流水$分割
-                    string selectedParam = DataConvert.Base64Decode(ROWS);
-
                     string tmpInfo = "";
-
-                    string[] array = selectedParam.Split('$');
+                    //选中的流水解码，多个流水$分割
+                    string[] array = ROWS.Split('$');
                     foreach (string item in array)
                     {
                         if (string.IsNullOrEmpty(item) == true)
@@ -497,7 +494,9 @@ namespace ApiMonitor.pages
                             continue;
                         }
 
-                        Dictionary<string, string> map = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(item);
+                        string selectedParam = DataConvert.Base64Decode(item);
+
+                        Dictionary<string, string> map = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(selectedParam);
                         string REC_NO = map["REC_NO"];       //处方号
                         string REG_NO = map["REG_NO"];       //门诊流水号
                         string REC_TIME = map["REC_TIME"] != "" ? map["REC_TIME"].ToString().Split(' ')[0].Replace(".", "-") : "";   //结算日期
@@ -533,7 +532,7 @@ namespace ApiMonitor.pages
                         param.Add("D502_09", dt.Rows[0]["qty"] as string); //药品数量字符串(用分号分隔)
                         param.Add("D502_08", dt.Rows[0]["price"] as string); //药品单价字符串(用分号分隔)
                         param.Add("D502_10", jsonDict["D502_10"]); //药品比例字符串(用分号分隔)
-                        param.Add("D501_13", dt.Rows[0]["dept_name"] as string); //接诊科室(前台选择)对应S201-03.xls
+                        param.Add("D501_13", jsonDict["D501_13"]); //接诊科室(前台选择)对应S201-03.xls
                         param.Add("D501_14", dt.Rows[0]["oper_name"] as string); //经治医生
                         param.Add("D501_15", jsonDict["D501_15"]); //来院状态(前台选择)对应S301-02.xls
                         param.Add("D503_03", jsonDict["D503_03"]); //总费用 (试算的时候传’NULL’)  收费时传(O_TOTAL_COSTS：总费用)
@@ -565,6 +564,7 @@ namespace ApiMonitor.pages
                             //retDict["REDEEM_TOTAL"];//单次补偿合计
 
                             XnhLogger.log("处方号：" + REC_NO + "试算成功，参数：" + shisuan.parames);
+                            XnhLogger.log("处方号：" + REC_NO + "试算成功，结果：" + shisuan.executeResult);
                             tmpInfo += "处方号：" + REC_NO + "试算成功；";
                         }
                         else
