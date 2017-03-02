@@ -665,6 +665,8 @@
             </div>
         </div>
 
+        
+
         <p></p>
 
         <div>
@@ -678,6 +680,43 @@
         </div>
 
         <p></p>
+        <p></p>
+
+        <div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="text-muted bootstrap-admin-box-title">试算结果</div>
+                        </div>
+                        <div class="bootstrap-admin-panel-content" style="display:none;">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>总费用：<span id="TOTAL_COSTS"></span></td>
+                                        <td>自费费用：<span id="ZF_COSTS"></span></td>
+                                        <td>合理费用：<span id="TOTAL_CHAGE"></span></td>
+                                        <td>实际补偿金额：<span id="D506_23"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>核算补偿金额[实际补偿合计额)：<span id="D506_18"></span></td>
+                                        <td>本次起伏线：<span id="BEGINPAY"></span></td>
+                                        <td>报销比例：<span id="SCALE"></span></td>
+                                        <td>大病支付额：<span id="HEAV_REDEEM_SUM"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>单次补偿合计：<span id="REDEEM_TOTAL"></span></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 
@@ -765,8 +804,32 @@
                 return;
             }
 
+            if (currentSelectedMember == null) {
+                alert("请选择家庭成员");
+                return;
+            }
+
+            //检查是否选择同一个人家庭成员的流水
+            isSamePeople = true;
+            var nameSelected = $("#D401_02").html();
+            if (checked.length > 0) {
+                for (var i = 0; i < allCheck.length; i++) {
+                    if (nameSelected != checked[i]) {
+                        isSamePeople = false;
+                        break;
+                    }
+                }
+            }
+
+            //选中的流水不是同一个人
+            if (isSamePeople == false) {
+                alert("请选择属于 " + nameSelected + " 的流水");
+                return;
+            }
+
             var info = "";
             var selectedRows = "";
+            
             for (var i = 0; i < checked.length; i++) {
                 info += "流水:" + $("#" + checked[i] + "_REG_NO").html() + " 患者:" + $("#" + checked[i] + "_NAME").html() + "\n";
 
@@ -976,6 +1039,7 @@
             }
         });
 
+        var isSamePeople = true;
         //检查选择了哪些流水
         function getChecked() {
             var allCheck = [];
@@ -983,6 +1047,7 @@
                 var val = $(this).val();
                 allCheck.push(val);
             });
+
             return allCheck;
         }
 
@@ -1096,7 +1161,7 @@
                             var D401_02 = member[1];
                             var param = '\'' + USER_ID + '\',' + '\'' + AREA_NO + '\',' + '\'' + D401_21 + '\'';
                             $("#familyMember tbody").append('<tr><td>' + D401_21 + '</td><td>' + D401_02 +
-                                '</td><td><a href="javascript:getMemberInfo(' + param + ');">查看信息</a></td><td></td></tr>');
+                                '</td><td><a href="javascript:getMemberInfo(' + param + ');">选择并查看基本信息</a></td><td></td></tr>');
                         }
 
                     } else {
@@ -1110,11 +1175,8 @@
             });
         }
 
-
-
         //当前选择中的成员
         var currentSelectedMember = null;
-
         //查看某个成员详细信息
         function getMemberInfo(USER_ID, AREA_NO, D401_21) {
             var pMap = {};

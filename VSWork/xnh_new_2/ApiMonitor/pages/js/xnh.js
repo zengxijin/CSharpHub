@@ -111,7 +111,15 @@ $(window).resize(function () { conPosition(); });
 /***********************遮罩相关 end********************/
 
 function getJsonObj(str) {
-    return eval("(" + str + ")");
+    var json = null;
+    try {
+        json = eval("(" + str + ")");
+    }
+    catch (err) {
+        var txt = "错误信息: " + err.message + "\n\n";
+        alert(txt + "\n\n 转换JSON参数信息：" + str);
+    }
+    return json;
 }
 
 /***********************读卡驱动配置********************/

@@ -680,6 +680,8 @@ namespace ApiMonitor.pages
                     if(mzcz.getExecuteStatus() == true) //冲正成功
                     {
                         info += "门诊流水:" + T_D502_01 + "冲正成功;";
+                        //冲正成功要修改HIS标志
+
                     }
                     else
                     {
