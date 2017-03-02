@@ -671,7 +671,7 @@
             <ul style="list-style:none;">
                 <li style="float:left;width:20%;"><button type="button" class="btn btn-default" onclick="javacript: tryCal();">试算</button></li>
                 <li style="float:left;width:20%;"><button type="button" class="btn btn-default">收费</button></li>
-                <li style="float:left;width:20%;"><button type="button" class="btn btn-default">冲正</button></li>
+                <li style="float:left;width:20%;"><button type="button" class="btn btn-default" onclick="javacript: chongzheng();">冲正</button></li>
                 <li style="float:left;width:20%;"><button type="button" class="btn btn-default">打印补偿票据</button></li>
 
             </ul>
@@ -839,6 +839,66 @@
             //retDict["SCALE"];//报销比例
             //retDict["HEAV_REDEEM_SUM"];//大病支付额
             //retDict["REDEEM_TOTAL"];//单次补偿合计
+        }
+
+        //冲正
+        function chongzheng() {
+            var checked = getChecked(); //获取被选中的信息
+            if (checked == null || checked.length == 0) {
+                alert("请勾选门诊流水进行操作");
+                return;
+            }
+
+            var AREA_NO = $("#areaNo").val();
+            if (AREA_NO == "") {
+                alert("请选择正确地区");
+                return;
+            }
+
+            var info = "";
+            var selectedRows = ""; //选中多个流水
+            for (var i = 0; i < checked.length; i++) {
+                info += "流水:" + $("#" + checked[i] + "_REG_NO").html() + " 患者:" + $("#" + checked[i] + "_NAME").html() + "\n";
+                //多个流水$分割
+                selectedRows += $("#" + checked[i] + "_REG_NO").html() + "$";
+            }
+
+            if (confirm("确定对\n\n" + info + "\n进行冲正吗？")) {
+            } else {
+                return;
+            }
+
+            var USER_ID = getCookie("USER_ID");
+            var pMap = {};
+            pMap["USER_ID"] = USER_ID;
+            pMap["AREA_NO"] = AREA_NO; //地区代码
+            pMap["MZLSH"] = selectedRows; //选中的冲正的门诊流水
+            var pJson = map2Json(pMap);
+
+            showMask("正在冲正处理，请稍后...");
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/chongzheng",
+                data: pJson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    //返回的数据用data.d获取内容
+                    var retVal = data.d;
+                    var retJson = getJsonObj(retVal);
+                    if (retJson.flag == '0') {
+                        var json = retJson.msg;
+                        alert(retJson.msg);
+                    } else {
+                        alert(retJson.msg);
+                    }
+                    closeMask();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
+                }
+            });
         }
 
         //患者姓名回车查询

@@ -648,6 +648,57 @@ namespace ApiMonitor.pages
             return null;
         }
 
+        /// <summary>
+        /// 冲正
+        /// </summary>
+        /// <param name="USER_ID"></param>
+        /// <param name="AREA_NO">地区代码</param>
+        /// <param name="MZLSH">门诊流水号（多个用$分割）</param>
+        /// <returns></returns>
+        [WebMethod]
+        public string chongzheng(string USER_ID, string AREA_NO,string MZLSH)
+        {
+            string retStr = "";
+            try
+            {
+                string[] array = MZLSH.Split('$'); //前台选中多个流水号
+
+                string info = "";
+                foreach (string T_D502_01 in array)
+                {
+                    if (string.IsNullOrEmpty(T_D502_01) == true)
+                    {
+                        continue;
+                    }
+
+                    MZBC_MZCZ mzcz = new MZBC_MZCZ();
+                    Dictionary<string, string> paramDict = new Dictionary<string, string>();
+                    paramDict.Add("AREA_NO", AREA_NO);//病人地区编码(取前台选择的地区编码)
+                    paramDict.Add("T_D502_01", T_D502_01);//取存储过的门诊登记流水号
+
+                    mzcz.executeSql(paramDict);
+                    if(mzcz.getExecuteStatus() == true) //冲正成功
+                    {
+                        info += "门诊流水:" + T_D502_01 + "冲正成功;";
+                    }
+                    else
+                    {
+                        info += "门诊流水:" + T_D502_01 + "冲正失败;失败信息:" + mzcz.getExecuteResultPlainString();
+                    }
+
+                }
+                retStr = DataConvert.getReturnJson("0", info);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            
+            return retStr;
+        }
+
+
         public string upload()
         {
             string retStr = "";
