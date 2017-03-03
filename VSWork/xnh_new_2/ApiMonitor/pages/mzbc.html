@@ -682,14 +682,14 @@
         <p></p>
         <p></p>
 
-        <div>
+        <div id="ssjg" style="display:none;">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="text-muted bootstrap-admin-box-title">试算结果</div>
                         </div>
-                        <div class="bootstrap-admin-panel-content" style="display:none;">
+                        <div class="bootstrap-admin-panel-content">
                             <table class="table">
                                 <tbody>
                                     <tr>
@@ -813,8 +813,8 @@
             isSamePeople = true;
             var nameSelected = $("#D401_02").html();
             if (checked.length > 0) {
-                for (var i = 0; i < allCheck.length; i++) {
-                    if (nameSelected != checked[i]) {
+                for (var i = 0; i < checked.length; i++) {
+                    if (nameSelected != $("#" + checked[i] + "_NAME").html()) {
                         isSamePeople = false;
                         break;
                     }
@@ -878,7 +878,17 @@
                     var retVal = data.d;
                     var retJson = getJsonObj(retVal);
                     if (retJson.flag == '0') {
-                        var json = retJson.msg;
+                        alert("试算成功，请查看试算结果");
+                        var info = retJson.msg;
+                        //绑定试算结果
+                        $("#ssjg").css("display", "block");
+                        for (var item in info) {
+                            var objTest = $("#" + item);
+                            if (objTest != null) {
+                                $("#" + item).html(info[item]);
+                            }
+                        }
+
                     } else {
                         alert(retJson.msg);
                     }
@@ -889,19 +899,6 @@
                     alert(textStatus + ":" + errorThrown);
                 }
             });
-        }
-
-        //绑定试算信息
-        function bindTryCalVal(param) {
-            //retDict["TOTAL_COSTS"];//总费用
-            //retDict["ZF_COSTS"];//自费费用
-            //retDict["TOTAL_CHAGE"];//合理费用
-            //retDict["D506_23"];//实际补偿金额
-            //retDict["D506_18"];//核算补偿金额[实际补偿合计额)
-            //retDict["BEGINPAY"];//本次起伏线
-            //retDict["SCALE"];//报销比例
-            //retDict["HEAV_REDEEM_SUM"];//大病支付额
-            //retDict["REDEEM_TOTAL"];//单次补偿合计
         }
 
         //冲正

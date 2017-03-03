@@ -487,6 +487,12 @@ namespace ApiMonitor.pages
                     string tmpInfo = "";
                     //选中的流水解码，多个流水$分割
                     string[] array = ROWS.Split('$');
+                    string REC_TIME = ""; //就诊日期
+                    string D502_04 = "";  //药品编码字符串(用分号分隔)此处因药品可能是多个，药品编码和下一个药品编码用分号分隔(下面的数量、单价、比例也一样)
+                    string D502_09 = "";  //药品数量字符串(用分号分隔)
+                    string D502_08 = "";  //药品单价字符串(用分号分隔)
+                    string D501_14 = "";
+                    string REC_NO_ALL = "";//多个流水
                     foreach (string item in array)
                     {
                         if (string.IsNullOrEmpty(item) == true)
@@ -497,86 +503,94 @@ namespace ApiMonitor.pages
                         string selectedParam = DataConvert.Base64Decode(item);
 
                         Dictionary<string, string> map = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(selectedParam);
-                        string REC_NO = map["REC_NO"];       //处方号
-                        string REG_NO = map["REG_NO"];       //门诊流水号
-                        string REC_TIME = map["REC_TIME"] != "" ? map["REC_TIME"].ToString().Split(' ')[0].Replace(".", "-") : "";   //结算日期
-                        string TOTAL = map["TOTAL"];         //结算金额
-                        string TOTAL_REC = map["TOTAL_REC"]; //处方金额
+                        string REC_NO = map["REC_NO"];        //处方号
+                        string REG_NO = map["REG_NO"];        //门诊流水号
+                        REC_TIME = map["REC_TIME"] != "" ? map["REC_TIME"].ToString().Split(' ')[0].Replace(".", "-") : "";   //结算日期
+                        string TOTAL = map["TOTAL"];          //结算金额
+                        string TOTAL_REC = map["TOTAL_REC"];  //处方金额
                         string OPER_NAME = map["OPER_NAME"];  //结算人
                         string NAME = map["NAME"];            //患者姓名
                         //string REC_NO = map["IP_DR"];       //处方医生
                         string FEE_CODE = map["FEE_CODE"];    //农合结算
 
                         DataTable dt = HIS.getMZMX(map);
-                        if (dt == null && dt.Rows.Count > 0)
+                        if (dt == null || dt.Rows.Count == 0)
                         {
                             XnhLogger.log("处方号：" + REC_NO + "查询门诊明细失败");
                             continue; //继续处理下一个
                         }
-
-                        //(2)疾病存在，进行试算交易
-                        MZBC_PROC_CALE_PRICE_LIST shisuan = new MZBC_PROC_CALE_PRICE_LIST();
-                        Dictionary<string, string> param = new Dictionary<string, string>();
-                        param.Add("AREA_NO", jsonDict["AREA_NO"]); //病人地区编码(取前台选择的地区编码)
-                        param.Add("D401_10", jsonDict["D401_10"]); //取存储过的的新医疗证号
-                        param.Add("D401_21", jsonDict["D401_21"]); //取存储过的成员序号
-                        param.Add("DEP_ID", jsonDict["DEP_ID"]); //就医机构代码(取存储过的用户单位ID)=DEP_ID
-                        param.Add("D501_16", jsonDict["D501_16"]); //疾病代码
-                        param.Add("D503_15", jsonDict["D503_15"]); //补偿类别代码
-                        param.Add("DEP_LEVEL", jsonDict["DEP_LEVEL"]); //就医机构级别，从存储过的变量中取
-                        param.Add("D503_16", jsonDict["DEP_ID"]); //补偿机构代码(鉴于不做转外的，补偿机构代码和就医机构代码暂时一样)=DEP_ID
-                        param.Add("D501_10", REC_TIME); //就诊日期(前台是用户自己选择的)格式为(YYYY-MM-DD)
-                        param.Add("USER_ID", jsonDict["USER_ID"]); //取存储过的的用户ID
-                        param.Add("FLAG", "1"); //1 试算 2 收费
-                        param.Add("D502_04", dt.Rows[0]["item_code"] as string); //药品编码字符串(用分号分隔)此处因药品可能是多个，药品编码和下一个药品编码用分号分隔(下面的数量、单价、比例也一样)
-                        param.Add("D502_09", dt.Rows[0]["qty"] as string); //药品数量字符串(用分号分隔)
-                        param.Add("D502_08", dt.Rows[0]["price"] as string); //药品单价字符串(用分号分隔)
-                        param.Add("D502_10", jsonDict["D502_10"]); //药品比例字符串(用分号分隔)
-                        param.Add("D501_13", jsonDict["D501_13"]); //接诊科室(前台选择)对应S201-03.xls
-                        param.Add("D501_14", dt.Rows[0]["oper_name"] as string); //经治医生
-                        param.Add("D501_15", jsonDict["D501_15"]); //来院状态(前台选择)对应S301-02.xls
-                        param.Add("D503_03", jsonDict["D503_03"]); //总费用 (试算的时候传’NULL’)  收费时传(O_TOTAL_COSTS：总费用)
-                        param.Add("D503_08", jsonDict["D503_08"]); //可补偿门诊医药费(试算的时候传’NULL’) 收费时传(O_TOTAL_CHAGE：合理费用)
-                        param.Add("D503_09", jsonDict["D503_09"]); //核算补偿金额(试算的时候传’NULL’) 收费时传(O_D503_09：核算补偿金额(实际补偿合计额))
-                        param.Add("OUTP_FACC", jsonDict["OUTP_FACC"]); //账户补偿(试算的时候传’NULL’) 收费时传(O_OUTP_FACC：帐户补偿)
-                        param.Add("SELF_PAY", jsonDict["SELF_PAY"]); //自费金额(试算的时候传’NULL’)  收费时传(O_ZF_COSTS：自费费用)
-                        param.Add("D501_09", jsonDict["D501_09"]); //就诊类型（对应s301_05.xls）
-                        param.Add("D503_18", jsonDict["D503_18"]); //经办人(取用户姓名 USER_NAME)
-                        param.Add("HOSP_NAME", jsonDict["HOSP_NAME"]); //诊治单位名称(目前取用户所在单位名称DEP_NAME，以后可能存在诊治单位用户自己填的情况)
-                        param.Add("D601_17_OUT", jsonDict["D601_17_OUT"]); //家庭账户支出(试算的时候传’NULL’)  收费时传(D601_17_OUT：家庭账户支出)
-                        param.Add("XY_OUT", jsonDict["XY_OUT"]); //西药补偿金额(试算的时候传’NULL’)  收费时传(XY_OUT：西药补偿金额)
-                        param.Add("ZCAOY_OUT", jsonDict["ZCAOY_OUT"]); //中草药补偿金额(试算的时候传’NULL’)  收费时传(ZCAOY_OUT：中草药补偿金额)
-                        param.Add("ZCHENGY_OUT", jsonDict["ZCHENGY_OUT"]); //中成药补偿金额(试算的时候传’NULL’)  收费时传(ZCHENGY_OUT：中成药补偿金额)
-
-                        shisuan.executeSql(param);
-                        if (shisuan.getExecuteStatus() == true) //试算成功
-                        {
-                            //需要存储试算结果，进行收费交易
-                            Dictionary<string, string> retDict = shisuan.getResponseResultWrapperMap();
-                            //retDict["TOTAL_COSTS"];//总费用
-                            //retDict["ZF_COSTS"];//自费费用
-                            //retDict["TOTAL_CHAGE"];//合理费用
-                            //retDict["D506_23"];//实际补偿金额
-                            //retDict["D506_18"];//核算补偿金额[实际补偿合计额)
-                            //retDict["BEGINPAY"];//本次起伏线
-                            //retDict["SCALE"];//报销比例
-                            //retDict["HEAV_REDEEM_SUM"];//大病支付额
-                            //retDict["REDEEM_TOTAL"];//单次补偿合计
-
-                            XnhLogger.log("处方号：" + REC_NO + "试算成功，参数：" + shisuan.parames);
-                            XnhLogger.log("处方号：" + REC_NO + "试算成功，结果：" + shisuan.executeResult);
-                            tmpInfo += "处方号：" + REC_NO + "试算成功；";
-                        }
-                        else
-                        {
-                            XnhLogger.log("处方号：" + REC_NO + "试算失败，参数：" + shisuan.parames);
-                            tmpInfo += "处方号：" + REC_NO + "试算失败；";
-                        }
-
+                        //拼接多个流水的数据
+                        D502_04 += dt.Rows[0]["item_code"] as string + ";";
+                        D502_09 += dt.Rows[0]["qty"] as string + ";";
+                        D502_08 += dt.Rows[0]["price"] as string + ";";
+                        D501_14 = dt.Rows[0]["oper_name"] as string;
+                        REC_NO_ALL += REC_NO;
                     }
 
-                    retStr = DataConvert.getReturnJson("0", " 试算结果：" + tmpInfo);
+                    D502_04 = D502_04.Length > 1 ? D502_04.Substring(0, D502_04.Length - 1) : ""; //去掉最后一个分号
+                    D502_09 = D502_09.Length > 1 ? D502_09.Substring(0, D502_09.Length - 1) : ""; //去掉最后一个分号
+                    D502_08 = D502_08.Length > 1 ? D502_08.Substring(0, D502_08.Length - 1) : ""; //去掉最后一个分号
 
+                    //(2)疾病存在，进行试算交易
+                    MZBC_PROC_CALE_PRICE_LIST shisuan = new MZBC_PROC_CALE_PRICE_LIST();
+                    Dictionary<string, string> param = new Dictionary<string, string>();
+                    param.Add("AREA_NO", jsonDict["AREA_NO"]); //病人地区编码(取前台选择的地区编码)
+                    param.Add("D401_10", jsonDict["D401_10"]); //取存储过的的新医疗证号
+                    param.Add("D401_21", jsonDict["D401_21"]); //取存储过的成员序号
+                    param.Add("DEP_ID", jsonDict["DEP_ID"]); //就医机构代码(取存储过的用户单位ID)=DEP_ID
+                    param.Add("D501_16", jsonDict["D501_16"]); //疾病代码
+                    param.Add("D503_15", jsonDict["D503_15"]); //补偿类别代码
+                    param.Add("DEP_LEVEL", jsonDict["DEP_LEVEL"]); //就医机构级别，从存储过的变量中取
+                    param.Add("D503_16", jsonDict["DEP_ID"]); //补偿机构代码(鉴于不做转外的，补偿机构代码和就医机构代码暂时一样)=DEP_ID
+                    param.Add("D501_10", REC_TIME); //就诊日期(前台是用户自己选择的)格式为(YYYY-MM-DD)
+                    param.Add("USER_ID", jsonDict["USER_ID"]); //取存储过的的用户ID
+                    param.Add("FLAG", "1"); //1 试算 2 收费
+                    param.Add("D502_04", D502_04); //药品编码字符串(用分号分隔)此处因药品可能是多个，药品编码和下一个药品编码用分号分隔(下面的数量、单价、比例也一样)
+                    param.Add("D502_09", D502_09); //药品数量字符串(用分号分隔)
+                    param.Add("D502_08", D502_08); //药品单价字符串(用分号分隔)
+                    param.Add("D502_10", jsonDict["D502_10"]); //药品比例字符串(用分号分隔)
+                    param.Add("D501_13", jsonDict["D501_13"]); //接诊科室(前台选择)对应S201-03.xls
+                    param.Add("D501_14", D501_14); //经治医生
+                    param.Add("D501_15", jsonDict["D501_15"]); //来院状态(前台选择)对应S301-02.xls
+                    param.Add("D503_03", jsonDict["D503_03"]); //总费用 (试算的时候传’NULL’)  收费时传(O_TOTAL_COSTS：总费用)
+                    param.Add("D503_08", jsonDict["D503_08"]); //可补偿门诊医药费(试算的时候传’NULL’) 收费时传(O_TOTAL_CHAGE：合理费用)
+                    param.Add("D503_09", jsonDict["D503_09"]); //核算补偿金额(试算的时候传’NULL’) 收费时传(O_D503_09：核算补偿金额(实际补偿合计额))
+                    param.Add("OUTP_FACC", jsonDict["OUTP_FACC"]); //账户补偿(试算的时候传’NULL’) 收费时传(O_OUTP_FACC：帐户补偿)
+                    param.Add("SELF_PAY", jsonDict["SELF_PAY"]); //自费金额(试算的时候传’NULL’)  收费时传(O_ZF_COSTS：自费费用)
+                    param.Add("D501_09", jsonDict["D501_09"]); //就诊类型（对应s301_05.xls）
+                    param.Add("D503_18", jsonDict["D503_18"]); //经办人(取用户姓名 USER_NAME)
+                    param.Add("HOSP_NAME", jsonDict["HOSP_NAME"]); //诊治单位名称(目前取用户所在单位名称DEP_NAME，以后可能存在诊治单位用户自己填的情况)
+                    param.Add("D601_17_OUT", jsonDict["D601_17_OUT"]); //家庭账户支出(试算的时候传’NULL’)  收费时传(D601_17_OUT：家庭账户支出)
+                    param.Add("XY_OUT", jsonDict["XY_OUT"]); //西药补偿金额(试算的时候传’NULL’)  收费时传(XY_OUT：西药补偿金额)
+                    param.Add("ZCAOY_OUT", jsonDict["ZCAOY_OUT"]); //中草药补偿金额(试算的时候传’NULL’)  收费时传(ZCAOY_OUT：中草药补偿金额)
+                    param.Add("ZCHENGY_OUT", jsonDict["ZCHENGY_OUT"]); //中成药补偿金额(试算的时候传’NULL’)  收费时传(ZCHENGY_OUT：中成药补偿金额)
+
+                    shisuan.executeSql(param);
+                    if (shisuan.getExecuteStatus() == true) //试算成功
+                    {
+                        //需要存储试算结果，进行收费交易
+                        Dictionary<string, string> retDict = shisuan.getResponseResultWrapperMap();
+                        //retDict["TOTAL_COSTS"];//总费用
+                        //retDict["ZF_COSTS"];//自费费用
+                        //retDict["TOTAL_CHAGE"];//合理费用
+                        //retDict["D506_23"];//实际补偿金额
+                        //retDict["D506_18"];//核算补偿金额[实际补偿合计额)
+                        //retDict["BEGINPAY"];//本次起伏线
+                        //retDict["SCALE"];//报销比例
+                        //retDict["HEAV_REDEEM_SUM"];//大病支付额
+                        //retDict["REDEEM_TOTAL"];//单次补偿合计
+                        string retJson = DataConvert.Dict2Json(retDict);
+
+                        XnhLogger.log("处方号：" + REC_NO_ALL + "试算成功，参数：" + shisuan.parames);
+                        XnhLogger.log("处方号：" + REC_NO_ALL + "试算成功，结果：" + shisuan.executeResult);
+                        retStr = DataConvert.getReturnJson("0", retJson);
+                    }
+                    else
+                    {
+                        XnhLogger.log("处方号：" + REC_NO_ALL + "试算失败，参数：" + shisuan.parames);
+                        tmpInfo = "处方号：" + REC_NO_ALL + "试算失败；原因：" + shisuan.executeResult;
+                        retStr = DataConvert.getReturnJson("1", " 试算结果：" + tmpInfo);
+                    }
                 }
                 else if (tmp == "1")
                 {
