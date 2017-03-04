@@ -161,6 +161,39 @@ namespace Service.WebService.ServiceImpl
         }
 
         /// <summary>
+        /// 根据参数和json的配置文件的参数信息，将请求参数转为dictionary
+        /// </summary>
+        /// <param name="SqlStr">操作的服务接口标志</param>
+        /// <param name="paramesString">请求参数</param>
+        /// <param name="split">参数分隔符</param>
+        /// <returns></returns>
+        public Dictionary<string, string> plainParamsStringToDict(string SqlStr, string paramesString, string split)
+        {
+            if (!string.IsNullOrEmpty(SqlStr)) this.sqlStr = SqlStr;
+
+            Dictionary<string, int> configDict = ConfigUtil.getRequestParamConfig(this.sqlStr);
+            Dictionary<string, string> retDict = new Dictionary<string, string>();
+
+            //根据配置的下标升序排列，防止配置文件配置乱序
+            Dictionary<string, int> dictSortedByValueIndex = configDict.OrderBy(p => p.Value).ToDictionary(p => p.Key, o => o.Value);
+
+            string[] plainParams = paramesString.Split(new string[] { split }, StringSplitOptions.None);
+            int i = 0;
+
+            foreach (KeyValuePair<string, int> pair in dictSortedByValueIndex)
+            {
+                if (i == pair.Value && i < plainParams.Length)
+                {
+                    retDict.Add(pair.Key, plainParams[i]);
+                }
+                i++;
+            }
+
+            return retDict;
+
+        }
+
+        /// <summary>
         /// 直接使用Dictionary包装的参数，其他参数由子类设置
         /// </summary>
         /// <param name="paramesDict">包装为Dictionary的参数</param>

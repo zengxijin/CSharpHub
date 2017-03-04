@@ -43,11 +43,123 @@ namespace ApiMonitor.DB
                 XnhLogger.log(ex.ToString() + " SQL:" + sql);
             }
         }
-
-        /// <summary>
-        /// 更新住院流水号
+         /// <summary>
+        
+        ///门诊冲正修改his标记
         /// </summary>
+        public static void modifyMZCZBJ(Dictionary<string,string> sqlParam)
+        {
+         if (sqlParam == null || sqlParam.Count == 0)
+         {
+             XnhLogger.log("modifyMZCZBJ sqlParam参数为空");
+             return ;
+         }
+         string sql = "UPDATE cl_recipe SET yb_up = '0' where rec_no = '$REC_NO$' and reg_no = '$REG_NO$' ";
+            try
+            {
+            sql = sql.Replace("0", (sqlParam.ContainsKey("yb_up") == true ? sqlParam["yb_up"] : ""));
+            sql = sql.Replace("$REC_NO$", (sqlParam.ContainsKey("rec_no") == true ? sqlParam["rec_no"] : ""));
+            sql = sql.Replace("$REG_NO$", (sqlParam.ContainsKey("reg_no") == true ? sqlParam["reg_no"] : ""));
+            DBUtil.updateExecute(sql);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(ex.ToString() + " SQL:" + sql);
+            }
+        }
+        ///门诊结算修改his标记
+        /// </summary>
+        public static void modifyMZJSBJ(Dictionary<string, string> sqlParam)
+        {
+            if (sqlParam == null || sqlParam.Count == 0)
+            {
+                XnhLogger.log("modifyMZCZBJ sqlParam参数为空");
+                return;
+            }
+            string sql = "UPDATE cl_recipe SET yb_up = '1',"
+              + "yb_caseno = '+此处结算返回的门诊登记流水号(不知道参数在哪里取)+' "
+            + "where rec_no = '$REC_NO$' and reg_no = '$REG_NO$' ";
+            try
+            {
+                sql = sql.Replace("0", (sqlParam.ContainsKey("yb_up") == true ? sqlParam["yb_up"] : ""));
+                sql = sql.Replace("$REC_NO$", (sqlParam.ContainsKey("rec_no") == true ? sqlParam["rec_no"] : ""));
+                sql = sql.Replace("$REG_NO$", (sqlParam.ContainsKey("reg_no") == true ? sqlParam["reg_no"] : ""));
+                DBUtil.updateExecute(sql);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(ex.ToString() + " SQL:" + sql);
+            }
+        }
+        /// <summary>
+        /// 存储门诊结算返回结果，后期做报表
+        /// create table MZJS
+        ///  (D401_02        VARCHAR2(18),     -- 成员姓名
+        ///   T_D502_01      CHAR(30),       -- 门诊登记流水号
+        ///   TOTAL_COSTS    VARCHAR2(24),      --总费用
+        ///   ZF_COSTS       VARCHAR2(24),      --自费费用
+        ///   TOTAL_CHAGE       VARCHAR2(24),      --合理费用
+        ///   D506_23          VARCHAR2(24),      --实际补偿金额
+        ///   D506_18           VARCHAR2(24),    --核算补偿金额[实际补偿合计额)
+        ///   BEGINPAY           VARCHAR2(24),   --本次起伏线
+        ///   SCALE             VARCHAR2(24),    --报销比例
+        ///   HEAV_REDEEM_SUM   VARCHAR2(24),    --大病支付额
+        ///   REDEEM_TOTAL       VARCHAR2(24)    --单次补偿合计
+        ///   )
+        /// </summary> 
         /// <param name="sqlParam"></param>
+        public static void CCMZJS(Dictionary<string, string> sqlParam)
+        {
+            if (sqlParam == null || sqlParam.Count == 0)
+            {
+                XnhLogger.log("MZJS sqlParam参数为空");
+                return;
+            }
+            string sql = "insert into MZJS(D401_02,T_D502_01,TOTAL_COSTS,ZF_COSTS,TOTAL_CHAGE,D506_23,D506_18,BEGINPAY,SCALE,HEAV_REDEEM_SUM,REDEEM_TOTAL) "
+                          + "values (D401_02,T_D502_01,TOTAL_COSTS,ZF_COSTS,TOTAL_CHAGE,D506_23,D506_18,BEGINPAY,SCALE,HEAV_REDEEM_SUM,REDEEM_TOTAL)";
+ ///依次是：成员姓名，门诊登记流水号，总费用，自费费用，合理费用，实际补偿金额，核算补偿金额[实际补偿合计额)，本次起伏线，报销比例，大病支付额，单次补偿合计
+            try
+            {
+                sql = sql.Replace("$D401_02$", (sqlParam.ContainsKey("D401_02") == true ? sqlParam["D401_02"] : ""));
+                sql = sql.Replace("$T_D502_01$", (sqlParam.ContainsKey("T_D502_01") == true ? sqlParam["T_D502_01"] : ""));
+                sql = sql.Replace("$TOTAL_COSTS$", (sqlParam.ContainsKey("TOTAL_COSTS") == true ? sqlParam["TOTAL_COSTS"] : ""));
+                sql = sql.Replace("$ZF_COSTS$", (sqlParam.ContainsKey("ZF_COSTS") == true ? sqlParam["ZF_COSTS"] : ""));
+                sql = sql.Replace("$TOTAL_CHAGE$", (sqlParam.ContainsKey("TOTAL_CHAGE") == true ? sqlParam["TOTAL_CHAGE"] : ""));
+                sql = sql.Replace("$D506_23$", (sqlParam.ContainsKey("D506_23") == true ? sqlParam["D506_23"] : ""));
+                sql = sql.Replace("$D506_18$", (sqlParam.ContainsKey("D506_18") == true ? sqlParam["D506_18"] : ""));
+                sql = sql.Replace("$BEGINPAY$", (sqlParam.ContainsKey("BEGINPAY") == true ? sqlParam["BEGINPAY"] : ""));
+                sql = sql.Replace("$SCALE$", (sqlParam.ContainsKey("SCALE") == true ? sqlParam["SCALE"] : ""));
+                sql = sql.Replace("$HEAV_REDEEM_SUM$", (sqlParam.ContainsKey("HEAV_REDEEM_SUM") == true ? sqlParam["HEAV_REDEEM_SUM"] : ""));
+                sql = sql.Replace("$REDEEM_TOTAL$", (sqlParam.ContainsKey("REDEEM_TOTAL") == true ? sqlParam["REDEEM_TOTAL"] : ""));
+                //sql = sql.Replace("$TOTAL_COSTS$", (sqlParam.ContainsKey("TOTAL_COSTS") == true ? sqlParam["TOTAL_COSTS"] : ""));
+                DBUtil.updateExecute(sql);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(ex.ToString() + " SQL:" + sql);
+            }
+        }
+        ///门诊冲正删除存储的费用信息
+        /// </summary>
+        public static void deleteCCMZJS(Dictionary<string, string> sqlParam)
+        {
+            if (sqlParam == null || sqlParam.Count == 0)
+            {
+                XnhLogger.log("deleteCCMZJS sqlParam参数为空");
+                return;
+            }
+            string sql = "delete from MZJS where T_D502_01 = T_D502_01 and D401_02 = D401_02";
+            try
+            {
+                sql = sql.Replace("$T_D502_01$", (sqlParam.ContainsKey("T_D502_01") == true ? sqlParam["T_D502_01"] : ""));
+                sql = sql.Replace("$D401_02$", (sqlParam.ContainsKey("D401_02") == true ? sqlParam["D401_02"] : ""));
+                DBUtil.updateExecute(sql);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(ex.ToString() + " SQL:" + sql);
+            }
+        }
         public static void updateMZBC(Dictionary<string, string> sqlParam)
         {
             if (sqlParam == null || sqlParam.Count == 0)

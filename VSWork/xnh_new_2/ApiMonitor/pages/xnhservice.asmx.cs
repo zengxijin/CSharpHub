@@ -570,15 +570,37 @@ namespace ApiMonitor.pages
                     {
                         //需要存储试算结果，进行收费交易
                         Dictionary<string, string> retDict = shisuan.getResponseResultWrapperMap();
-                        //retDict["TOTAL_COSTS"];//总费用
-                        //retDict["ZF_COSTS"];//自费费用
-                        //retDict["TOTAL_CHAGE"];//合理费用
-                        //retDict["D506_23"];//实际补偿金额
-                        //retDict["D506_18"];//核算补偿金额[实际补偿合计额)
-                        //retDict["BEGINPAY"];//本次起伏线
-                        //retDict["SCALE"];//报销比例
-                        //retDict["HEAV_REDEEM_SUM"];//大病支付额
-                        //retDict["REDEEM_TOTAL"];//单次补偿合计
+                        //O_TOTAL_COSTS	NUMBER(8,2)	总费用
+                        //O_ZF_COSTS	NUMBER(8,2)	自费费用
+                        //O_TOTAL_CHAGE	NUMBER(8,2)	合理费用
+                        //O_OUTP_FACC	NUMBER(8,2)	帐户补偿
+                        //O_OUT_JJ	NUMBER(8,2)	基金补偿
+                        //O_D503_09	NUMBER(8,2)	核算补偿金额(实际补偿合计额)
+                        //D601_17_OUT	NUMBER(8,2)	家庭账户支出
+                        //XY_OUT	NUMBER(8,2)	西药补偿金额
+                        //ZCAOY_OUT	NUMBER(8,2)	中草药补偿金额
+                        //ZCHENGY_OUT	NUMBER(8,2)	中成药补偿金额
+
+
+                        //将试算的参数缓存一份，下次再做收费的时候大部分参数都是可用的
+                        Dictionary<string, string> buffer = new Dictionary<string, string>();
+                        buffer = param;
+                        //收费时的参数
+                        buffer["FLAG"] = "2"; //1 试算 2 收费
+                        buffer["D503_03"] = retDict["O_TOTAL_COSTS"]; //总费用 (试算的时候传’NULL’)  收费时传(O_TOTAL_COSTS：总费用)
+                        buffer["D503_08"] = retDict["O_TOTAL_CHAGE"]; //可补偿门诊医药费(试算的时候传’NULL’) 收费时传(O_TOTAL_CHAGE：合理费用)
+                        buffer["D503_09"] = retDict["O_D503_09"];        //核算补偿金额(试算的时候传’NULL’) 收费时传(O_D503_09：核算补偿金额(实际补偿合计额))
+                        buffer["OUTP_FACC"] = retDict["O_OUTP_FACC"];   //账户补偿(试算的时候传’NULL’) 收费时传(O_OUTP_FACC：帐户补偿)
+                        buffer["SELF_PAY"] = retDict["O_ZF_COSTS"];     //自费金额(试算的时候传’NULL’)  收费时传(O_ZF_COSTS：自费费用)
+                        buffer["D601_17_OUT"] = retDict["D601_17_OUT"];  //家庭账户支出(试算的时候传’NULL’)  收费时传(D601_17_OUT：家庭账户支出)
+                        buffer["XY_OUT"] = retDict["XY_OUT"];           //西药补偿金额(试算的时候传’NULL’)  收费时传(XY_OUT：西药补偿金额)
+                        buffer["ZCAOY_OUT"] = retDict["ZCAOY_OUT"];     //中草药补偿金额(试算的时候传’NULL’)  收费时传(ZCAOY_OUT：中草药补偿金额)
+                        buffer["ZCHENGY_OUT"] = retDict["ZCHENGY_OUT"];  //中成药补偿金额(试算的时候传’NULL’)  收费时传(ZCHENGY_OUT：中成药补偿金额)
+                        string shoufeiJson = DataConvert.Dict2Json(buffer);
+                        shoufeiJson = DataConvert.Base64Encode(shoufeiJson);
+
+                        retDict.Add("MZBC_SHOUFEI", shoufeiJson); //收费时使用的参数
+
                         string retJson = DataConvert.Dict2Json(retDict);
 
                         XnhLogger.log("处方号：" + REC_NO_ALL + "试算成功，参数：" + shisuan.parames);
@@ -695,6 +717,12 @@ namespace ApiMonitor.pages
                     {
                         info += "门诊流水:" + T_D502_01 + "冲正成功;";
                         //冲正成功要修改HIS标志
+                        
+                    //   Dictionary<string, string> map = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(selectedParam);
+                   //    string REC_NO = map["REC_NO"];        //处方号
+                   //     string REG_NO = map["REG_NO"];        //门诊流水号
+                      //  Dictionary<string, string> record = new Dictionary<string, string>() { { "REC_NO", REC_NO }, { "REC_NO", REC_NO } };
+                     //   HIS.modifyMZCZBJ(record);
 
                     }
                     else
@@ -974,8 +1002,36 @@ namespace ApiMonitor.pages
             string retStr = "";
             try
             {
+                string sql = "SELECT IP_REGISTER.REG_NO," //住院流水号
+         + "IP_REGISTER.IP_NO,"  	  //住院号
+         + "IP_REGISTER.IP_CNT,"   	  // -次数
+         + "IP_REGISTER.FEE_CODE,"    //费用类别(11农合)
+         + "IP_REGISTER.NAME,"     // 患者名称
+         + "IP_REGISTER.IP_DATE,"  //--入院日期
+         + "IP_REGISTER.OP_DATE,"   //--出院日期
+         + "IP_REGISTER.OP_DEPT,"    //   --出院科室
+         + "(select card_no from PATIENTINFO where PATIENTINFO.PID=ip_register.pid) as card_no,"   // --卡号
+         + "CODE_FEE.FEE_NAME,"      //   	--费用类别名称
+         + "CODE_DEPARTMENT.DEPT_NAME,"  // --出院科室名称
+         + "IP_REGISTER.OP_TIME,"    //	--出院时间
+         + "IP_REGISTER.LOC_FLAG "  		//--状态(1:在院,2:科室出院)
+         + "FROM IP_REGISTER,CODE_FEE,CODE_DEPARTMENT "
+         + "WHERE ( IP_REGISTER.FEE_CODE = CODE_FEE.FEE_CODE ) and"
+         + "( IP_REGISTER.OP_DEPT = CODE_DEPARTMENT.DEPT_CODE(+) ) and"
+         + "( ( IP_REGISTER.LOC_FLAG in ('1','2') ) AND"
+         + "( IP_REGISTER.CHRG_FLAG <> '3' ) )"
+         + "and (trim(IP_REGISTER.FEE_CODE) in ('11'))"
+         + "order by ip_no";
+                DataTable dt = DBUtil.queryExecute(sql);
+                if ((dt == null) || (dt.Rows.Count == 0))
+                {
+                    retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
+                    return retStr;
+                }
+                string msg = DataConvert.DataTable2Json(dt);
+                retStr = DataConvert.getReturnJson("0", msg);
                 //todo:由HIS提供视图或查询字段绑定
-                retStr = DataConvert.getReturnJson("-1", "query=" + query + "　待由HIS提供视图或查询字段完成数据绑定");
+               // retStr = DataConvert.getReturnJson("-1", "query=" + query + "　待由HIS提供视图或查询字段完成数据绑定");
             }
             catch (Exception ex)
             {
@@ -995,6 +1051,32 @@ namespace ApiMonitor.pages
             string retStr = "";
             try
             {
+                string sql = "select "
+           + "b.ip_no, "	//--住院号
+           + "a.item_code, "	//--HIS项目编码
+           + "price, "		//--HIS项目单价
+           + "qty, "		//--HIS项目数量
+           + "total, "		//--HIS项目总价格
+           + "bill_time, "	//--记账时间
+           + "pre_no, "		//--医嘱编号
+           + "a.up_flag, "	//--上传标志
+           + "standard, "	//--规格
+           + "small_unit, "	//--单位
+           + "(select item_cls from code_item where item_code=a.item_code ) as item_cls, "	//--项目类型(1,2,3:药品 4,5,6,7,8,9:其他)
+           + "(select item_name from code_item where item_code=a.item_code ) as item_name " 	//--项目名称
+           + "from "
+           + "IP_BILL a left join IP_REGISTER b on a.reg_no=b.reg_no ,plus_item c "
+           + "where "
+           + "c.item_code=a.item_code and c.type=3 and a.reg_no='" + data + "' "
+           + "order by bill_time,a.item_code ";
+                DataTable dt = DBUtil.queryExecute(sql);
+                if ((dt == null) || (dt.Rows.Count == 0))
+                {
+                    retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
+                    return retStr;
+                }
+                string msg = DataConvert.DataTable2Json(dt);
+                retStr = DataConvert.getReturnJson("0", msg);
                 //todo:由HIS提供字段信息
                 retStr = DataConvert.getReturnJson("-1", "data=" + data + "　待由HIS提供字段数据");
             }

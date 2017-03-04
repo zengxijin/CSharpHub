@@ -175,6 +175,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DB\DBUtil.cs" />
+    <Compile Include="DB\Dictionary.cs" />
     <Compile Include="DB\HIS.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
