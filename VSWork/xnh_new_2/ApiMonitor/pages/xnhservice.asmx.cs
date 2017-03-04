@@ -638,50 +638,69 @@ namespace ApiMonitor.pages
         /// <summary>
         /// 收费
         /// </summary>
-        /// <param name="user_id"></param>
-        /// <param name="DIAGNOSIS_CODE"></param>
+        /// <param name="USER_ID"></param>
+        /// <param name="PARAM">试算缓存的参数</param>
         /// <returns></returns>
         [WebMethod]
-        public string charge(string user_id, string DIAGNOSIS_CODE)
+        public string charge(string USER_ID, string PARAM)
         {
+            string retStr = "";
             try
             {
                 //(1)收费
-                RJZ_shoufei shoufei = new RJZ_shoufei();
-                Dictionary<string, string> paramDict = new Dictionary<string, string>();
-                paramDict.Add("AREA_CODE", "");//病人地区编码(取前台选择的地区编码)
-                paramDict.Add("D504_01", "");//住院登记流水号
-                paramDict.Add("D504_12", "");//出院时间(格式为YYYY-MM-DD)
-                paramDict.Add("D504_15", "");//就医机构级别(相关数据代码标准:S201-06)
-                paramDict.Add("D504_17", "");//出院科室(相关数据代码标准:S201-03)
-                paramDict.Add("D504_18", "");//经治医生
-                paramDict.Add("D504_20", "");//出院状态(相关数据代码标准:S301-03)
-                paramDict.Add("D504_22", "");//并发症(为空时传’NULL’)
-                paramDict.Add("D506_03", "");//总费用（TOTAL_COSTS 总费用）试算得到
-                paramDict.Add("D506_13", "");//可补偿住院医药费（TOTAL_CHAGE 合理费用）试算得到
-                paramDict.Add("D506_18", "");//核算补偿金额（D506_18  核算补偿金额(实际补偿合计额)）试算得到
-                paramDict.Add("D506_15", "");//补偿类别代码
-                paramDict.Add("D506_14", "");//补偿账户类别(相关数据代码标准:S301-09)
-                paramDict.Add("D506_16", "");//核算机构(代码)
-                paramDict.Add("D506_17", "");//核算人
-                paramDict.Add("D506_23", "");//实际补偿额（D506_23   实际补偿金额）试算得到
-                paramDict.Add("D506_26", "");//付款人
-                paramDict.Add("D506_27", "");//中途结算标志(相关数据代码标准:S701-01)
-                paramDict.Add("SELF_PAY", "");//自费金额（ZF_COSTS  自费费用）试算得到
-                paramDict.Add("HEAV_REDEEM_SUM", "");//大病支付金额（HEAV_REDEEM_SUM  大病支付额）试算得到
-                paramDict.Add("BEGINPAY", "");//本次起付额（BEGINPAY   本次起伏线）试算得到
-                paramDict.Add("D504_29", "");//出院诊断(疾病代码)
+                MZBC_PROC_CALE_PRICE_LIST shoufei = new MZBC_PROC_CALE_PRICE_LIST();
+                //根据前面一步缓存的试算信息
+                string paramBase64 = DataConvert.Base64Decode(PARAM); //解码参数
+                Dictionary<string, string> paramDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(paramBase64);
+                
+                //paramDict.Add("AREA_CODE", "");//病人地区编码(取前台选择的地区编码)
+                //paramDict.Add("D504_01", "");//住院登记流水号
+                //paramDict.Add("D504_12", "");//出院时间(格式为YYYY-MM-DD)
+                //paramDict.Add("D504_15", "");//就医机构级别(相关数据代码标准:S201-06)
+                //paramDict.Add("D504_17", "");//出院科室(相关数据代码标准:S201-03)
+                //paramDict.Add("D504_18", "");//经治医生
+                //paramDict.Add("D504_20", "");//出院状态(相关数据代码标准:S301-03)
+                //paramDict.Add("D504_22", "");//并发症(为空时传’NULL’)
+                //paramDict.Add("D506_03", "");//总费用（TOTAL_COSTS 总费用）试算得到
+                //paramDict.Add("D506_13", "");//可补偿住院医药费（TOTAL_CHAGE 合理费用）试算得到
+                //paramDict.Add("D506_18", "");//核算补偿金额（D506_18  核算补偿金额(实际补偿合计额)）试算得到
+                //paramDict.Add("D506_15", "");//补偿类别代码
+                //paramDict.Add("D506_14", "");//补偿账户类别(相关数据代码标准:S301-09)
+                //paramDict.Add("D506_16", "");//核算机构(代码)
+                //paramDict.Add("D506_17", "");//核算人
+                //paramDict.Add("D506_23", "");//实际补偿额（D506_23   实际补偿金额）试算得到
+                //paramDict.Add("D506_26", "");//付款人
+                //paramDict.Add("D506_27", "");//中途结算标志(相关数据代码标准:S701-01)
+                //paramDict.Add("SELF_PAY", "");//自费金额（ZF_COSTS  自费费用）试算得到
+                //paramDict.Add("HEAV_REDEEM_SUM", "");//大病支付金额（HEAV_REDEEM_SUM  大病支付额）试算得到
+                //paramDict.Add("BEGINPAY", "");//本次起付额（BEGINPAY   本次起伏线）试算得到
+                //paramDict.Add("D504_29", "");//出院诊断(疾病代码)
 
                 shoufei.executeSql(paramDict);
+                XnhLogger.log("收费成功，参数：" + shoufei.parames);
+                XnhLogger.log("收费成功，结果：" + shoufei.getExecuteResultPlainString());
+                //收费成功： S_Returns= 0;T_D502_01   （分号分隔）
+                //T_D502_01：门诊登记流水号，此号要存储，以便后面打印补偿凭据的时候用。
+                if (shoufei.getExecuteStatus() == true)
+                {
+                    retStr = DataConvert.getReturnJson("0", "收费成功，返回结果：" + shoufei.getExecuteResultPlainString());
+                }
+                else
+                {
+                    retStr = DataConvert.getReturnJson("-1", "收费失败，返回结果：" + shoufei.getExecuteResultPlainString());
+                }
 
                 //(2)收费成功后将相应的信息保存到数据库中，并修改HIS中补偿标志（供以后制作报表查询使用）
+                //加上更新HIS的SQL操作
+                Dictionary<string, string> retDict = shoufei.getResponseResultWrapperMap();
+                //tDict["T_D502_01"]; 这个就是获取收费返回的结果
             }
             catch (Exception ex)
             {
-                XnhLogger.log(this.GetType().ToString() + " diagnosisCheck " + ex.StackTrace);
+                XnhLogger.log(this.GetType().ToString() + " 收费失败： " + ex.StackTrace);
             }
 
-            return null;
+            return retStr;
         }
 
         /// <summary>
