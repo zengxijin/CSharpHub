@@ -1059,9 +1059,53 @@ namespace ApiMonitor.pages
             }
             return retStr;
         }
-
         /// <summary>
-        ///批量传明细
+        ///住院明细查询
+        /// </summary>
+        /// <returns></returns>
+        public string zymxcx(string data)
+        {
+            string retStr = "";
+            try
+            {
+                string sql = "select "
+           + "b.ip_no, "	//--住院号
+           + "a.item_code, "	//--HIS项目编码
+           + "price, "		//--HIS项目单价
+           + "qty, "		//--HIS项目数量
+           + "total, "		//--HIS项目总价格
+           + "bill_time, "	//--记账时间
+           + "pre_no, "		//--医嘱编号
+           + "a.up_flag, "	//--上传标志
+           + "standard, "	//--规格
+           + "small_unit, "	//--单位
+           + "(select item_cls from code_item where item_code=a.item_code ) as item_cls, "	//--项目类型(1,2,3:药品 4,5,6,7,8,9:其他)
+           + "(select item_name from code_item where item_code=a.item_code ) as item_name " 	//--项目名称
+           + "from "
+           + "IP_BILL a left join IP_REGISTER b on a.reg_no=b.reg_no ,plus_item c "
+           + "where "
+           + "c.item_code=a.item_code and c.type=3 and a.reg_no='" + data + "'  "
+           + "order by bill_time,a.item_code ";
+                DataTable dt = DBUtil.queryExecute(sql);
+                if ((dt == null) || (dt.Rows.Count == 0))
+                {
+                    retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
+                    return retStr;
+                }
+                string msg = DataConvert.DataTable2Json(dt);
+                retStr = DataConvert.getReturnJson("0", msg);
+                //todo:由HIS提供字段信息
+               // retStr = DataConvert.getReturnJson("-1", "data=" + data + "　待由HIS提供字段数据");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+        /// <summary>
+        ///批量传明细(只会传没有传过的)
         /// </summary>
         /// <returns></returns>
         [WebMethod]
@@ -1086,7 +1130,7 @@ namespace ApiMonitor.pages
            + "from "
            + "IP_BILL a left join IP_REGISTER b on a.reg_no=b.reg_no ,plus_item c "
            + "where "
-           + "c.item_code=a.item_code and c.type=3 and a.reg_no='" + data + "' "
+           + "c.item_code=a.item_code and c.type=3 and a.reg_no='" + data + "' and a.up_flag is null "
            + "order by bill_time,a.item_code ";
                 DataTable dt = DBUtil.queryExecute(sql);
                 if ((dt == null) || (dt.Rows.Count == 0))
@@ -1097,7 +1141,7 @@ namespace ApiMonitor.pages
                 string msg = DataConvert.DataTable2Json(dt);
                 retStr = DataConvert.getReturnJson("0", msg);
                 //todo:由HIS提供字段信息
-                retStr = DataConvert.getReturnJson("-1", "data=" + data + "　待由HIS提供字段数据");
+              //  retStr = DataConvert.getReturnJson("-1", "data=" + data + "　待由HIS提供字段数据");
             }
             catch (Exception ex)
             {
