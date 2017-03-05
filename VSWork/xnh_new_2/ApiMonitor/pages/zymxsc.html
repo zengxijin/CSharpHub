@@ -403,33 +403,31 @@
                     //遍历json数组操作
                     var retJson = getJsonObj(retVal);
                     if (retJson.flag == '0') {
-                        var json = retJson.msg;
+                        var row = retJson.msg.data[0];
+                        
                         $("#zymx tbody tr").detach();
-                        for (var item in json.data) {
-                            var row = json.data[item];
+                        
 
                             var trId = $.trim(row['REC_NO']);
 
                             var trStr = '<tr class="example" id="' + trId + '" >';//动态拼接table
-                            // var html = '';
-                            //for (var key in row) {//
-                            trStr += '<td id="' + trId + '_item_code">' + $.trim(row['item_code']) + '</td>';//数据表的主键值 门诊流水号
-                            //}
-                            trStr += '<td id="' + trId + '_item_code">' + row['item_code'] + '</td>';    //项目编码
-                            trStr += '<td id="' + trId + '_item_name">' + row['item_name'] + '</td>';  //名称
-                            trStr += '<td id="' + trId + '_price">' + row['price'] + '</td>';   //项目单价
-                            trStr += '<td id="' + trId + '_qty">' + row['qty'] + '</td>';         //项目数量
-                            trStr += '<td id="' + trId + '_total">' + row['total'] + '</td>'; //项目总价格
-                            trStr += '<td id="' + trId + '_bill_time">' + row['bill_time'] + '</td>'; //记账时间
-                            trStr += '<td id="' + trId + '_pre_no">' + row['pre_no'] + '</td>';         //医嘱编号
-                            trStr += '<td id="' + trId + '_up_flag">' + row['up_flag'] + '</td>'; //上传标志
-                            trStr += '<td id="' + trId + '_standard">' + row['standard'] + '</td>';//规格
-                            trStr += '<td id="' + trId + '_small_unit">' + row['small_unit'] + '</td>';//单位
+
+                            //trStr += '<td id="' + trId + '_item_code">' + $.trim(row['ITEM_CODE']) + '</td>';//数据表的主键值 门诊流水号
+                            trStr += '<td id="' + trId + '_item_code">' + row['ITEM_CODE'] + '</td>';    //项目编码
+                            trStr += '<td id="' + trId + '_item_name">' + row['ITEM_NAME'] + '</td>';  //名称
+                            trStr += '<td id="' + trId + '_price">' + row['PRICE'] + '</td>';   //项目单价
+                            trStr += '<td id="' + trId + '_qty">' + row['QTY'] + '</td>';         //项目数量
+                            trStr += '<td id="' + trId + '_total">' + row['TOTAL'] + '</td>'; //项目总价格
+                            trStr += '<td id="' + trId + '_bill_time">' + row['BILL_TIME'] + '</td>'; //记账时间
+                            trStr += '<td id="' + trId + '_pre_no">' + row['PRE_NO'] + '</td>';         //医嘱编号
+                            trStr += '<td id="' + trId + '_up_flag">' + row['UP_FLAG'] + '</td>'; //上传标志
+                            trStr += '<td id="' + trId + '_standard">' + row['STANDARD'] + '</td>';//规格
+                            trStr += '<td id="' + trId + '_small_unit">' + row['SMALL_UNIT'] + '</td>';//单位
                             trStr += '<td class="center">                              '
                             + '        <a>作废收费项目</a>                                  '
                             + '    </td> ';
                             $(trStr).appendTo("#mxlist");
-                        }
+                        
                         //todo：根据需要绑定解析和绑定前台数据
 
                     } else {
