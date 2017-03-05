@@ -349,7 +349,7 @@ namespace ApiMonitor.pages
                         { "D401_21", D401_21 },
                         { "D504_21", jsonDict["D504_21"] },
                         { "D504_01", D504_01 },
-                        {"D504_09",jsonDict["D504_09"]}, //住院号
+                        { "D504_09",jsonDict["D504_09"]}, //住院号
                         };
                         HIS.bcZYBC(record);
 
@@ -367,7 +367,18 @@ namespace ApiMonitor.pages
                     ZYBC_PROC_UPDATE_NOTICE updateNotice = new ZYBC_PROC_UPDATE_NOTICE();
                     Dictionary<string, string> param = new Dictionary<string, string>();
                     param.Add("AREA_CODE", jsonDict["AREA_CODE"]); //病人地区编码(取前台选择的地区编码)
-                    param.Add("D504_01", jsonDict["D504_01"]); //住院登记流水号
+                    //去数据库查之前登记过的流水号
+                    string D504_01 = "";
+                    string sql = "select D504_01 from zybc where D401_10 ='" + D401_10 + "' and D401_21='" + D401_21 + "'";
+                    DataTable dt = DBUtil.queryExecute(sql);
+                    if (dt == null || dt.Rows.Count == 0)
+                    {
+                        retStr = DataConvert.getReturnJson("-1", "未找到已登记过的流水号，无法做修改登记操作");
+                        XnhLogger.log("未找到已登记过的流水号，无法做修改登记操作，sql=" + sql);
+                        return retStr;
+                    }
+                    D504_01 = dt.Rows[0]["D504_01"] as string;
+                    param.Add("D504_01", D504_01); //住院登记流水号 （农合第一次登记返回的）
                     param.Add("D504_21", jsonDict["D504_21"]); //疾病代码
                     param.Add("D504_09", jsonDict["D504_09"]); //住院号
                     param.Add("D504_10", jsonDict["D504_10"]); //就诊类型
@@ -380,12 +391,14 @@ namespace ApiMonitor.pages
                     if (updateNotice.getExecuteStatus() == true)
                     {
                         //保存修改到HIS
-                        Dictionary<string, string> record = new Dictionary<string, string>() { 
-                            { "D401_10", D401_10 }, 
-                            { "D401_21", D401_21 },
-                            { "D504_21", jsonDict["D504_21"] }
+                        Dictionary<string, string> record = new Dictionary<string, string>(){
+                        { "D401_10", D401_10 }, 
+                        { "D401_21", D401_21 },
+                        { "D504_21", jsonDict["D504_21"] },
+                        { "D504_01", D504_01 },
+                        { "D504_09",jsonDict["D504_09"]}, //住院号
                         };
-                        HIS.xgZYBC(record);
+                        HIS.bcZYBC(record);
                         retStr = DataConvert.getReturnJson("0", "修改住院登记成功");
                     }
                     else
