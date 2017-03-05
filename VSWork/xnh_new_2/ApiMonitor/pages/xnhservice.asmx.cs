@@ -349,6 +349,7 @@ namespace ApiMonitor.pages
                         { "D401_21", D401_21 },
                         { "D504_21", jsonDict["D504_21"] },
                         { "D504_01", D504_01 },
+                        {"D504_09",jsonDict["D504_09"]}, //住院号
                         };
                         HIS.bcZYBC(record);
 

@@ -279,13 +279,15 @@ namespace ApiMonitor.DB
                 return;
             }
             //UPDATE zybc SET D504_21=D504_21,D504_01=D504_01 WHERE D401_10 = D401_10 AND D401_21 = D401_21;
-            string sql = "UPDATE zybc t SET t.D504_21='$D504_21$',t.D504_01='$D504_01$' WHERE t.D401_10 = '$D401_10$' AND t.D401_21 = '$D401_21$'";
+            string sql = "UPDATE zybc t SET t.D504_21='$D504_21$',t.D504_01='$D504_01$',t.D504_09='$D504_09$' WHERE t.D401_10 = '$D401_10$' AND t.D401_21 = '$D401_21$'";
             try
             {
                 sql = sql.Replace("$D401_10$", (sqlParam.ContainsKey("D401_10") == true ? sqlParam["D401_10"] : "")); //医疗证号
                 sql = sql.Replace("$D401_21$", (sqlParam.ContainsKey("D401_21") == true ? sqlParam["D401_21"] : "")); //成员序号
+
                 sql = sql.Replace("$D504_21$", (sqlParam.ContainsKey("D504_21") == true ? sqlParam["D504_21"] : "")); //疾病代码
-                sql = sql.Replace("$D504_01$", (sqlParam.ContainsKey("D504_01") == true ? sqlParam["D504_01"] : "")); //住院登记流水号
+                sql = sql.Replace("$D504_01$", (sqlParam.ContainsKey("D504_01") == true ? sqlParam["D504_01"] : "")); //住院登记流水号（农合返回的）
+                sql = sql.Replace("$D504_09$", (sqlParam.ContainsKey("D504_09") == true ? sqlParam["D504_09"] : "")); //住院号
 
                 DBUtil.updateExecute(sql);
             }
