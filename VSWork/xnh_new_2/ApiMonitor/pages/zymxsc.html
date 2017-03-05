@@ -193,6 +193,7 @@
                         <table class="table" id="zymx">
                             <thead>
                                 <tr>
+                                    <th>住院号</th>
                                     <th>HIS项目编码</th>
                                     <th>项目名称</th>
                                     <th>项目单价</th>
@@ -208,41 +209,7 @@
                             </thead>
                             <tbody id="mxlist"></tbody>
                         </table>
-                        <!--<table class="table">
-                            <tbody>-->
-                                <!--<tr>
-                    <td>登录名：刘德华</td>
-                    <td>所在单位ID：xxxx</td>
-                    <td>电话：123456789</td>
-                    <td>单位名称：4564687631xxadas</td>
-                </tr>-->
-                                <!--<tr>
-                    <td>机构详细地址编码：1235</td>
-                    <td>机构类型：乡</td>
-                    <td>机构级别：村卫生室</td>
-                    <td>机构地区编码：5464</td>
-                </tr>
-                <tr>
-                    <td>补偿年度：2016</td>
-                    <td>本县芯片卡刷卡授权：有刷卡权限</td>
-                    <td>本县刷卡标志是够开启：开启</td>
-                    <td>此医疗机构刷卡权限是否开启：刷</td>
-                </tr>
-                <tr>
-                    <td>是否开启药品最高限价：开启</td>
-                    <td>日记账药品删除期限：22</td>
-                    <td>本县保障起始时间：2016-10-10</td>
-                    <td>本县保障结束时间：2016-12-10</td>
-
-                </tr>
-                <tr>
-                    <td>打印明细是否汇总：汇总</td>
-                    <td>是否启用单次刷卡时间限制：不启用</td>
-                    <td>单次刷卡时间：10</td>
-                    <td></td>
-                </tr>-->
-                            <!--</tbody>
-                        </table>-->
+                        
                     </div>
                 </div>
             </div>
@@ -408,25 +375,25 @@
                         $("#zymx tbody tr").detach();
                         
 
-                            var trId = $.trim(row['REC_NO']);
+                        var trId = $.trim(row['IP_NO']);
 
-                            var trStr = '<tr class="example" id="' + trId + '" >';//动态拼接table
+                        var trStr = '<tr class="example" id="' + trId + '" >';//动态拼接table
 
-                            //trStr += '<td id="' + trId + '_item_code">' + $.trim(row['ITEM_CODE']) + '</td>';//数据表的主键值 门诊流水号
-                            trStr += '<td id="' + trId + '_item_code">' + row['ITEM_CODE'] + '</td>';    //项目编码
-                            trStr += '<td id="' + trId + '_item_name">' + row['ITEM_NAME'] + '</td>';  //名称
-                            trStr += '<td id="' + trId + '_price">' + row['PRICE'] + '</td>';   //项目单价
-                            trStr += '<td id="' + trId + '_qty">' + row['QTY'] + '</td>';         //项目数量
-                            trStr += '<td id="' + trId + '_total">' + row['TOTAL'] + '</td>'; //项目总价格
-                            trStr += '<td id="' + trId + '_bill_time">' + row['BILL_TIME'] + '</td>'; //记账时间
-                            trStr += '<td id="' + trId + '_pre_no">' + row['PRE_NO'] + '</td>';         //医嘱编号
-                            trStr += '<td id="' + trId + '_up_flag">' + row['UP_FLAG'] + '</td>'; //上传标志
-                            trStr += '<td id="' + trId + '_standard">' + row['STANDARD'] + '</td>';//规格
-                            trStr += '<td id="' + trId + '_small_unit">' + row['SMALL_UNIT'] + '</td>';//单位
-                            trStr += '<td class="center">                              '
-                            + '        <a>作废收费项目</a>                                  '
-                            + '    </td> ';
-                            $(trStr).appendTo("#mxlist");
+                        trStr += '<td id="' + trId + '_item_code">' + $.trim(row['ITEM_CODE']) + '</td>';//数据表的主键值 门诊流水号
+                        trStr += '<td id="' + trId + '_item_code">' + row['ITEM_CODE'] + '</td>';    //项目编码
+                        trStr += '<td id="' + trId + '_item_name">' + row['ITEM_NAME'] + '</td>';  //名称
+                        trStr += '<td id="' + trId + '_price">' + row['PRICE'] + '</td>';   //项目单价
+                        trStr += '<td id="' + trId + '_qty">' + row['QTY'] + '</td>';         //项目数量
+                        trStr += '<td id="' + trId + '_total">' + row['TOTAL'] + '</td>'; //项目总价格
+                        trStr += '<td id="' + trId + '_bill_time">' + row['BILL_TIME'] + '</td>'; //记账时间
+                        trStr += '<td id="' + trId + '_pre_no">' + row['PRE_NO'] + '</td>';         //医嘱编号
+                        trStr += '<td id="' + trId + '_up_flag">' + row['UP_FLAG'] + '</td>'; //上传标志
+                        trStr += '<td id="' + trId + '_standard">' + row['STANDARD'] + '</td>';//规格
+                        trStr += '<td id="' + trId + '_small_unit">' + row['SMALL_UNIT'] + '</td>';//单位
+                        trStr += '<td class="center">                              '
+                        + '        <a >作废收费项目</a>                                  '
+                        + '    </td> ';
+                        $(trStr).appendTo("#mxlist");
                         
                         //todo：根据需要绑定解析和绑定前台数据
 

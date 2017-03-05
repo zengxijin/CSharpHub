@@ -173,7 +173,7 @@ namespace ApiMonitor.pages
                         foreach (string one in memberArray)
                         {
                             string D401_21 = one.Split(new string[] { "/" }, StringSplitOptions.None)[0]; //成员序号
-                            Dictionary<string, string> record = new Dictionary<string, string>() { { "D401_10", D401_10 }, { "D401_21", D401_21 } };
+                            Dictionary<string, string> record = new Dictionary<string, string>() { { "D401_10", D401_10 }, { "D401_21", D401_21 }, { "AREA_CODE", AREA_NO } };
                             HIS.insertMZBC(record);
                             HIS.insertZYBC(record);
                         }
@@ -401,14 +401,33 @@ namespace ApiMonitor.pages
             return retStr;
         }
 
-
-        public string qxrydj(string AREA_NO, string D504_01)
+        /// <summary>
+        /// 取消入院登记 需要根据医疗证号、成员序号去表zybc查询做过登记的农合返回的登记流水号
+        /// </summary>
+        /// <param name="AREA_NO">地区编码</param>
+        /// <param name="D401_10">医疗证号</param>
+        /// <param name="D401_21">成员序号</param>
+        /// <returns></returns>
+        [WebMethod]
+        public string qxrydj(string AREA_CODE, string D401_10, string D401_21) 
         {
             string retStr = "";
             try
             {
+                string D504_01 = "";
+                string sql = "select D504_01 from zybc where D401_10 ='" + D401_10 + "' and D401_21='" + D401_21 + "'";
+                DataTable dt = DBUtil.queryExecute(sql);
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    retStr = DataConvert.getReturnJson("-1", "未找到已登记过的流水号，无法做取消登记操作");
+                    XnhLogger.log("未找到已登记过的流水号，无法做取消登记操作，sql=" + sql);
+                    return retStr;
+                }
+
+                D504_01 = dt.Rows[0]["D504_01"] as string;
+
                 ZYBC_PROC_DELETE_NOTICE deleteNotice = new ZYBC_PROC_DELETE_NOTICE();
-                deleteNotice.executeSql(new Dictionary<string, string>() { { "AREA_NO", AREA_NO }, { "D504_01", D504_01 } });
+                deleteNotice.executeSql(new Dictionary<string, string>() { { "AREA_NO", AREA_CODE }, { "D504_01", D504_01 } });
                 //0	成功
                 //1	失败 
                 //删除成功： S_Returns= 0
@@ -417,7 +436,7 @@ namespace ApiMonitor.pages
                 {
                     //删除HIS的登记信息
                     HIS.scZYBC(new Dictionary<string, string>() { { "D504_01", D504_01 } });
-                    retStr = DataConvert.getReturnJson("0", "删除入院登记成功");
+                    retStr = DataConvert.getReturnJson("0", "取消入院登记成功");
                 }
                 else
                 {

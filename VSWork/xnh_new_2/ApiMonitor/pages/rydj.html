@@ -848,9 +848,10 @@
             }
 
             var pMap = {};
-            pMap["AREA_CODE"] = $("#areaNo").val();
-            pMap["D504_01"] = $("#REG_NO").val(); //住院登记流水号
-            var pJson = map2Json(pMap);
+            pMap["AREA_CODE"] = $("#areaNo").val(); //地区号
+            pMap["D401_10"] = $("#ylzh").val(); //医疗证号
+            pMap["D401_21"] = currentMemberSelected["D401_21"]; //成员序号
+            var pJson = map2Json(pMap);    
 
             showMask("正在处理，请稍后...");
             $.ajax({

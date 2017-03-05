@@ -67,6 +67,7 @@ namespace ApiMonitor.DB
                 conn.Open();
                 cmd = new OracleCommand(updateSql, conn);
                 return cmd.ExecuteNonQuery();
+                
 
             }
             catch (Exception ex)

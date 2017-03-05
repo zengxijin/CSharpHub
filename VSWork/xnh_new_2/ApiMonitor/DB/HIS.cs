@@ -247,8 +247,8 @@ namespace ApiMonitor.DB
                 return;
             }
 
-            string sql = "insert into zybc " +
-                    "select '$D401_10$','$D401_21$','$D504_01$','$D504_21$' from dual "
+            string sql = "insert into zybc(D401_10,D401_21,D504_21,D504_01,AREA_CODE) " +
+                    "select '$D401_10$','$D401_21$','$D504_01$','$D504_21$','$AREA_CODE$' from dual "
                     + "where not exists (select * from zybc t where t.D401_10='$D401_10$' and t.D401_21='$D401_21$' )";
             try
             {
@@ -256,6 +256,8 @@ namespace ApiMonitor.DB
                 sql = sql.Replace("$D401_21$", (sqlParam.ContainsKey("D401_21") == true ? sqlParam["D401_21"] : ""));
                 sql = sql.Replace("$D504_21$", (sqlParam.ContainsKey("D504_21") == true ? sqlParam["D504_21"] : ""));
                 sql = sql.Replace("$D504_01$", (sqlParam.ContainsKey("D504_01") == true ? sqlParam["D504_01"] : ""));
+                sql = sql.Replace("$AREA_CODE$", (sqlParam.ContainsKey("AREA_CODE") == true ? sqlParam["AREA_CODE"] : ""));
+                
 
                 DBUtil.updateExecute(sql);
             }
@@ -280,10 +282,10 @@ namespace ApiMonitor.DB
             string sql = "UPDATE zybc t SET t.D504_21='$D504_21$',t.D504_01='$D504_01$' WHERE t.D401_10 = '$D401_10$' AND t.D401_21 = '$D401_21$'";
             try
             {
-                sql = sql.Replace("$D401_10$", (sqlParam.ContainsKey("D401_10") == true ? sqlParam["D401_10"] : ""));
-                sql = sql.Replace("$D401_21$", (sqlParam.ContainsKey("D401_21") == true ? sqlParam["D401_21"] : ""));
-                sql = sql.Replace("$D504_21$", (sqlParam.ContainsKey("D504_21") == true ? sqlParam["D504_21"] : ""));
-                sql = sql.Replace("$D504_01$", (sqlParam.ContainsKey("D504_01") == true ? sqlParam["D504_01"] : ""));
+                sql = sql.Replace("$D401_10$", (sqlParam.ContainsKey("D401_10") == true ? sqlParam["D401_10"] : "")); //医疗证号
+                sql = sql.Replace("$D401_21$", (sqlParam.ContainsKey("D401_21") == true ? sqlParam["D401_21"] : "")); //成员序号
+                sql = sql.Replace("$D504_21$", (sqlParam.ContainsKey("D504_21") == true ? sqlParam["D504_21"] : "")); //疾病代码
+                sql = sql.Replace("$D504_01$", (sqlParam.ContainsKey("D504_01") == true ? sqlParam["D504_01"] : "")); //住院登记流水号
 
                 DBUtil.updateExecute(sql);
             }
@@ -335,7 +337,7 @@ namespace ApiMonitor.DB
             string sql = "delete from zybc  where D504_01 = '$D504_01$'";
             try
             {
-                sql = sql.Replace("$D504_21$", (sqlParam.ContainsKey("D504_21") == true ? sqlParam["D504_21"] : ""));
+                sql = sql.Replace("$D504_01$", (sqlParam.ContainsKey("D504_01") == true ? sqlParam["D504_01"] : ""));
 
                 DBUtil.updateExecute(sql);
             }
