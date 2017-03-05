@@ -193,7 +193,7 @@
                         <table class="table" id="zymx">
                             <thead>
                                 <tr>
-                                    <th>住院号</th>
+                                   <!--<th>住院号</th>-->
                                     <th>HIS项目编码</th>
                                     <th>项目名称</th>
                                     <th>项目单价</th>
@@ -266,7 +266,7 @@
                                      '<tr class="odd gradeX">                               '
                                     + '    <td>' + dataJson[i]["NAME"] + '+' + dataJson[i]["IP_NO"] + '</td>                                        '
                                     + '    <td>                                             '
-                                    + '        <a>单独传明细</a>                            '
+                                    + '        <a onclick="javascript:ddcmx(\'' + dataJson[i]["IP_NO"] + '\',\'' + dataJson[i]["REG_NO"] + '\');">单独传明细</a>                            '
                                     + '        <br />                                       '
                                     + '        <a>删除收费项目</a>                          '
                                     + '    </td>                                            '
@@ -281,7 +281,7 @@
                                     + '        <a></a>                                      '
                                     + '    </td>                                            '
                                     + '    <td>                                             '
-                                    + '    <input type="checkbox" value="刘德华 562148" />  '
+                                    + '    <input type="checkbox" value="' + dataJson[i]["IP_NO"] + '" />  '
                                     + '     </td>                                           '
                                     + '</tr>                                                '
                                 $("#zyls tbody").append(row);
@@ -379,7 +379,7 @@
 
                         var trStr = '<tr class="example" id="' + trId + '" >';//动态拼接table
 
-                        trStr += '<td id="' + trId + '_item_code">' + $.trim(row['ITEM_CODE']) + '</td>';//数据表的主键值 门诊流水号
+                        //trStr += '<td id="' + trId + '_ip_no">' + $.trim(row['IP_NO']) + '</td>';//数据表的主键值 门诊流水号
                         trStr += '<td id="' + trId + '_item_code">' + row['ITEM_CODE'] + '</td>';    //项目编码
                         trStr += '<td id="' + trId + '_item_name">' + row['ITEM_NAME'] + '</td>';  //名称
                         trStr += '<td id="' + trId + '_price">' + row['PRICE'] + '</td>';   //项目单价
@@ -391,7 +391,7 @@
                         trStr += '<td id="' + trId + '_standard">' + row['STANDARD'] + '</td>';//规格
                         trStr += '<td id="' + trId + '_small_unit">' + row['SMALL_UNIT'] + '</td>';//单位
                         trStr += '<td class="center">                              '
-                        + '        <a >作废收费项目</a>                                  '
+                        + '        <a onclick="javascript:zfsfxm(\'' + row['IP_NO'] + '\',\'' + row["NH_BM"] + '\');" >作废收费项目</a>                                  '
                         + '    </td> ';
                         $(trStr).appendTo("#mxlist");
                         
@@ -409,6 +409,109 @@
             });
 
         }
+    
+        //作废收费项目
+        function zfsfxm(D504_09, NH_BM) {
+            if (confirm("确定作废收费项目？")) {
+            } else {
+                return;
+            }
+
+            var USER_ID = getCookie("USER_ID");
+            var pMap = {};
+            pMap["USER_ID"] = USER_ID;
+            pMap["D504_09"] = D504_09; //住院号
+            pMap["NH_BM"] = NH_BM; //住院号
+            var pJson = map2Json(pMap);
+
+            showMask("正在处理，请稍后...");
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/zfsfxm",
+                data: pJson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    closeMask();
+                    var retVal = data.d;
+                    //遍历json数组操作
+                    var retJson = getJsonObj(retVal);
+                    if (retJson.flag == '0') {
+                        alert("处理成功");
+                    } else {
+                        alert("处理失败：" + retJson.msg);
+                    }
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
+                }
+            });
+
+        }
+    
+        //单独传明细
+        function ddcmx(IP_NO, REG_NO) {
+            //D505_02	入院登记成功后返回的住院登记流水号
+            //COME_AREA	登录返回的
+            //AREA_CODE	存储的病人地区编码
+            //D505_04	住院明细sql查询里面的item_code（收费项目编码组合   （药品代码、数量、单价））
+            //D505_08	住院明细sql查询里面的qty
+            //D505_07	住院明细sql查询里面的price
+            //D505_09	（农合技术部说是保内是1 保外是0）
+            //D505_ID_HIS	农合编码
+            //USER_ID	登录返回的
+            //D504_14	取用户登录后返回的诊治单位代码
+            //USER_NAME	取用户登录后返回的操作员姓名
+            //LEVEL	取用户登录后返回的DEP_LEVEL
+            if (confirm("确定上传 " + IP_NO + " 明细？")) {
+            } else {
+                return;
+            }
+
+            var USER_ID = getCookie("USER_ID");
+            var pMap = {};
+            pMap["USER_ID"] = USER_ID; //当前操作员id
+            pMap["COME_AREA"] = getCookie("DEP_AREA"); //地区代码(医疗机构)
+            pMap["D504_14"] = getCookie("DEP_ID"); //诊治单位代码
+            pMap["D504_09"] = IP_NO; //住院号
+            pMap["USER_NAME"] = getCookie("USER_NAME"); //操作员姓名
+            pMap["LEVEL"] = getCookie("DEP_LEVEL"); //诊治单位级别
+            pMap["REG_NO"] = REG_NO; //住院流水
+            var paramBase64 = $.base64.encode(map2Json(pMap), "utf8"); //base64编码，防止传到后台乱码
+
+            var newMap = {};
+            newMap["PARAM"] = paramBase64; 
+            var pJson = map2Json(newMap);
+
+            showMask("正在处理，请稍后...");
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/ddcmx",
+                data: pJson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    closeMask();
+                    var retVal = data.d;
+                    //遍历json数组操作
+                    var retJson = getJsonObj(retVal);
+                    if (retJson.flag == '0') {
+                        alert("处理成功");
+                    } else {
+                        alert("处理失败：" + retJson.msg);
+                    }
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
+                }
+            });
+
+        }
+    
     </script>
 </body>
 

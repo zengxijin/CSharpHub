@@ -397,13 +397,13 @@ namespace ApiMonitor.DB
                 XnhLogger.log("modifyZYCZBJ sqlParam参数为空");
                 return;
             }
-            string sql = "UPDATE ip_bill SET up_flag = '1',"
-            + "where REG_NO ='$REG_NO$' and pre_no = '$pre_no$' and bill_time = '$bill_time$' and basic_cls = '$basic_cls$'";
+            string sql = "UPDATE ip_bill SET up_flag = '$up_flag$',"
+            + "where REG_NO ='$reg_no$' and pre_no = '$pre_no$' and bill_time = '$bill_time$' and basic_cls = '$basic_cls$'";
             try
             {
-                sql = sql.Replace("1", (sqlParam.ContainsKey("up_flag") == true ? sqlParam["up_flag"] : ""));
+                sql = sql.Replace("$up_flag$", (sqlParam.ContainsKey("up_flag") == true ? sqlParam["up_flag"] : ""));
                 sql = sql.Replace("$pre_no$", (sqlParam.ContainsKey("pre_no") == true ? sqlParam["pre_no"] : ""));
-                sql = sql.Replace("$REG_NO$", (sqlParam.ContainsKey("reg_no") == true ? sqlParam["reg_no"] : ""));
+                sql = sql.Replace("$reg_no$", (sqlParam.ContainsKey("reg_no") == true ? sqlParam["reg_no"] : ""));
                 sql = sql.Replace("$bill_time$", (sqlParam.ContainsKey("bill_time") == true ? sqlParam["bill_time"] : ""));
                 sql = sql.Replace("$basic_cls$", (sqlParam.ContainsKey("basic_cls") == true ? sqlParam["basic_cls"] : ""));
                 DBUtil.updateExecute(sql);
@@ -412,6 +412,44 @@ namespace ApiMonitor.DB
             {
                 XnhLogger.log(ex.ToString() + " SQL:" + sql);
             }
+        }
+
+
+        public static DataTable cxzymx(string reg_no)
+        {
+            string sql = "";
+            try
+            {
+                sql = "select "
+                  + "b.ip_no, "	//--住院号
+                  + "a.item_code, "	//--HIS项目编码
+                  + "price, "		//--HIS项目单价
+                  + "(select wydm from xnh_dm where xnh_dm.item_code = a.item_code) as nh_bm, "    //农合编码
+                  + "(select bnbw from xnh_ypzl  where xnh_ypzl.wydm = d.wydm and d.item_code = a.item_code) as nh_bnw, "//--保外0，内1
+                  + "qty, "		//--HIS项目数量
+                  + "total, "		//--HIS项目总价格
+                  + "bill_time, "	//--记账时间
+                  + "a.basic_cls, "//多条同批次缺库存，其他批次收费标志
+                  + "pre_no, "		//--医嘱编号
+                  + "a.up_flag, "	//--上传标志
+                  + "standard, "	//--规格
+                  + "small_unit, "	//--单位
+                  + "(select item_cls from code_item where item_code=a.item_code ) as item_cls, "	//--项目类型(1,2,3:药品 4,5,6,7,8,9:其他)
+                  + "(select item_name from code_item where item_code=a.item_code ) as item_name " 	//--项目名称
+                  + "from "
+                  + "IP_BILL a left join IP_REGISTER b on a.reg_no=b.reg_no ,plus_item c left join xnh_dm d on c.item_code = d.item_code "
+                  + "where "
+                  + "c.item_code=a.item_code and c.type=3 and a.reg_no='" + reg_no + "'  "
+                  + "order by bill_time,a.item_code ";
+
+                DataTable dt = DBUtil.queryExecute(sql);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log("查询住院明细：sql=" + sql + " 异常：" + ex.StackTrace);
+            }
+            return null;
         }
 
         #endregion

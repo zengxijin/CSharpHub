@@ -1102,26 +1102,7 @@ namespace ApiMonitor.pages
             string retStr = "";
             try
             {
-                string sql = "select "
-           + "b.ip_no, "	//--住院号
-           + "a.item_code, "	//--HIS项目编码
-           + "price, "		//--HIS项目单价
-           + "qty, "		//--HIS项目数量
-           + "total, "		//--HIS项目总价格
-           + "bill_time, "	//--记账时间
-           + "a.basic_cls, "//多条同批次缺库存，其他批次收费标志
-           + "pre_no, "		//--医嘱编号
-           + "a.up_flag, "	//--上传标志
-           + "standard, "	//--规格
-           + "small_unit, "	//--单位
-           + "(select item_cls from code_item where item_code=a.item_code ) as item_cls, "	//--项目类型(1,2,3:药品 4,5,6,7,8,9:其他)
-           + "(select item_name from code_item where item_code=a.item_code ) as item_name " 	//--项目名称
-           + "from "
-           + "IP_BILL a left join IP_REGISTER b on a.reg_no=b.reg_no ,plus_item c "
-           + "where "
-           + "c.item_code=a.item_code and c.type=3 and a.reg_no='" + data + "'  "
-           + "order by bill_time,a.item_code ";
-                DataTable dt = DBUtil.queryExecute(sql);
+                DataTable dt = HIS.cxzymx(data);
                 if ((dt == null) || (dt.Rows.Count == 0))
                 {
                     retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
@@ -1139,6 +1120,7 @@ namespace ApiMonitor.pages
             }
             return retStr;
         }
+       
         /// <summary>
         ///批量传明细(只会传没有传过的)
         /// </summary>
@@ -1152,6 +1134,7 @@ namespace ApiMonitor.pages
                 string sql = "select "
            + "b.ip_no, "	//--住院号
            + "a.item_code, "	//--HIS项目编码
+           + "(select wydm from xnh_dm where xnh_dm.item_code = a.item_code) as nh_bm, "    //农合编码
            + "price, "		//--HIS项目单价
            + "qty, "		//--HIS项目数量
            + "total, "		//--HIS项目总价格
@@ -1185,6 +1168,97 @@ namespace ApiMonitor.pages
             }
             return retStr;
         }
+
+        /// <summary>
+        /// 单独传明细
+        /// </summary>
+        /// <param name="PARAM"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public string ddcmx(string PARAM)
+        {
+            string retStr = "";
+            try
+            {
+                string paramsJson = DataConvert.Base64Decode(PARAM);//解码
+                Dictionary<string, string> jsonDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(paramsJson);
+                string D504_09 = jsonDict["D504_09"]; //住院号
+                //根据住院号查之前的入院登记信息
+                string sql = "select * from zybc where D504_09 ='" + D504_09 + "'";
+                DataTable dt = DBUtil.queryExecute(sql);
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    retStr = DataConvert.getReturnJson("-1", "表zybc未找到已登记过的入院流水号D504_01");
+                    XnhLogger.log("未找到已登记过的流水号，sql=" + sql);
+                    return retStr;
+                }
+
+                string D504_01 = dt.Rows[0]["D504_01"] as string;   //住院登记流水号
+                string AREA_NO = dt.Rows[0]["AREA_CODE"] as string; //地区代码
+                string REG_NO = jsonDict["REG_NO"]; //HIS的住院流水
+                DataTable dtMX = HIS.cxzymx(REG_NO); //根据住院流水查住院明细
+                if (dtMX == null || dtMX.Rows.Count == 0)
+                {
+                    retStr = DataConvert.getReturnJson("-1", "未查到住院明细信息，住院流水REG_NO=" + REG_NO);
+                    XnhLogger.log("未查到住院明细信息，住院流水REG_NO=" + REG_NO );
+                    return retStr;
+                }
+
+                DataRow row = dtMX.Rows[0];
+
+                Dictionary<string, string> dict = new Dictionary<string, string>();
+                dict.Add("D505_02", D504_01); //入院登记成功后返回的住院登记流水号
+                dict.Add("COME_AREA", jsonDict["COME_AREA"]); //登录返回的
+                dict.Add("AREA_CODE", AREA_NO); //存储的病人地区编码
+                dict.Add("D505_04", dtMX.Rows[0]["ITEM_CODE"] as string); //住院明细sql查询里面的item_code（收费项目编码组合   （药品代码、数量、单价））
+                dict.Add("D505_08", dtMX.Rows[0]["QTY"].ToString()); //住院明细sql查询里面的qty
+                dict.Add("D505_07", dtMX.Rows[0]["PRICE"].ToString()); //住院明细sql查询里面的price
+                dict.Add("D505_09", dtMX.Rows[0]["NH_BNW"] as string); //（农合技术部说是保内是1 保外是0）
+                dict.Add("D505_ID_HIS", dtMX.Rows[0]["NH_BM"] as string); //农合编码
+                dict.Add("USER_ID", jsonDict["USER_ID"]); //登录返回的
+                dict.Add("D504_14", jsonDict["D504_14"]); //取用户登录后返回的诊治单位代码
+                dict.Add("USER_NAME", jsonDict["USER_NAME"]); //取用户登录后返回的操作员姓名
+                dict.Add("LEVEL", jsonDict["LEVEL"]); //取用户登录后返回的DEP_LEVEL
+
+                RJZ_Save_Row save = new RJZ_Save_Row();
+                save.executeSql(dict);
+
+                XnhLogger.log("单独上传明细，参数：" + save.parames + " 结果：" + save.getExecuteResultPlainString());
+
+                if (save.getExecuteStatus() == true)
+                {
+                    //上传明细成功返回
+                    Dictionary<string, string> retDict = save.getResponseResultWrapperMap();
+                    //d505_01：VARCHAR2(24)  住院处方流水号
+                    //TOTAL_COSTS ：NUMBER(8,2)  住院总费用
+                    //TOTAL_CHAGE：NUMBER(8,2)   住院可补偿金额
+                    //ZF_COSTS：NUMBER(8,2)    住院自费费用
+
+                    //(三)	“单独传明细”是上传当前选择患者的未上传的明细（成功后修改HIS中对应上传标志）。
+                    Dictionary<string, string> modifyZYJSBJ_Param = new Dictionary<string, string>();
+                    modifyZYJSBJ_Param.Add("up_flag","1");
+                    modifyZYJSBJ_Param.Add("pre_no", row["pre_no"] as string);
+                    modifyZYJSBJ_Param.Add("reg_no",REG_NO );
+                    modifyZYJSBJ_Param.Add("bill_time", row["bill_time"] as string);
+                    modifyZYJSBJ_Param.Add("basic_cls", row["basic_cls"] as string);
+                    HIS.modifyZYJSBJ(modifyZYJSBJ_Param);
+
+                    retStr = DataConvert.getReturnJson("0", "上传明细成功");
+                }
+                else
+                {
+                    retStr = DataConvert.getReturnJson("-1", "上传明细失败：" + save.getExecuteResultPlainString());
+                }
+
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+
 
         /// <summary>
         ///冲正理赔查询
@@ -1294,6 +1368,11 @@ namespace ApiMonitor.pages
 
         }
 
+        /// <summary>
+        /// 补偿类别，根据地区号查补偿类别
+        /// </summary>
+        /// <param name="AREA_NO"></param>
+        /// <returns></returns>
         [WebMethod]
         public string bclb(string AREA_NO)
         {
@@ -1332,5 +1411,50 @@ namespace ApiMonitor.pages
             return retStr;
         }
 
+
+        [WebMethod]
+        public string zfsfxm(string USER_ID, string D504_09, string NH_BM)
+        {
+            string retStr = "";
+            try
+            {
+                RJZ_PROC_DELETE_PRICE_LIST_PER zf = new RJZ_PROC_DELETE_PRICE_LIST_PER();
+
+                string sql = "select D504_01,AREA_CODE from zybc where D504_09 ='" + D504_09 + "'";
+                DataTable dt = DBUtil.queryExecute(sql);
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    retStr = DataConvert.getReturnJson("-1", "表zybc未找到已登记过的入院流水号D504_01");
+                    XnhLogger.log("未找到已登记过的流水号，sql=" + sql);
+                    return retStr;
+                }
+
+                string D504_01 = dt.Rows[0]["D504_01"] as string; //住院登记流水号
+                string AREA_NO = dt.Rows[0]["AREA_CODE"] as string; //地区代码
+                zf.executeSql(new Dictionary<string, string>() { 
+                { "AREA_NO", AREA_NO }, 
+                {"D504_01",D504_01}, 
+                {"HIS_ID",NH_BM == "" ? "0" : NH_BM} // 如果是空，传0过去
+                });
+
+                XnhLogger.log("作废收费项目，参数：" + zf.parames + " 结果：" + zf.getExecuteResultPlainString());
+
+                if (zf.getExecuteStatus() == true)
+                {
+                    retStr = DataConvert.getReturnJson("0", "作废该收费项目成功");
+                }
+                else
+                {
+                    retStr = DataConvert.getReturnJson("-1", zf.getExecuteResultPlainString());
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
     }
 }

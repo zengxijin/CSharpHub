@@ -600,5 +600,19 @@
 		"response": {
 			"return_code": "0"
 		}
+	},
+    "PROC_DELETE_PRICE_LIST_PER": {
+		"callService": {
+			"service": "Update_Data_String"
+		},
+		"request": {
+			"AREA_NO": "0",
+            "D504_01": "1",
+            "HIS_ID": "2"
+             
+		},
+		"response": {
+			"return_code": "0"
+		}
 	}
 }
