@@ -1063,6 +1063,7 @@ namespace ApiMonitor.pages
         ///住院明细查询
         /// </summary>
         /// <returns></returns>
+        [WebMethod]
         public string zymxcx(string data)
         {
             string retStr = "";
@@ -1075,6 +1076,7 @@ namespace ApiMonitor.pages
            + "qty, "		//--HIS项目数量
            + "total, "		//--HIS项目总价格
            + "bill_time, "	//--记账时间
+           + "a.basic_cls, "//多条同批次缺库存，其他批次收费标志
            + "pre_no, "		//--医嘱编号
            + "a.up_flag, "	//--上传标志
            + "standard, "	//--规格

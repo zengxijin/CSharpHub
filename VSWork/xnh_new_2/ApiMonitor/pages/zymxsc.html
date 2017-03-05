@@ -260,6 +260,7 @@
     <script type="text/javascript" src="js/bootstrap-admin-theme-change-size.js"></script>
     <script type="text/javascript" src="js/jquery.cookie.js"></script>
     <script type="text/javascript" src="js/xnh.js"></script>
+    <script type="text/javascript" src="js/jquery.base64.js"></script>
     <script>
 
         var buffer = null;
@@ -275,7 +276,7 @@
                 }
 
                 showMask("正在查询，请稍后...");
-                batchUpload
+                //batchUpload
                 $.ajax({
                     type: "Post",
                     url: "xnhservice.asmx/ydjwjs",
@@ -308,7 +309,7 @@
                                     + '        <a>结算收费</a>                              '
                                     + '    </td>                                            '
                                     + '    <td>                                             '
-                                    + '        <button type="button" class="btn btn-default" id="Upload">查看明细项目</button>                          '
+                                    + '        <button type="button" class="btn btn-default" onclick="javascript:ckmx(\'' + dataJson[i]["REG_NO"] + '\');">查看明细项目</button>                          '
                                     + '        <br />                                       '
                                     + '        <a></a>                                      '
                                     + '    </td>                                            '
@@ -326,9 +327,9 @@
                         }
 
                     },
-                    error: function (err) {
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
                         closeMask();
-                        alert(err.toString());
+                        alert(textStatus + ":" + errorThrown);
                     }
                 });
             }
@@ -375,74 +376,74 @@
                             }
 
                         },
-                        error: function (err) {
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
                             closeMask();
-                            alert(err.toString());
+                            alert(textStatus + ":" + errorThrown);
                         }
                     });
                 }
             }
         });
+
         ///查看明细项目
-        $("#Upload").on("click", function () {  //按钮触发不了
-           
-            var checkedVal = "";   //怎么把住院流水号放进去？ 
-                    showMask("正在处理，请稍后...");
-                    $.ajax({
-                        type: "Post",
-                        url: "xnhservice.asmx/zymxcx",
-                        data: "{'data':'" + checkedVal + "'}",
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        success: function (data) {
-                            closeMask();
-                            //返回的数据用data.d获取内容
-                            var retVal = data.d;
-                            //遍历json数组操作
-                            var retJson = getJsonObj(retVal);
-                            if (retJson.flag == '0') {
-                                var json = retJson.msg;
-                                $("#zymx tbody tr").detach();
-                                for (var item in json.data) {
-                                    var row = json.data[item];
+        function ckmx(REG_NO) {  //按钮触发不了？
 
-                                    var trId = $.trim(row['REC_NO']);
+            var checkedVal = REG_NO;   //怎么把住院流水号放进去？ 
+            showMask("正在处理，请稍后...");
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/zymxcx",
+                data: "{'data':'" + checkedVal + "'}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    closeMask();
+                    //返回的数据用data.d获取内容
+                    var retVal = data.d;
+                    //遍历json数组操作
+                    var retJson = getJsonObj(retVal);
+                    if (retJson.flag == '0') {
+                        var json = retJson.msg;
+                        $("#zymx tbody tr").detach();
+                        for (var item in json.data) {
+                            var row = json.data[item];
 
-                                    var trStr = '<tr class="example" id="' + trId + '" >';//动态拼接table
-                                    // var html = '';
-                                    //for (var key in row) {//
-                                    trStr += '<td id="' + trId + '_item_code">' + $.trim(row['item_code']) + '</td>';//数据表的主键值 门诊流水号
-                                    //}
-                                    trStr += '<td id="' + trId + '_item_code">' + row['item_code'] + '</td>';    //项目编码
-                                    trStr += '<td id="' + trId + '_item_name">' + row['item_name'] + '</td>';  //名称
-                                    trStr += '<td id="' + trId + '_price">' + row['price'] + '</td>';   //项目单价
-                                    trStr += '<td id="' + trId + '_qty">' + row['qty'] + '</td>';         //项目数量
-                                    trStr += '<td id="' + trId + '_total">' + row['total'] + '</td>'; //项目总价格
-                                    trStr += '<td id="' + trId + '_bill_time">' + row['bill_time'] + '</td>'; //记账时间
-                                    trStr += '<td id="' + trId + '_pre_no">' + row['pre_no'] + '</td>';         //医嘱编号
-                                    trStr += '<td id="' + trId + '_up_flag">' + row['up_flag'] + '</td>'; //上传标志
-                                    trStr += '<td id="' + trId + '_standard">' + row['standard'] + '</td>';//规格
-                                    trStr += '<td id="' + trId + '_small_unit">' + row['small_unit'] + '</td>';//单位
-                                    trStr += '<td class="center">                              '
-                                    + '        <a>作废收费项目</a>                                  '
-                                    + '    </td> ';
-                                    $(trStr).appendTo("#mxlist");
-                                }
-                                //todo：根据需要绑定解析和绑定前台数据
+                            var trId = $.trim(row['REC_NO']);
 
-                            } else {
-                                alert("查询失败：" + retJson.msg);
-                            }
-
-                        },
-                        error: function (err) {
-                            closeMask();
-                            alert(err.toString());
+                            var trStr = '<tr class="example" id="' + trId + '" >';//动态拼接table
+                            // var html = '';
+                            //for (var key in row) {//
+                            trStr += '<td id="' + trId + '_item_code">' + $.trim(row['item_code']) + '</td>';//数据表的主键值 门诊流水号
+                            //}
+                            trStr += '<td id="' + trId + '_item_code">' + row['item_code'] + '</td>';    //项目编码
+                            trStr += '<td id="' + trId + '_item_name">' + row['item_name'] + '</td>';  //名称
+                            trStr += '<td id="' + trId + '_price">' + row['price'] + '</td>';   //项目单价
+                            trStr += '<td id="' + trId + '_qty">' + row['qty'] + '</td>';         //项目数量
+                            trStr += '<td id="' + trId + '_total">' + row['total'] + '</td>'; //项目总价格
+                            trStr += '<td id="' + trId + '_bill_time">' + row['bill_time'] + '</td>'; //记账时间
+                            trStr += '<td id="' + trId + '_pre_no">' + row['pre_no'] + '</td>';         //医嘱编号
+                            trStr += '<td id="' + trId + '_up_flag">' + row['up_flag'] + '</td>'; //上传标志
+                            trStr += '<td id="' + trId + '_standard">' + row['standard'] + '</td>';//规格
+                            trStr += '<td id="' + trId + '_small_unit">' + row['small_unit'] + '</td>';//单位
+                            trStr += '<td class="center">                              '
+                            + '        <a>作废收费项目</a>                                  '
+                            + '    </td> ';
+                            $(trStr).appendTo("#mxlist");
                         }
-                    });
-                
-            }
-       );
+                        //todo：根据需要绑定解析和绑定前台数据
+
+                    } else {
+                        alert("查询失败：" + retJson.msg);
+                    }
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
+                }
+            });
+
+        }
     </script>
 </body>
 

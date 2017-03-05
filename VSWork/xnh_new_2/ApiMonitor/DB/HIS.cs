@@ -78,7 +78,7 @@ namespace ApiMonitor.DB
             }
             string sql = "UPDATE cl_recipe SET yb_up = '1',"
               + "yb_caseno = '+此处结算返回的门诊登记流水号(不知道参数在哪里取)+' "
-            + "where rec_no = '$REC_NO$' and reg_no = '$REG_NO$' ";
+            + "where rec_no in ('$REC_NO$') and reg_no in ('$REG_NO$') ";
             try
             {
                 sql = sql.Replace("0", (sqlParam.ContainsKey("yb_up") == true ? sqlParam["yb_up"] : ""));
@@ -344,7 +344,71 @@ namespace ApiMonitor.DB
                 XnhLogger.log(ex.ToString() + " SQL:" + sql);
             }
         }
-
+        /// <summary>
+        /// 存储住院结算返回费用，后期做报表
+        /// create table ZYJS
+        ///  ( NAME     VARCHAR2(16),  姓名（从未结算患者列表sql查询返回的结果）
+        ///    IP_NO    VARCHAR2(24),  住院号（从未结算患者列表sql查询返回的结果）
+        ///    D505_02   VARCHAR2(24),  住院登记流水号
+        ///    d505_01  VARCHAR2(24),  住院处方流水号
+        ///    TOTAL_COSTS  NUMBER(8,2),  住院总费用
+        ///    TOTAL_CHAGE  NUMBER(8,2),   住院可补偿金额
+       ///     ZF_COSTS  NUMBER(8,2)    住院自费费用
+        ///   )
+        /// </summary> 
+        /// <param name="sqlParam"></param>
+        public static void CCZYJS(Dictionary<string, string> sqlParam)
+        {
+            if (sqlParam == null || sqlParam.Count == 0)
+            {
+                XnhLogger.log("MZJS sqlParam参数为空");
+                return;
+            }
+            string sql = "insert into ZYJS(NAME,IP_NO,D505_02,d505_01,TOTAL_COSTS,TOTAL_CHAGE,TOTAL_CHAGE,ZF_COSTS) "
+                          + "values (NAME,IP_NO,D505_02,d505_01,TOTAL_COSTS,TOTAL_COSTS,TOTAL_CHAGE,TOTAL_CHAGE,ZF_COSTS)";
+          
+            try
+            {
+                sql = sql.Replace("$NAME$", (sqlParam.ContainsKey("NAME") == true ? sqlParam["NAME"] : ""));
+                sql = sql.Replace("$IP_NO$", (sqlParam.ContainsKey("IP_NO") == true ? sqlParam["IP_NO"] : ""));
+                sql = sql.Replace("$d505_02$", (sqlParam.ContainsKey("d505_02") == true ? sqlParam["d505_02"] : ""));
+                sql = sql.Replace("$d505_01$", (sqlParam.ContainsKey("d505_01") == true ? sqlParam["d505_01"] : ""));
+                sql = sql.Replace("$TOTAL_COSTS$", (sqlParam.ContainsKey("TOTAL_COSTS") == true ? sqlParam["TOTAL_COSTS"] : ""));
+                sql = sql.Replace("$TOTAL_CHAGE$", (sqlParam.ContainsKey("TOTAL_CHAGE") == true ? sqlParam["TOTAL_CHAGE"] : ""));
+                sql = sql.Replace("$ZF_COSTS$", (sqlParam.ContainsKey("ZF_COSTS") == true ? sqlParam["ZF_COSTS"] : ""));
+              
+                DBUtil.updateExecute(sql);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(ex.ToString() + " SQL:" + sql);
+            }
+        }
+        ///住院上传修改对应his标记
+        /// </summary>
+        public static void modifyZYJSBJ(Dictionary<string, string> sqlParam)
+        {
+            if (sqlParam == null || sqlParam.Count == 0)
+            {
+                XnhLogger.log("modifyZYCZBJ sqlParam参数为空");
+                return;
+            }
+            string sql = "UPDATE ip_bill SET up_flag = '1',"
+            + "where REG_NO ='$REG_NO$' and pre_no = '$pre_no$' and bill_time = '$bill_time$' and basic_cls = '$basic_cls$'";
+            try
+            {
+                sql = sql.Replace("1", (sqlParam.ContainsKey("up_flag") == true ? sqlParam["up_flag"] : ""));
+                sql = sql.Replace("$pre_no$", (sqlParam.ContainsKey("pre_no") == true ? sqlParam["pre_no"] : ""));
+                sql = sql.Replace("$REG_NO$", (sqlParam.ContainsKey("reg_no") == true ? sqlParam["reg_no"] : ""));
+                sql = sql.Replace("$bill_time$", (sqlParam.ContainsKey("bill_time") == true ? sqlParam["bill_time"] : ""));
+                sql = sql.Replace("$basic_cls$", (sqlParam.ContainsKey("basic_cls") == true ? sqlParam["basic_cls"] : ""));
+                DBUtil.updateExecute(sql);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(ex.ToString() + " SQL:" + sql);
+            }
+        }
 
         #endregion
     }
