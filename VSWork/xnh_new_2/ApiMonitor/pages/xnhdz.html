@@ -1,0 +1,429 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>新农合药品对照</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" media="screen" href="css/bootstrap.min.css">
+    <link rel="stylesheet" media="screen" href="css/bootstrap-theme.min.css">
+    <!-- Bootstrap Admin Theme -->
+    <link rel="stylesheet" media="screen" href="css/bootstrap-admin-theme.css">
+    <link rel="stylesheet" media="screen" href="css/bootstrap-admin-theme-change-size.css">
+    <!-- Custom styles -->
+    <style type="text/css">
+        @font-face {
+            font-family: Ubuntu;
+            src: url('fonts/Ubuntu-Regular.ttf');
+        }
+
+        a {
+          cursor:pointer;
+        }
+
+        .bs-docs-masthead {
+            background-color: #6f5499;
+            background-image: linear-gradient(to bottom, #563d7c 0px, #6f5499 100%);
+            background-repeat: repeat-x;
+        }
+
+        .bs-docs-masthead {
+            padding: 0;
+        }
+
+            .bs-docs-masthead h1 {
+                color: #fff;
+                font-size: 40px;
+                margin: 0;
+                padding: 34px 0;
+                text-align: center;
+            }
+
+            .bs-docs-masthead a:hover {
+                text-decoration: none;
+            }
+
+        .meritoo-logo a {
+            background-color: #fff;
+            border: 1px solid rgba(66, 139, 202, 0.4);
+            display: block;
+            font-family: Ubuntu;
+            padding: 22px 0;
+            text-align: center;
+        }
+
+            .meritoo-logo a,
+            .meritoo-logo a:hover,
+            .meritoo-logo a:focus {
+                text-decoration: none;
+            }
+
+                .meritoo-logo a img {
+                    display: block;
+                    margin: 0 auto;
+                }
+
+                .meritoo-logo a span {
+                    color: #4e4b4b;
+                    font-size: 18px;
+                }
+
+        .row-urls {
+            margin-top: 4px;
+        }
+
+            .row-urls .col-md-6 {
+                text-align: center;
+            }
+
+                .row-urls .col-md-6 a {
+                    font-size: 14px;
+                }
+
+        #mask_background {
+            position: absolute;
+            z-index: 998;
+            top: 0px;
+            left: 0px;
+            background: rgb(50,50,50);
+            background: rgba(0,0,0,0.5);
+            display: none;
+        }
+
+        #mask_content {
+            position: absolute;
+            width: 500px;
+            z-index: 999;
+            padding: 10px;
+            background: #fff;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+       <script type="text/javascript" src="js/html5shiv.js"></script>
+       <script type="text/javascript" src="js/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="bootstrap-admin-with-small-navbar">
+    <div id="mask_background"></div>
+    <div id="mask_content"></div>
+    <!-- small navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top bootstrap-admin-navbar-sm" role="navigation">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav navbar-left bootstrap-admin-theme-change-size">
+                            <li style="float:left;">使用单位:<span id="loginInfo_DEP_NAME"></span></li>
+                            <li style="float:left;padding-left:10px;">当前登录人:<span id="loginInfo_USER_CODE"></span></li>
+                            <li style="float:left;padding-left:10px;">所在单位ID:<span id="loginInfo_DEP_ID"></span></li>
+                            <li style="float:left;padding-left:10px;">当前时间:<span id="loginInfo_dateTime"></span></li>
+                            <li><a class="size-changer large active" onclick="javascript: exit();">退出</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- main / large navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top bootstrap-admin-navbar bootstrap-admin-navbar-under-small" role="navigation">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".main-navbar-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    </div>
+                    <div class="collapse navbar-collapse main-navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="rydj.html">住院业务</a></li>
+                            <li><a href="mzbc.html">门诊补偿</a></li>
+                            <li ><a href="zymxsc.html">住院费用上传</a></li>
+                            <li><a href="czlp.html">发票打印</a></li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-hover="dropdown">其他 <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li role="presentation" class="dropdown-header">#1</li>
+                                    <li class="active"><a href="nhdm.html">新农合药品对照</a></li>
+                                    <li role="presentation" class="divider"></li>
+                                    <li role="presentation" class="dropdown-header">#2</li>
+                                    <li><a href="#">菜单2</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div><!-- /.navbar-collapse -->
+                </div>
+            </div>
+        </div><!-- /.container -->
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="text-muted bootstrap-admin-box-title">本地His药品目录</div>
+                    </div>
+                    <div class="bootstrap-admin-panel-content">
+                        <div class="form-inline" role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="queryJS" placeholder="回车检索">
+                            </div>
+                        </div>
+                        <p></p>
+                        <table class="table table-striped table-bordered" id="bdhis">
+                            <thead>
+                                <tr>
+                                    <th>his编码</th>
+                                    <th>his项目名称</th>
+                                    <th>农合中心编码</th>
+                                    <th>农合名称</th>
+                                    <th>项目类别</th>
+                                    <th>拼音码</th>
+                                    <th>规格</th>
+                                    <th>单位</th>
+                                    <th>价格</th>
+                                </tr>
+                                
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <table class="table">
+        <tr>
+            <td></td>
+            <td></td>
+            <td>HIS编码：<span id="nowHIS"></span></td>
+            <td></td>
+            <td></td>
+            <td>农合编码：<span id="nowNH"></span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+<td><button type="button" class="btn btn-default" id="bmdz">对照</button> </td>
+<td><button type="button" class="btn btn-default" id="qxmbdz">取消对照</button> </td>             
+        </tr>
+    </table>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="text-muted bootstrap-admin-box-title">农合中心药品目录   </div>
+                    </div>
+                   
+                    <div class="bootstrap-admin-panel-content">
+                        <div class="form-inline" role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="queryNH" placeholder="双击his项目">
+                            </div>
+                        </div>
+                        <p></p>
+                        <table class="table table-striped table-bordered" id="nhsj">
+                            <thead>
+                                <tr>
+                                    <th>拼音码</th>
+                                    <th>农合中心编码</th>
+                                    <th>药品分类</th>
+                                    <th>药品名称</th>
+                                    <th>规格</th>
+                                    <th>单位</th>
+                                    <th>单价</th>
+                                    <th>报销比例</th>
+                                    <th>报内保外</th>
+                                    <th>甲乙类</th>
+                                    <th>基药非基药</th>
+                                </tr>
+                                <!--<tr>
+                                    <td>拼音码</td>
+                                    <td>农合中心编码</td>
+                                    <td>药品分类</td>
+                                    <td>药品名称</td>
+                                    <td>规格</td>
+                                    <td>单位</td>
+                                    <td>单价</td>
+                                </tr>-->
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/twitter-bootstrap-hover-dropdown.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-admin-theme-change-size.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="js/xnh.js"></script>
+    <script type="text/javascript" src="js/jquery.base64.js"></script>
+    <script>
+    $('#queryJS').bind('keyup', function (event) {
+        if (event.keyCode == "13") {
+            var query = $("#queryJS").val();
+            if (query == '') {
+                alert("请输入信息查询");
+                return;
+            }
+
+            showMask("正在查询，请稍后...");
+            //batchUpload
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/bdhis",
+                data: "{'query':'" + query + "'}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    closeMask();
+                    //返回的数据用data.d获取内容
+                    var retVal = data.d;
+                    //遍历json数组操作
+                    var retJson = getJsonObj(retVal);
+                    if (retJson.flag == '0') {
+                        var dataJson = retJson.msg.data;
+                        $("#bdhis tbody tr").detach();
+
+                        for (var i = 0; i < dataJson.length; i++) {
+                            var row = dataJson[i];
+                            var tdId = dataJson[i]["ITEM_CODE"];
+                            var td =
+                               '<tr>               '
+                               + '<td ><a onclick="javascript:hisdmxz(\'' + tdId +'\');" id="' + tdId + '_ITEM_CODE"></a></td> '
+                               + '<td id="' +tdId+ '_ITEM_NAME"></td> '
+                               + '<td id="' +tdId+ '_NH_CODE"></td> '
+                               + '<td id="' +tdId+ '_NH_NAME"></td> '
+                               + '<td id="' +tdId+ '_ITEM_CLS"></td> '
+                               + '<td id="' +tdId+ '_PY_CODE"></td> '
+                               + '<td id="' +tdId+ '_STANDARD"></td> '
+                               + '<td id="' +tdId+ '_SMALL_UNIT"></td> '
+                               + '<td id="' +tdId+ '_RET_PRICE"></td> '
+                               + '</tr>             ';
+                            $("#bdhis tbody").append(td);
+                        
+                            for (var item in row) {
+                                $("#" + tdId + "_" + item).html(row[item]);
+                            }
+                                
+                        }
+                    } else {
+                        alert("查询失败：" + retJson.msg);
+                    }
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
+                }
+            });
+        }
+    });
+    
+    var currentHisID = "";
+    function hisdmxz(tdId) {
+        var hisCode = $("#" + tdId + "_ITEM_CODE").html(); //获取HIS编码的值
+        $("#nowHIS").html(hisCode);
+        $("#nowNH").html($("#" + tdId + "_NH_CODE").html());
+        currentHisID = tdId;
+
+        $("#queryNH").val($("#" + tdId + "_ITEM_NAME").html()); //点击项目把值传到农合搜索框
+    }
+
+    function nhdmxz(tdId) {
+        if (currentHisID == "") {
+            alert("请先选择HIS对码的记录");
+            return;
+        }
+
+        var nhCode = $("#" + tdId + "_WYDM").html(); //获取农合编码的值
+        $("#nowNH").html(nhCode);
+        $("#" + currentHisID + "_NH_CODE").html(nhCode);
+
+    }
+
+
+    var buffer = null;
+    $('#queryNH').bind('keyup', function (event) {
+        if (event.keyCode == "13") {
+            var query = $("#queryNH").val();
+            if (query == '') {
+                alert("请输入信息查询");
+                return;
+            }
+
+            showMask("正在查询，请稍后...");
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/nhbm",
+                data: "{'query':'" + query + "'}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    closeMask();
+                    //返回的数据用data.d获取内容
+                    var retVal = data.d;
+                    //遍历json数组操作
+                    var retJson = getJsonObj(retVal);
+                    buffer = retJson;
+                    if (retJson.flag == '0') {
+                        var dataJson = buffer.msg.data;//buffer.msg.data[0]["NAME"]
+                        $("#nhsj tbody tr").detach();
+                        for (var i = 0; i < dataJson.length; i++) {
+                            var row = dataJson[i];
+                            var trId = row["WYDM"];
+                            var tr =
+	                        '<tr>' 
+	                        +'<td  id="'  +trId+ '_CXGJZ"></td>'
+	                        + '<td ><a onclick="javascript:nhdmxz(\'' + trId + '\');" id="' + trId + '_WYDM"></a></td>'
+	                        + '<td id="' +trId+ '_YPFL"></td>'
+	                        + '<td id="' +trId+ '_YPMC"></td>'
+	                        + '<td id="' +trId+ '_GG"></td>'
+	                        + '<td id="' +trId+ '_DW"></td>'
+	                        + '<td id="' +trId+ '_DJ"></td>'
+	                        + '<td id="' +trId+ '_BXBL"></td>'
+	                        + '<td id="' +trId+ '_BNBW"></td>'
+	                        + '<td id="' +trId+ '_JYL"></td>'
+	                        + '<td id="' +trId+ '_JYFJY"></td>'
+	                        + '</tr>';
+                            $("#nhsj tbody").append(tr);
+
+                            
+                            for (var item in row) {
+                                $("#" + trId + "_" + item).html(row[item]);
+                            }
+                        }
+                        
+
+                        
+                    } else {
+                        alert("查询失败：" + retJson.msg);
+                    }
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
+                }
+            });
+        }
+    });
+    </script>
+</body>
+</html>
+

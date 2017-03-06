@@ -1411,7 +1411,63 @@ namespace ApiMonitor.pages
             return retStr;
         }
 
+        /// <summary>
+        ///对码页面本地his查询
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod]
+        public string bdhis(string query)
+        {
+            string retStr = "";
+            try
+            {
+                DataTable dt = HIS.fetchHIS(query);
+                if ((dt == null) || (dt.Rows.Count == 0))
+                {
+                    retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
+                    return retStr;
+                }
+                string msg = DataConvert.DataTable2Json(dt);
+                retStr = DataConvert.getReturnJson("0", msg);
+                //todo:由HIS提供字段信息
+                // retStr = DataConvert.getReturnJson("-1", "data=" + data + "　待由HIS提供字段数据");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
 
+        /// <summary>
+        ///对码页面农和编码查询
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod]
+        public string nhbm(string query)
+        {
+            string retStr = "";
+            try
+            {
+                DataTable dt = HIS.fetchXNH(query);
+                if ((dt == null) || (dt.Rows.Count == 0))
+                {
+                    retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
+                    return retStr;
+                }
+                string msg = DataConvert.DataTable2Json(dt);
+                retStr = DataConvert.getReturnJson("0", msg);
+                //todo:由HIS提供字段信息
+                // retStr = DataConvert.getReturnJson("-1", "data=" + data + "　待由HIS提供字段数据");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
         [WebMethod]
         public string zfsfxm(string USER_ID, string D504_09, string NH_BM)
         {
@@ -1456,5 +1512,6 @@ namespace ApiMonitor.pages
             }
             return retStr;
         }
+
     }
 }

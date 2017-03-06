@@ -154,6 +154,7 @@
     <Content Include="pages\js\respond.min.js" />
     <Content Include="pages\js\twitter-bootstrap-hover-dropdown.js" />
     <Content Include="pages\js\twitter-bootstrap-hover-dropdown.min.js" />
+    <Content Include="pages\xnhdz.html" />
     <Content Include="pages\xnhservice.asmx" />
     <Content Include="pages\zymxsc.html" />
     <Content Include="pages\rydj.html" />

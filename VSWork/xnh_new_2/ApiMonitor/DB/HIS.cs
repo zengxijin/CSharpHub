@@ -388,7 +388,7 @@ namespace ApiMonitor.DB
                 XnhLogger.log(ex.ToString() + " SQL:" + sql);
             }
         }
-        ///住院上传修改对应his标记
+        ///住院明细上传修改对应his标记
         /// </summary>
         public static void modifyZYJSBJ(Dictionary<string, string> sqlParam)
         {
@@ -414,7 +414,30 @@ namespace ApiMonitor.DB
             }
         }
 
-
+        ///入院登记修改对应his标记
+        /// </summary>
+        public static void modifyRYDJ(Dictionary<string, string> sqlParam)
+        {
+            if (sqlParam == null || sqlParam.Count == 0)
+            {
+                XnhLogger.log("modifyRYDJ sqlParam参数为空");
+                return;
+            }
+            string sql = "UPDATE ip_register SET up_flag = '$up_flag$' "  //入院登记成功改成‘1’
+            + "where REG_NO ='$reg_no$' ";
+            try
+            {
+                sql = sql.Replace("$up_flag$", (sqlParam.ContainsKey("up_flag") == true ? sqlParam["up_flag"] : ""));
+               
+                sql = sql.Replace("$reg_no$", (sqlParam.ContainsKey("reg_no") == true ? sqlParam["reg_no"] : ""));
+               
+                DBUtil.updateExecute(sql);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(ex.ToString() + " SQL:" + sql);
+            }
+        }
         public static DataTable cxzymx(string reg_no)
         {
             string sql = "";
@@ -451,7 +474,89 @@ namespace ApiMonitor.DB
             }
             return null;
         }
+        ///提取本地his药品编码
+        /// </summary>
+        public static DataTable fetchHIS(string ypdm)
+        {
 
+            string sql = "";
+            try
+            {
+                sql = "select a.item_code,  " //--his编码
+                          + "a.item_name,  " // --his项目名称
+       + "(select wydm from xnh_dm where xnh_dm.item_code = a.item_code) as nh_code, "  //  --农合中心编码
+       + " (select ypmc from xnh_ypzl,xnh_dm where xnh_ypzl.wydm = xnh_dm.wydm and xnh_dm.item_code = a.item_code) as nh_name, "      //--农合名称
+       + " a.item_cls, "    //--项目类别123药品，其他诊疗
+       + " a.py_code, "   // --拼音码
+       + " b.standard, "   //--规格
+       + "b.small_unit, "  //  --单位
+       + " b.ret_price  "  //  --价格
+      +" from code_item a,plus_item b "
+      + " where (b.type = '3' and a.item_code = b.item_code) and (a.item_code like '%" + ypdm + "%' or a.item_code like '%" + ypdm + "%' or a.py_code like '%" + ypdm + "%')  order by a.item_code ";
+                DataTable dt = DBUtil.queryExecute(sql);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log("his药品数据提取：sql=" + sql + " 异常：" + ex.StackTrace);
+            }
+            return null;
+        }
+        ///提取农合药品编码
+        /// </summary>
+        public static DataTable fetchXNH(string ypdm)
+        {
+
+            string sql = "";
+            try
+            {
+                sql ="select  cxgjz, " // --拼音码
+       + "wydm, "   //--农合中心编码
+       + " ypfl,"   //--药品分类
+       + " ypmc, "  //--药品名称
+       + " gg, "    //--规格
+       + " dw, "    //--单位
+       + " dj, "     //--单价
+       + " bxbl, "  //--报销比例
+       + " bnbw, "  //--1报内0保外
+       + "jyl, "    //--甲乙类（0：甲类，1乙类，2：不区分）
+       + "jyfjy "    //--基药非基药(0：基药 1：非基药)
+       + " from xnh_ypzl a "
+       + " where a.cxgjz like '%" + ypdm + "%' or a.wydm like '%" + ypdm + "%' or a.ypmc like '%" + ypdm + "%' ";
+                DataTable dt = DBUtil.queryExecute(sql);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log("农合药品数据提取：sql=" + sql + " 异常：" + ex.StackTrace);
+            }
+            return null;
+        }
+        ///住院发票打印
+        /// </summary>
+        public static DataTable printZYFP(string fpdy)
+        {
+
+            string sql = "";
+            try
+            {
+                sql = "select a.name, "    //--姓名
+                      + "a.ip_no, "      //--住院号
+                      + "a.D505_02, "    //-- 住院登记流水号
+                      + "a.TOTAL_COSTS, " // --住院总费用
+                      + "a.TOTAL_CHAGE, "  //--住院可补偿金额
+                      + "a.ZF_COSTS,  "   // --住院自费费用
+                      + "b.area_code "   //--地区编码
+                      + "from ZYJS a left join ZYBC b on a.ip_no = b.D504_01 where ip_no = '"+fpdy+"'"; 
+                DataTable dt = DBUtil.queryExecute(sql);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log("发票信息提取：sql=" + sql + " 异常：" + ex.StackTrace);
+            }
+            return null;
+        }
         #endregion
     }
 }
