@@ -195,6 +195,8 @@ namespace ApiMonitor.DB
                 + " a.rec_no,"	 //处方号
                 + " a.item_code,"	 //HIS项目编码
                 + " a.price,"	 //HIS项目单价
+                + "(select wydm from xnh_dm where xnh_dm.item_code = b.item_code ) as nh_bm, "  // --农合编码
+                + "(select bxbl from xnh_ypzl ,xnh_dm where xnh_ypzl.wydm = xnh_dm.wydm and xnh_dm.item_code = b.item_code) as nh_bnw,"//报销比例
                 + " a.qty,"		 //项目数量
                 + " a.total,"	 //项目总金额
                 + " b.item_name,"	 //HIS项目名称
@@ -448,7 +450,7 @@ namespace ApiMonitor.DB
                   + "a.item_code, "	//--HIS项目编码
                   + "price, "		//--HIS项目单价
                   + "(select wydm from xnh_dm where xnh_dm.item_code = a.item_code) as nh_bm, "    //农合编码
-                  + "(select bnbw from xnh_ypzl  where xnh_ypzl.wydm = d.wydm and d.item_code = a.item_code) as nh_bnw, "//--保外0，内1
+                  + "(select bxbl from xnh_ypzl  where xnh_ypzl.wydm = d.wydm and d.item_code = a.item_code) as nh_bnw, "//--报销比例
                   + "qty, "		//--HIS项目数量
                   + "total, "		//--HIS项目总价格
                   + "bill_time, "	//--记账时间
@@ -532,6 +534,59 @@ namespace ApiMonitor.DB
             }
             return null;
         }
+
+        /// <summary>
+        ///增加对码功能
+        /// </summary>
+        /// <param name="sqlParam"></param>
+        public static void zjdmgn(Dictionary<string, string> sqlParam)
+        {
+            if (sqlParam == null || sqlParam.Count == 0)
+            {
+                XnhLogger.log("bcZYBC sqlParam参数为空");
+                return;
+            }
+           
+            string sql = "insert into xnh_dm (item_code,wydm) values ('$HIS$','$NH$')";
+            try
+            {
+                sql = sql.Replace("$HIS$", (sqlParam.ContainsKey("HIS") == true ? sqlParam["HIS"] : "")); 
+                sql = sql.Replace("$NH$", (sqlParam.ContainsKey("NH") == true ? sqlParam["NH"] : "")); 
+
+                DBUtil.updateExecute(sql);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(ex.ToString() + " SQL:" + sql);
+            }
+        }
+        
+
+        /// <summary>
+        ///增加取消对码功能
+        /// </summary>
+        /// <param name="sqlParam"></param>
+        public static void qxdmgn(Dictionary<string, string> sqlParam)
+        {
+            if (sqlParam == null || sqlParam.Count == 0)
+            {
+                XnhLogger.log("bcZYBC sqlParam参数为空");
+                return;
+            }
+            //UPDATE zybc SET D504_21=D504_21,D504_01=D504_01 WHERE D401_10 = D401_10 AND D401_21 = D401_21;
+            string sql = "delete from xnh_dm  where  item_code = '$HIS$' and wydm = '$NH$' ";
+            try
+            {
+                sql = sql.Replace("$HIS$", (sqlParam.ContainsKey("item_code") == true ? sqlParam["item_code"] : ""));
+                sql = sql.Replace("$NH$", (sqlParam.ContainsKey("wydm") == true ? sqlParam["wydm"] : ""));
+
+                DBUtil.updateExecute(sql);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(ex.ToString() + " SQL:" + sql);
+            }
+        }
         ///住院发票打印
         /// </summary>
         public static DataTable printZYFP(string fpdy)
@@ -558,5 +613,7 @@ namespace ApiMonitor.DB
             return null;
         }
         #endregion
+
+       
     }
 }

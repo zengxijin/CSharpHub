@@ -176,7 +176,7 @@
                             </div>
                         </div>
                         <p></p>
-                        <table class="table table-striped table-bordered" id="bdhis">
+                        <table class="table table-striped table-bordered" id="bdhis" style="font-size :10px">
                             <thead>
                                 <tr>
                                     <th>his编码</th>
@@ -215,8 +215,9 @@
             <td></td>
             <td></td>
             <td></td>
-<td><button type="button" class="btn btn-default" id="bmdz">对照</button> </td>
-<td><button type="button" class="btn btn-default" id="qxmbdz">取消对照</button> </td>             
+          
+<td><button type="button" class="btn btn-default" onclick="javascript:dm();">对照</button> </td>
+<td><button type="button" class="btn btn-default" onclick="javascript:qxdm();">取消对照</button> </td>             
         </tr>
     </table>
     <div class="container">
@@ -234,7 +235,8 @@
                             </div>
                         </div>
                         <p></p>
-                        <table class="table table-striped table-bordered" id="nhsj">
+                        <table class="table table-striped table-bordered" id="nhsj" style= "font-size: 10px;">
+                           
                             <thead>
                                 <tr>
                                     <th>拼音码</th>
@@ -250,14 +252,14 @@
                                     <th>基药非基药</th>
                                 </tr>
                                 <!--<tr>
-                                    <td>拼音码</td>
-                                    <td>农合中心编码</td>
-                                    <td>药品分类</td>
-                                    <td>药品名称</td>
-                                    <td>规格</td>
-                                    <td>单位</td>
-                                    <td>单价</td>
-                                </tr>-->
+                <td>拼音码</td>
+                <td>农合中心编码</td>
+                <td>药品分类</td>
+                <td>药品名称</td>
+                <td>规格</td>
+                <td>单位</td>
+                <td>单价</td>
+            </tr>-->
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -423,6 +425,96 @@
             });
         }
     });
+       
+    function dm() {
+        var hisCode = $("#nowHIS").html();
+        var nhCode = $("#nowNH").html();
+
+        if (hisCode=="") {
+            alert("HIS编码不能为空，请选择记录");
+            return;
+        }
+        if (nhCode == "") {
+            alert("农合编码不能为空，请选择记录");
+            return;
+        }
+       
+
+        var pMap = {};
+        pMap["HIS"] = hisCode;
+        pMap["NH"] = nhCode;
+        pJson = map2Json(pMap);
+
+        $.ajax({
+            type: "Post",
+            url: "xnhservice.asmx/dzbm",
+            data: pJson,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                closeMask();
+                var retVal = data.d;
+                //遍历json数组操作
+                var retJson = getJsonObj(retVal);
+                if (retJson.flag == '0') {
+                    alert("处理成功");
+                } else {
+                    alert("处理失败：" + retJson.msg);
+                }
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                closeMask();
+                alert(textStatus + ":" + errorThrown);
+            }
+        });
+
+    }
+
+    function qxdm() {
+        var hisCode = $("#nowHIS").html();
+        var nhCode = $("#nowNH").html();
+
+        if (hisCode == "") {
+            alert("HIS编码不能为空，请选择记录");
+            return;
+        }
+        if (nhCode == "") {
+            alert("农合编码不能为空，请选择记录");
+            return;
+        }
+
+
+        var pMap = {};
+        pMap["HIS"] = hisCode;
+        pMap["NH"] = nhCode;
+        pJson = map2Json(pMap);
+
+        $.ajax({
+            type: "Post",
+            url: "xnhservice.asmx/qxdzbm",
+            data: pJson,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                closeMask();
+                var retVal = data.d;
+                //遍历json数组操作
+                var retJson = getJsonObj(retVal);
+                if (retJson.flag == '0') {
+                    alert("处理成功");
+                } else {
+                    alert("处理失败：" + retJson.msg);
+                }
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                closeMask();
+                alert(textStatus + ":" + errorThrown);
+            }
+        });
+
+    }
     </script>
 </body>
 </html>

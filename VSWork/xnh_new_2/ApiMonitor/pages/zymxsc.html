@@ -12,6 +12,8 @@
         <!-- Bootstrap Admin Theme -->
         <link rel="stylesheet" media="screen" href="css/bootstrap-admin-theme.css">
         <link rel="stylesheet" media="screen" href="css/bootstrap-admin-theme-change-size.css">
+        <link rel="stylesheet" media="screen" href="calendar/datepicker.min.css">
+        <link rel="stylesheet" media="screen" href="calendar/css/main.css">
 
         <!-- Custom styles -->
         <style type="text/css">
@@ -69,7 +71,48 @@
             }
             #mask_background {position:absolute; z-index:998; top:0px; left:0px; background:rgb(50,50,50);background:rgba(0,0,0,0.5); display:none;}
             #mask_content {position:absolute; width:500px; z-index:999; padding:10px; background:#fff; border-radius:5px; display:none;}
+
+            a {
+              cursor:pointer;
+            }
+
         </style>
+
+        <style type="text/css">
+            .auto_hidden {
+                width: 204px;
+                border-top: 1px solid #333;
+                border-bottom: 1px solid #333;
+                border-left: 1px solid #333;
+                border-right: 1px solid #333;
+                position: absolute;
+                display: none;
+            }
+
+            .auto_show {
+                width: 204px;
+                border-top: 1px solid #333;
+                border-bottom: 1px solid #333;
+                border-left: 1px solid #333;
+                border-right: 1px solid #333;
+                position: absolute;
+                z-index: 9999; /* 设置对象的层叠顺序 */
+                display: block;
+            }
+
+            .auto_onmouseover {
+                color: #ffffff;
+                background-color: highlight;
+                width: 100%;
+            }
+
+            .auto_onmouseout {
+                color: #000000;
+                width: 100%;
+                background-color: #ffffff;
+            }
+        </style>
+
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -141,6 +184,324 @@
 
     <div class="container">
 
+        <table>
+            <tr>
+                
+                <td >地区编码：</td>
+                <td >
+                    <select id="areaNo" name="">
+                        <option value="">请选择</option>
+                        <option value="620000">甘肃省(620000)</option>
+                        <option value="620100">兰州市(620100)</option>
+                        <option value="620103">七里河区(620103)</option>
+                        <option value="620104">西固区(620104)</option>
+                        <option value="620105">安宁区(620105)</option>
+                        <option value="620111">红古区(620111)</option>
+                        <option value="620121">永登县(620121)</option>
+                        <option value="620122">皋兰县(620122)</option>
+                        <option value="620123">榆中县(620123)</option>
+                        <option value="620200">嘉峪关市(620200)</option>
+                        <option value="620300">金昌市(620300)</option>
+                        <option value="620302">金川区(620302)</option>
+                        <option value="620321">永昌县(620321)</option>
+                        <option value="620400">白银市(620400)</option>
+                        <option value="620402">白银区(620402)</option>
+                        <option value="620403">平川区(620403)</option>
+                        <option value="620421">靖远县(620421)</option>
+                        <option value="620422">会宁县(620422)</option>
+                        <option value="620423">景泰县(620423)</option>
+                        <option value="620500">天水市(620500)</option>
+                        <option value="620502">秦州区(620502)</option>
+                        <option value="620503">麦积区(620503)</option>
+                        <option value="620521">清水县(620521)</option>
+                        <option value="620522">秦安县(620522)</option>
+                        <option value="620523">甘谷县(620523)</option>
+                        <option value="620524">武山县(620524)</option>
+                        <option value="620525">张家川回族自治县(620525)</option>
+                        <option value="620600">武威市(620600)</option>
+                        <option value="620602">凉州区(620602)</option>
+                        <option value="620621">民勤县(620621)</option>
+                        <option value="620622">古浪县(620622)</option>
+                        <option value="620623">天祝县(620623)</option>
+                        <option value="620700">张掖市(620700)</option>
+                        <option value="620702">甘州区(620702)</option>
+                        <option value="620721">肃南县(620721)</option>
+                        <option value="620722">民乐县(620722)</option>
+                        <option value="620723">临泽县(620723)</option>
+                        <option value="620724">高台县(620724)</option>
+                        <option value="620725">山丹县(620725)</option>
+                        <option value="620800">平凉市(620800)</option>
+                        <option value="620802">崆峒区(620802)</option>
+                        <option value="620821">泾川县(620821)</option>
+                        <option value="620822">灵台县(620822)</option>
+                        <option value="620823">崇信县(620823)</option>
+                        <option value="620824">华亭县(620824)</option>
+                        <option value="620825">庄浪县(620825)</option>
+                        <option value="620826">静宁县(620826)</option>
+                        <option value="620900">酒泉市(620900)</option>
+                        <option value="620902">肃州区(620902)</option>
+                        <option value="620921">金塔县(620921)</option>
+                        <option value="620922">安西县(620922)</option>
+                        <option value="620923">肃北蒙古族自治县(620923)</option>
+                        <option value="620924">阿克塞哈萨克族自治县(620924)</option>
+                        <option value="620981">玉门市(620981)</option>
+                        <option value="620982">敦煌市(620982)</option>
+                        <option value="621000">庆阳市(621000)</option>
+                        <option value="621002">西峰区(621002)</option>
+                        <option value="621021">庆城县(621021)</option>
+                        <option value="621022">环县(621022)</option>
+                        <option value="621023">华池县(621023)</option>
+                        <option value="621024">合水县(621024)</option>
+                        <option value="621025">正宁县(621025)</option>
+                        <option value="621026">宁县(621026)</option>
+                        <option value="621027">镇原县(621027)</option>
+                        <option value="621100">定西市(621100)</option>
+                        <option value="621102">安定区(621102)</option>
+                        <option value="621121">通渭县(621121)</option>
+                        <option value="621122">陇西县(621122)</option>
+                        <option value="621123">渭源县(621123)</option>
+                        <option value="621124">临洮县(621124)</option>
+                        <option value="621125">漳县(621125)</option>
+                        <option value="621126">岷县(621126)</option>
+                        <option value="621200">陇南市(621200)</option>
+                        <option value="621202">武都区(621202)</option>
+                        <option value="621223">宕昌县(621223)</option>
+                        <option value="621221">成县(621221)</option>
+                        <option value="621224">康县(621224)</option>
+                        <option value="621222">文县(621222)</option>
+                        <option value="621225">西和县(621225)</option>
+                        <option value="621226">礼县(621226)</option>
+                        <option value="621228">两当县(621228)</option>
+                        <option value="621227">徽县(621227)</option>
+                        <option value="622900">临夏回族自治州(622900)</option>
+                        <option value="622901">临夏市(622901)</option>
+                        <option value="622921">临夏县(622921)</option>
+                        <option value="622922">康乐县(622922)</option>
+                        <option value="622923">永靖县(622923)</option>
+                        <option value="622924">广河县(622924)</option>
+                        <option value="622925">和政县(622925)</option>
+                        <option value="622926">东乡县(622926)</option>
+                        <option value="622927">积石山保安族东乡族撒拉族自治县(622927)</option>
+                        <option value="623000">甘南藏族自治州(623000)</option>
+                        <option value="623001">合作市(623001)</option>
+                        <option value="623021">临潭县(623021)</option>
+                        <option value="623022">卓尼县(623022)</option>
+                        <option value="623023">舟曲县(623023)</option>
+                        <option value="623024">迭部县(623024)</option>
+                        <option value="623025">玛曲县(623025)</option>
+                        <option value="623026">碌曲县(623026)</option>
+                        <option value="623027">夏河县(623027)</option>
+                        <option value="620201">嘉峪关市(620201)</option>
+
+                    </select>
+                </td>
+                <td style="padding-left:20px;">补偿类别：</td>
+                <td>
+                    <select id="bclb" name="" style="width:100px;"></select>
+                </td>
+
+            </tr>
+        </table>
+
+        <p></p>
+
+        <table>
+            <tr>
+
+                <td>出院时间：</td>
+                <td>
+                    <input type="text" id="date" class="form-control docs-date" name="date" placeholder="选择日期">
+                </td>
+                <td style="padding-left:20px;">出院科室：</td>
+                <td>
+                    <select id="cyks" name="">
+                        <option value="">请选择</option>
+                        <option value="01">预防保健科</option>
+                        <option value="02">全科医疗科</option>
+                        <option value="03">内科</option>
+                        <option value="0301">呼吸内科专业</option>
+                        <option value="0302">消化内科专业</option>
+                        <option value="0303">神经内科专业</option>
+                        <option value="0304">心血管内科专业</option>
+                        <option value="0305">血液内科专业</option>
+                        <option value="0306">肾病学专业</option>
+                        <option value="0307">内分泌专业</option>
+                        <option value="0308">免疫学专业</option>
+                        <option value="0309">变态反应专业</option>
+                        <option value="0310">老年病专业</option>
+                        <option value="0399">其他</option>
+                        <option value="0312">重症监护(内科)</option>
+                        <option value="04">外科</option>
+                        <option value="0401">普通外科专业</option>
+                        <option value="0402">神经外科专业</option>
+                        <option value="0403">骨科专业</option>
+                        <option value="0404">泌尿外科专业</option>
+                        <option value="0405">胸外科专业</option>
+                        <option value="0406">心脏大血管外科专业</option>
+                        <option value="0407">烧伤科专业</option>
+                        <option value="0408">整形外科专业</option>
+                        <option value="0499">其他</option>
+                        <option value="0410">重症监护(外科)</option>
+                        <option value="05">妇产科</option>
+                        <option value="0501">妇科专业</option>
+                        <option value="0502">产科专业</option>
+                        <option value="0503">计划生育专业</option>
+                        <option value="0504">优生学专业</option>
+                        <option value="0505">生殖健康与不孕症专业</option>
+                        <option value="0599">其他</option>
+                        <option value="06">妇女保健科</option>
+                        <option value="0601">青春期保健专业</option>
+                        <option value="0602">围产期保健专业</option>
+                        <option value="0603">更年期保健专业</option>
+                        <option value="0604">妇女心理卫生专业</option>
+                        <option value="0605">妇女营养专业</option>
+                        <option value="0699">其他</option>
+                        <option value="07">儿科</option>
+                        <option value="0701">新生儿专业</option>
+                        <option value="0702">小儿传染病专业</option>
+                        <option value="0703">小儿消化专业</option>
+                        <option value="0704">小儿呼吸专业</option>
+                        <option value="0705">小儿心脏病专业</option>
+                        <option value="0706">小儿肾病专业</option>
+                        <option value="0707">小儿血液病专业</option>
+                        <option value="0708">小儿神经病学专业</option>
+                        <option value="0709">小儿内分泌专业</option>
+                        <option value="0710">小儿遗传病专业</option>
+                        <option value="0711">小儿免疫专业</option>
+                        <option value="0799">其他</option>
+                        <option value="08">小儿外科</option>
+                        <option value="0801">小儿普通外科专业</option>
+                        <option value="0802">小儿骨科专业</option>
+                        <option value="0803">小儿泌尿外科专业</option>
+                        <option value="0804">小儿胸心外科专业</option>
+                        <option value="0805">小儿神经外科专业</option>
+                        <option value="0899">其他</option>
+                        <option value="09">儿童保健科</option>
+                        <option value="0901">儿童生长发育专业</option>
+                        <option value="0902">儿童营养专业</option>
+                        <option value="0903">儿童心理卫生专业</option>
+                        <option value="0904">儿童五官保健专业</option>
+                        <option value="0905">儿童康复专业</option>
+                        <option value="0999">其他</option>
+                        <option value="10">眼科</option>
+                        <option value="11">耳鼻咽喉科</option>
+                        <option value="1101">耳科专业</option>
+                        <option value="1102">鼻科专业</option>
+                        <option value="1103">咽喉科专业</option>
+                        <option value="1199">其他</option>
+                        <option value="12">口腔科</option>
+                        <option value="1201">口腔内科专业</option>
+                        <option value="1202">口腔颌面外科专业</option>
+                        <option value="1203">正畸专业</option>
+                        <option value="1204">口腔修复专业</option>
+                        <option value="1205">口腔预防保健专业</option>
+                        <option value="1299">其他</option>
+                        <option value="13">皮肤科</option>
+                        <option value="1301">皮肤病专业</option>
+                        <option value="1302">性传播疾病专业</option>
+                        <option value="1399">其他</option>
+                        <option value="14">医疗美容科</option>
+                        <option value="15">精神科</option>
+                        <option value="1501">精神病专业</option>
+                        <option value="1502">精神卫生专业</option>
+                        <option value="1503">药物依赖专业</option>
+                        <option value="1504">精神康复专业</option>
+                        <option value="1505">社区防治专业</option>
+                        <option value="1506">临床心理专业</option>
+                        <option value="1507">司法精神专业</option>
+                        <option value="1599">其他</option>
+                        <option value="16">传染科</option>
+                        <option value="1601">肠道传染病专业</option>
+                        <option value="1602">呼吸道传染病专业</option>
+                        <option value="1603">肝炎专业</option>
+                        <option value="1604">虫媒传染病专业</option>
+                        <option value="1605">动物源性传染病专业</option>
+                        <option value="1606">蠕虫病专业</option>
+                        <option value="1699">其它</option>
+                        <option value="17">结核病科</option>
+                        <option value="18">地方病科</option>
+                        <option value="19">肿瘤科</option>
+                        <option value="20">急诊医学科</option>
+                        <option value="2001">重症监护(急诊)</option>
+                        <option value="21">康复医学科</option>
+                        <option value="22">运动医学科</option>
+                        <option value="23">职业病科</option>
+                        <option value="2301">职业中毒专业</option>
+                        <option value="2302">尘肺专业</option>
+                        <option value="2303">放射病专业</option>
+                        <option value="2304">物理因素损伤专业</option>
+                        <option value="2305">职业健康监护专业</option>
+                        <option value="2399">其他</option>
+                        <option value="24">临终关怀科</option>
+                        <option value="25">特种医学与军事医学科</option>
+                        <option value="26">麻醉科</option>
+                        <option value="30">医学检验科</option>
+                        <option value="3001">临床体液、血液专业</option>
+                        <option value="3002">临床微生物学专业</option>
+                        <option value="3003">临床生化检验专业</option>
+                        <option value="3004">临床免疫、血清学专业</option>
+                        <option value="3099">其他</option>
+                        <option value="31">病理科</option>
+                        <option value="32">医学影像科</option>
+                        <option value="3201">X线诊断专业</option>
+                        <option value="3202">CT诊断专业</option>
+                        <option value="3203">磁共振成像诊断专业</option>
+                        <option value="3204">核医学专业</option>
+                        <option value="3205">超声诊断专业</option>
+                        <option value="3206">心电诊断专业</option>
+                        <option value="3207">脑电及脑血流图诊断专业</option>
+                        <option value="3208">神经肌肉电图专业</option>
+                        <option value="3209">介入放射学专业</option>
+                        <option value="3210">放射治疗专业</option>
+                        <option value="3299">其他</option>
+                        <option value="50">中医科</option>
+                        <option value="5001">内科专业</option>
+                        <option value="5002">外科专业</option>
+                        <option value="5003">妇产科专业</option>
+                        <option value="5004">儿科专业</option>
+                        <option value="5005">皮肤科专业</option>
+                        <option value="5006">眼科专业</option>
+                        <option value="5007">耳鼻咽喉科专业</option>
+                        <option value="5008">口腔科专业</option>
+                        <option value="5009">肿瘤科专业</option>
+                        <option value="5010">骨伤科专业</option>
+                        <option value="5011">肛肠科专业</option>
+                        <option value="5012">老年病科专业</option>
+                        <option value="5013">针灸科专业</option>
+                        <option value="5014">推拿科专业</option>
+                        <option value="5015">康复医学专业</option>
+                        <option value="5016">急诊科专业</option>
+                        <option value="5017">预防保健科专业</option>
+                        <option value="5099">其他</option>
+                        <option value="51">民族医学科</option>
+                        <option value="5101">维吾尔医学</option>
+                        <option value="5102">藏医学</option>
+                        <option value="5103">蒙医学</option>
+                        <option value="5104">彝医学</option>
+                        <option value="5105">傣医学</option>
+                        <option value="5199">其他</option>
+                        <option value="52">中西医结合科</option>
+                        <option value="61">重症监护室(综合)</option>
+                        <option value="79">其它</option>
+                        <option value="99">管理科室</option>
+                        <option value="9901">感染(管理)科</option>
+                    </select>
+                </td>
+
+                <td style="padding-left:20px;">是否中途结算：</td>
+                <td>
+                    <select id="sfztjs" name="">
+                        <option value="">请选择</option>
+                        <option value="1">是</option>
+                        <option value="2">否</option>
+                     </select>
+                </td>
+
+            </tr>
+        </table>
+
+        <p></p>
+
         <div class="row">
             <div class="col-lg-12">
                 <div class="panel panel-default">
@@ -152,6 +513,10 @@
                             <div class="form-inline" role="form">
                                 <div class="form-group">
                                     <input type="text" class="form-control" id="queryBtn" placeholder="输入回车查询">
+                                    
+                                        <input type="text" style="width:300px;height:30px;font-size:10pt;" placeholder="出院诊断" id="jbbm" onkeyup="autoComplete.start(event)">
+                                       
+
                                 </div>
                             </div>
                             <p></p>
@@ -163,6 +528,7 @@
                                         <th>操作2</th>
                                         <th>操作3</th>
                                         <th>批量操作</th>
+                                       
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -180,6 +546,9 @@
         </div>
 
         <p></p>
+        
+        <div class="auto_hidden" id="auto"><!--自动完成 DIV--> </div>
+
         
 
         <div class="row">
@@ -217,6 +586,42 @@
 
         <p></p>
 
+        <div id="ssjg" >
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="text-muted bootstrap-admin-box-title">试算结果</div>
+                        </div>
+                        <div class="bootstrap-admin-panel-content">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>总费用：<span id="TOTAL_COSTS"></span></td>
+                                        <td>自费费用：<span id="ZF_COSTS"></span></td>
+                                        <td>合理费用：<span id="TOTAL_CHAGE"></span></td>
+                                        <td>实际补偿金额：<span id="D506_23"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>核算补偿金额[实际补偿合计额)：<span id="D506_18"></span></td>
+                                        <td>本次起伏线：<span id="BEGINPAY"></span></td>
+                                        <td>报销比例：<span id="SCALE"></span></td>
+                                        <td>大病支付额：<span id="HEAV_REDEEM_SUM"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>单次补偿合计：<span id="REDEEM_TOTAL"></span></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
    
@@ -228,6 +633,9 @@
     <script type="text/javascript" src="js/jquery.cookie.js"></script>
     <script type="text/javascript" src="js/xnh.js"></script>
     <script type="text/javascript" src="js/jquery.base64.js"></script>
+    <script type="text/javascript" src="calendar/datepicker.min.js"></script>
+    <script type="text/javascript" src="calendar/datepicker.zh-CN.js"></script>
+    <script type="text/javascript" src="calendar/js/main.js"></script>
     <script>
 
         var buffer = null;
@@ -271,7 +679,7 @@
                                     + '        <a>删除收费项目</a>                          '
                                     + '    </td>                                            '
                                     + '    <td class="center">                              '
-                                    + '        <a>试算</a>                                  '
+                                    + '        <a onclick="javascript:shisuan(\'' + dataJson[i]["IP_NO"] + '\',\'' + dataJson[i]["REG_NO"] + '\');">试算</a>                                  '
                                     + '        <br />                                       '
                                     + '        <a>结算收费</a>                              '
                                     + '    </td>                                            '
@@ -512,7 +920,339 @@
 
         }
     
+        //试算
+        function shisuan(IP_NO, REG_NO) {
+            var BCLB = $("#bclb").val(); //补偿类别
+            var areaNo = $("#areaNo").val(); //地区代码
+            var sfztjs = $("#sfztjs").val(); //是否中途结算
+            var cyks = $("#cyks").val(); //出院科室
+            var cysj = $("#date").val(); //出院时间
+            var cyzd = $("#jbbm").val(); //出院诊断
+
+            if (BCLB == "") {
+                alert("请选择地区选择补偿类别");
+                return;
+            }
+
+            if (cysj == "") {
+                alert("请选择出院时间");
+                return;
+            }
+
+            if (cyks == "") {
+                alert("请选择出院科室");
+                return;
+            }
+
+            if (sfztjs == "") {
+                alert("请选择是否中途结算");
+                return;
+            }
+
+            if (cyzd == "") {
+                alert("请确定出院诊断");
+                return;
+            }
+
+            //由于出院诊断需要搜索，因此，只需要取第一个的值即可
+            if (cyzd != "" && cyzd != null) {
+                var tmpCode = cyzd.split('|');
+                if (tmpCode != null && tmpCode.length > 0) {
+                    cyzd = tmpCode[0];
+                }
+            }
+
+            var USER_ID = getCookie("USER_ID");
+            var pMap = {};
+            pMap["USER_ID"] = USER_ID; //当前操作员id
+            pMap["D504_09"] = IP_NO; //住院号
+            pMap["DEP_ID"] = getCookie("DEP_ID"); //诊治单位代码
+            pMap["COME_AREA"] = getCookie("DEP_AREA"); //地区代码(医疗机构)
+            pMap["REG_NO"] = REG_NO; //住院流水
+            pMap["BCLB"] = BCLB; //补偿类别
+            pMap["SFZTJS"] = sfztjs; //是否中途结算
+            pMap["CYKS"] = cyks; //出院科室
+            pMap["CYSJ"] = cysj; //出院时间
+            pMap["CYZD"] = cyzd; //出院诊断
+
+            pJson = map2Json(pMap);
+
+            showMask("正在处理，请稍后...");
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/zyshisuan",
+                data: pJson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    closeMask();
+                    var retVal = data.d;
+                    var retJson = getJsonObj(retVal);
+                    if (retJson.flag == '0') {
+                        //绑定试算结果
+                        var json = retJson.msg;
+                        for (var item in json) {
+                            $("#" + item).html(json[item]);
+                        }
+
+                    } else {
+                        alert("处理失败：" + retJson.msg);
+                    }
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
+                }
+            });
+        }
+    
+        //根据选择的地区获取补偿类别数据
+        function bclbInfo(AREA_NO) {
+            if (AREA_NO == '') {
+                alert("提示：请选择地区代码");
+                return;
+            }
+
+            showMask("正在加载补偿类别...");
+
+            var pMap = {};
+            pMap["AREA_NO"] = AREA_NO;
+            var pJson = map2Json(pMap);
+
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/bclb",
+                data: pJson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+
+                    //返回的数据用data.d获取内容
+                    $("#bclb option").detach();
+                    $("#bclb").append('<option value="">请选择</option>');
+                    var retJson = getJsonObj(data.d);
+                    if (retJson.flag == '0') {
+                        //ITEM_CODE / ITEM_NAME; ITEM_CODE / ITEM_NAME
+                        var itemArray = retJson.msg.split(";");
+                        for (var i = 0; i < itemArray.length; i++) {
+                            var member = itemArray[i].split('/');
+                            var ITEM_CODE = member[0];
+                            var ITEM_NAME = member[1];
+                            $("#bclb").append('<option value="' + ITEM_CODE + '">' + ITEM_NAME + '</option>');
+                        }
+                    } else {
+                        alert("加载失败:" + retJson.msg);
+                    }
+                    closeMask();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
+                }
+            });
+        }
+
+        $(document).ready(
+            function () {
+                $("#areaNo").change(function () {
+                    var AREA_NO = $("#areaNo").val();
+                    bclbInfo(AREA_NO);
+
+
+                });
+            }
+        );
+    
     </script>
+    <script type="text/javascript">
+    var $$ = function (id) {
+        return "string" == typeof id ? document.getElementById(id) : id;
+    }
+    var Bind = function (object, fun) {
+        return function () {
+            return fun.apply(object, arguments);
+        }
+    }
+    function AutoComplete(obj, autoObj, arr) {
+        this.obj = $$(obj); //输入框
+        this.autoObj = $$(autoObj);//DIV的根节点
+        this.value_arr = arr; //不要包含重复值
+        this.index = -1; //当前选中的DIV的索引
+        this.search_value = ""; //保存当前搜索的字符
+    }
+    AutoComplete.prototype = {
+        //初始化DIV的位置
+        init: function () {
+            this.autoObj.style.left = this.obj.offsetLeft + "px";
+            this.autoObj.style.top = this.obj.offsetTop + this.obj.offsetHeight + "px";
+            this.autoObj.style.width = this.obj.offsetWidth - 2 + "px";//减去边框的长度2px
+        },
+        //删除自动完成需要的所有DIV
+        deleteDIV: function () {
+            while (this.autoObj.hasChildNodes()) {
+                this.autoObj.removeChild(this.autoObj.firstChild);
+            }
+            this.autoObj.className = "auto_hidden";
+        },
+        //设置值
+        setValue: function (_this) {
+            return function () {
+                _this.obj.value = this.seq;
+                _this.autoObj.className = "auto_hidden";
+            }
+        },
+        //模拟鼠标移动至DIV时，DIV高亮
+        autoOnmouseover: function (_this, _div_index) {
+            return function () {
+                _this.index = _div_index;
+                var length = _this.autoObj.children.length;
+                for (var j = 0; j < length; j++) {
+                    if (j != _this.index) {
+                        _this.autoObj.childNodes[j].className = 'auto_onmouseout';
+                    } else {
+                        _this.autoObj.childNodes[j].className = 'auto_onmouseover';
+                    }
+                }
+            }
+        },
+        //更改classname
+        changeClassname: function (length) {
+            for (var i = 0; i < length; i++) {
+                if (i != this.index) {
+                    this.autoObj.childNodes[i].className = 'auto_onmouseout';
+                } else {
+                    this.autoObj.childNodes[i].className = 'auto_onmouseover';
+                    this.obj.value = this.autoObj.childNodes[i].seq;
+                }
+            }
+        },
+
+        //响应键盘
+        pressKey: function (event) {
+
+            var length = this.autoObj.children.length;
+            //光标键"↓"
+            if (event.keyCode == 40) {
+                ++this.index;
+                if (this.index > length) {
+                    this.index = 0;
+                } else if (this.index == length) {
+                    this.obj.value = this.search_value;
+                }
+                this.changeClassname(length);
+            }
+                //光标键"↑"
+            else if (event.keyCode == 38) {
+                this.index--;
+                if (this.index < -1) {
+                    this.index = length - 1;
+                } else if (this.index == -1) {
+                    this.obj.value = this.search_value;
+                }
+                this.changeClassname(length);
+            }
+                //回车键
+            else if (event.keyCode == 13) {
+                this.autoObj.className = "auto_hidden";
+                this.index = -1;
+            } else {
+                this.index = -1;
+            }
+
+
+
+
+        },
+        //程序入口
+        start: function (event) {
+
+            //其它正常输入值按钮事件
+            //重要：调用后台的service服务去查询结果，并显示在前台供选择
+            if (event.keyCode != 13 && event.keyCode != 38 && event.keyCode != 40) {
+                var query = $('#jbbm').val();
+                if (query != '') {
+                    $.ajax({
+                        type: "Post",
+                        async: false,
+                        url: "xnhservice.asmx/getRYZD", //这个就是绑定的数据源服务
+                        data: "{'query':'" + query + "'}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (data) {
+                            //返回的数据用data.d获取内容
+                            var retVal = data.d;
+                            //alert(retVal);
+                            if (retVal != '') {
+                                var arr = [];
+                                arr = retVal.toString().split(',');
+                                autoComplete.value_arr = arr;
+                            }
+                        },
+                        error: function (err) {
+                            alert(err.toString());
+                        }
+                    });
+                }
+            }
+
+            if (event.keyCode != 13 && event.keyCode != 38 && event.keyCode != 40) {
+                this.init();
+                this.deleteDIV();
+                this.search_value = this.obj.value;
+                var valueArr = this.value_arr;
+                valueArr.sort();
+                if (this.obj.value.replace(/(^\s*)|(\s*$)/g, '') == "") { return; }//值为空，退出
+                try { var reg = new RegExp("(" + this.obj.value + ")", "i"); }
+                catch (e) { return; }
+                var div_index = 0;//记录创建的DIV的索引
+                for (var i = 0; i < valueArr.length; i++) {
+                    if (reg.test(valueArr[i])) {
+                        var div = document.createElement("div");
+                        div.className = "auto_onmouseout";
+                        div.seq = valueArr[i];
+                        div.onclick = this.setValue(this);
+                        div.onmouseover = this.autoOnmouseover(this, div_index);
+                        div.innerHTML = valueArr[i].replace(reg, "<strong>$1</strong>");//搜索到的字符粗体显示
+                        this.autoObj.appendChild(div);
+                        this.autoObj.className = "auto_show";
+
+                        //调整好显示结果的位置
+                        var topOffset = $("#jbbm").offset().top;
+                        var leftOffset = $("#jbbm").offset().left;
+                        $("#auto").css({ position: "absolute", 'top': topOffset + 30, 'left': leftOffset, 'z-index': 2 });
+
+                        div_index++;
+                    }
+                }
+            }
+
+            this.pressKey(event);
+            window.onresize = Bind(this, function () { this.init(); });
+        }
+    }
+
+    //注意:
+    //第一个参数是查询的输入框input的id，如这个样例中的
+    //第二个参数是查询结果下拉显示div的id，如这个样例是auto
+    //第三个参数是查询结果数组，初始化时随便赋值，这里为['*']
+    var autoComplete = new AutoComplete('jbbm', 'auto', ['0', '1']);
+    </script>
+    <script>
+    //中文语种日期
+    $(".docs-date").datepicker({
+        language: 'zh-CN'
+    });
+    </script>
+
+
+
+    <!--<script>
+        //中文语种日期
+        $(".docs-date").datepicker({
+            language: 'zh-CN'
+        });
+    </script>-->
 </body>
 
 </html>

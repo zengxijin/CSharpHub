@@ -301,6 +301,10 @@ namespace ApiMonitor.pages
                 //此病人在其他医院已经做过入院登记：  2;医院名称（分号分隔）
                 //程序异常： 						  3;错误信息（分号分隔）
                 string flag = zydjCheck.getExecuteResultPlainString().Substring(0, 1);
+                if (flag == "1")
+                {
+                    return retStr = DataConvert.getReturnJson("-1", "此病人在本院已经做过入院登记" + zydjCheck.getExecuteResultPlainString());
+                }
                 if (flag == "2")
                 {
                     return retStr = DataConvert.getReturnJson("-1", "此病人在其他医院已经做过入院登记:" + zydjCheck.getExecuteResultPlainString());
@@ -310,7 +314,21 @@ namespace ApiMonitor.pages
                     return retStr = DataConvert.getReturnJson("-1", "程序异常:" + zydjCheck.getExecuteResultPlainString());
                 }
 
-                if (flag == "0")
+                //检查住院号是否重复
+                //DEP_ID VARCHAR2(22)	所住医院代码(取存储过的用户单位ID)
+                //D504_09	VARCHAR2(12)	所输住院号
+                ZYBC_PROC_ZYH_CHECK zyhCheck = new ZYBC_PROC_ZYH_CHECK();
+                zyhCheck.executeSql(
+                    new Dictionary<string, string>() { { "DEP_ID", DEP_ID }, { "D504_09", jsonDict["D504_09"] } }
+                 );
+                //成功：S_Returns= 0   住院号不重复
+                //住院号重复： S_Returns= 1
+                //程序异常：S_Returns= 2;错误信息   （分号分隔)
+                string isCF = zyhCheck.getExecuteResultPlainString();
+                isCF = isCF.Length >= 1 ? isCF.Substring(0, 1) : isCF;
+
+
+                if (flag == "0" && isCF == "0")
                 {
                     Dictionary<string, string> param = new Dictionary<string, string>();
                     param.Add("COME_AREA", jsonDict["COME_AREA"]); //医疗机构所在地区编码(取用户所在机构地区编码AREA_CODE)
@@ -334,6 +352,8 @@ namespace ApiMonitor.pages
                     //保存入院登记
                     ZYBC_PROC_NEW_NOTICE newNotice = new ZYBC_PROC_NEW_NOTICE();
                     newNotice.executeSql(param);
+
+                    XnhLogger.log("医疗证号：" + D401_10 + " 入院登记返回结果：" + newNotice.getExecuteResultPlainString());
 
                     //0	成功
                     //1	失败 
@@ -361,7 +381,7 @@ namespace ApiMonitor.pages
                     }
                 }
 
-                if (flag == "1")
+                if (isCF == "1") //住院号重复，修改住院登记
                 {
                     //修改住院登记
                     ZYBC_PROC_UPDATE_NOTICE updateNotice = new ZYBC_PROC_UPDATE_NOTICE();
@@ -384,10 +404,11 @@ namespace ApiMonitor.pages
                     param.Add("D504_10", jsonDict["D504_10"]); //就诊类型
                     param.Add("D504_19", jsonDict["D504_19"]); //入院状态代码(对应S301-02.xls)
                     param.Add("D504_16", jsonDict["D504_16"]); //入院科室代码（对应S201-03.xls）
-                    param.Add("D504_11", jsonDict["D504_11"]); //入院时间(格式为YYYY-MM-DD)
+                    param.Add("D504_11", jsonDict["D504_11"] == "" ? "" : jsonDict["D504_11"].Split(' ')[0].Replace(".", "-")); //入院时间(格式为YYYY-MM-DD)
                     param.Add("D504_28", jsonDict["D504_28"]); //联系电话
 
                     updateNotice.executeSql(param);
+                    XnhLogger.log("医疗证号：" + D401_10 + " 修改入院登记返回结果：" + updateNotice.getExecuteResultPlainString());
                     if (updateNotice.getExecuteStatus() == true)
                     {
                         //保存修改到HIS
@@ -524,6 +545,7 @@ namespace ApiMonitor.pages
                     string D502_04 = "";  //药品编码字符串(用分号分隔)此处因药品可能是多个，药品编码和下一个药品编码用分号分隔(下面的数量、单价、比例也一样)
                     string D502_09 = "";  //药品数量字符串(用分号分隔)
                     string D502_08 = "";  //药品单价字符串(用分号分隔)
+                    string D502_10 = "";
                     string D501_14 = "";
                     string REC_NO_ALL = "";//多个流水
                     foreach (string item in array)
@@ -553,9 +575,10 @@ namespace ApiMonitor.pages
                             continue; //继续处理下一个
                         }
                         //拼接多个流水的数据
-                        D502_04 += dt.Rows[0]["item_code"] as string + ";";
+                        D502_04 += dt.Rows[0]["nh_bm"] as string + ";"; //农合编码
                         D502_09 += dt.Rows[0]["qty"] as string + ";";
-                        D502_08 += dt.Rows[0]["price"] as string + ";";
+                        D502_08 += dt.Rows[0]["price"].ToString() + ";";
+                        D502_10 += dt.Rows[0]["nh_bnw"] as string + ";";
                         D501_14 = dt.Rows[0]["oper_name"] as string;
                         REC_NO_ALL += REC_NO;
                     }
@@ -563,6 +586,7 @@ namespace ApiMonitor.pages
                     D502_04 = D502_04.Length > 1 ? D502_04.Substring(0, D502_04.Length - 1) : ""; //去掉最后一个分号
                     D502_09 = D502_09.Length > 1 ? D502_09.Substring(0, D502_09.Length - 1) : ""; //去掉最后一个分号
                     D502_08 = D502_08.Length > 1 ? D502_08.Substring(0, D502_08.Length - 1) : ""; //去掉最后一个分号
+                    D502_10 = D502_10.Length > 1 ? D502_10.Substring(0, D502_10.Length - 1) : ""; //去掉最后一个分号
 
                     //(2)疾病存在，进行试算交易
                     MZBC_PROC_CALE_PRICE_LIST shisuan = new MZBC_PROC_CALE_PRICE_LIST();
@@ -581,7 +605,7 @@ namespace ApiMonitor.pages
                     param.Add("D502_04", D502_04); //药品编码字符串(用分号分隔)此处因药品可能是多个，药品编码和下一个药品编码用分号分隔(下面的数量、单价、比例也一样)
                     param.Add("D502_09", D502_09); //药品数量字符串(用分号分隔)
                     param.Add("D502_08", D502_08); //药品单价字符串(用分号分隔)
-                    param.Add("D502_10", jsonDict["D502_10"]); //药品比例字符串(用分号分隔)
+                    param.Add("D502_10", D502_10); //药品比例字符串(用分号分隔)
                     param.Add("D501_13", jsonDict["D501_13"]); //接诊科室(前台选择)对应S201-03.xls
                     param.Add("D501_14", D501_14); //经治医生
                     param.Add("D501_15", jsonDict["D501_15"]); //来院状态(前台选择)对应S301-02.xls
@@ -1468,6 +1492,126 @@ namespace ApiMonitor.pages
             }
             return retStr;
         }
+
+
+        [WebMethod]
+        public string dzbm(string HIS, string NH)
+        {
+            string retStr = "";
+            string sql = " delete from xnh_dm t where t.item_code='" + HIS +"'";
+           // Dictionary<string, string> record = new Dictionary<string, string>() { { "HIS", HIS }, { "NH", NH } };
+            //删除HIS的登记信息zjdmgn
+            try
+            {
+                //先删除再插入
+                try
+                {
+                    DBUtil.updateExecute(sql);
+                }
+                catch (Exception e)
+                {
+                    XnhLogger.log("删除失败，sql" + sql + " " + e.StackTrace);
+                }
+                
+                
+                Dictionary<string, string> record = new Dictionary<string, string>(){
+                        { "HIS", HIS }, 
+                        { "NH", NH }
+                        };
+
+                ApiMonitor.DB.HIS.zjdmgn(record);
+                retStr = DataConvert.getReturnJson("0", "对码成功");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+            
+        }
+
+        /// <summary>
+        /// 取消对照
+        /// </summary>
+        /// <param name="HIS"></param>
+        /// <param name="NH"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public string qxdzbm(string HIS, string NH)
+        {
+           // string retStr = "";
+           // string sql = " delete from xnh_dm t where t.item_code='" + HIS + "'";
+            // Dictionary<string, string> record = new Dictionary<string, string>() { { "HIS", HIS }, { "NH", NH } };
+            //删除HIS的登记信息zjdmgn
+            try
+            {
+                
+
+
+                Dictionary<string, string> record = new Dictionary<string, string>(){
+                        { "HIS", HIS }, 
+                        { "NH", NH }
+                        };
+
+                ApiMonitor.DB.HIS.qxdmgn(record);
+                retStr = DataConvert.getReturnJson("0", "取消对码成功");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+
+        }
+        /// <summary>
+        ///列表信息从HIS查，HIS提供接口
+        ///明细（也是从HIS取）
+        ///加个输入框筛选，字段由HIS定；
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod]
+        public string czlp(string query)
+        {
+            string retStr = "";
+            try
+            {
+                string sql = "select a.name, "    //--姓名
+                      + "a.ip_no, "      //--住院号
+                      + "a.D505_02, "    //-- 住院登记流水号
+                      + "a.TOTAL_COSTS, " // --住院总费用
+                      + "a.TOTAL_CHAGE, "  //--住院可补偿金额
+                      + "a.ZF_COSTS,  "   // --住院自费费用
+                      + "b.area_code "   //--地区编码
+                      + "from ZYJS a left join ZYBC b on a.ip_no = b.D504_01 where ip_no = '" + query + "'"; 
+                DataTable dt = DBUtil.queryExecute(sql);
+                if ((dt == null) || (dt.Rows.Count == 0))
+                {
+                    retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
+                    return retStr;
+                }
+                string msg = DataConvert.DataTable2Json(dt);
+                retStr = DataConvert.getReturnJson("0", msg);
+                //todo:由HIS提供视图或查询字段绑定
+                // retStr = DataConvert.getReturnJson("-1", "query=" + query + "　待由HIS提供视图或查询字段完成数据绑定");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+
+     
+        /// <summary>
+        /// 作废该收费项目成功
+        /// </summary>
+        /// <param name="USER_ID"></param>
+        /// <param name="D504_09"></param>
+        /// <param name="NH_BM"></param>
+        /// <returns></returns>
         [WebMethod]
         public string zfsfxm(string USER_ID, string D504_09, string NH_BM)
         {
@@ -1513,5 +1657,130 @@ namespace ApiMonitor.pages
             return retStr;
         }
 
+        //住院费用上传-试算
+        [WebMethod]
+        public string zyshisuan(string USER_ID, string D504_09, string DEP_ID, string COME_AREA, string REG_NO,
+            string BCLB,string SFZTJS,string CYKS,string CYSJ, string CYZD)  
+        {
+            string retStr = "";
+            try
+            {
+                string sql = "select * from zybc where D504_09 ='" + D504_09 + "'"; //根据住院号查入院登记信息
+                DataTable dt = DBUtil.queryExecute(sql);
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    retStr = DataConvert.getReturnJson("-1", "表zybc未找到已登记过的入院流水号D504_01");
+                    XnhLogger.log("未找到已登记过的流水号，sql=" + sql);
+                    return retStr;
+                }
+                string AREA_NO = dt.Rows[0]["AREA_CODE"] as string;
+                string D401_10 = dt.Rows[0]["D401_10"] as string;
+                string D401_21 = dt.Rows[0]["D401_21"] as string;
+                string D504_01 = dt.Rows[0]["D504_01"] as string;
+
+                //通过选择的成员来查询成员住院基础信息
+                //说明：此接口只能查询出做了入院登记还没收费的信息。
+                RJZ_Get_Member_Zy_Information info = new RJZ_Get_Member_Zy_Information();
+                Dictionary<string,string> paramsDict = new Dictionary<string,string>();
+                paramsDict.Add("AREA_NO", AREA_NO); //病人地区编码(取前台选择的地区编码)
+                paramsDict.Add("D401_10", D401_10); //取存储过的的新医疗证号
+                paramsDict.Add("D401_21", D401_21); //取存储过的成员序号
+                paramsDict.Add("DEP_ID", DEP_ID);   //用户所在单位编码
+                info.executeSql(paramsDict); //执行查询
+                XnhLogger.log("Get_Member_Zy_Information 查询成员住院信息，参数=" + info.parames + " 返回结果：" + info.getExecuteResultPlainString());
+
+                //返回结果
+                //0	成功
+                //1	失败  未找到该信息
+                if (info.getExecuteStatus() == true)
+                {
+                    Dictionary<string, string> retDict = info.getResponseResultWrapperMap();
+                    //返回的结果信息
+                    //retDict["D504_03"]; //患者姓名
+                    //retDict["D504_04"]; //患者性别（1：男 2：女）
+                    //retDict["D504_01"]; //住院登记流水号
+                    //retDict["D504_05"]; //患者身份证号
+                    //retDict["D504_06"]; //年龄
+                    //retDict["D504_08"]; //医疗证号
+                    //retDict["D401_13"]; //家庭地址
+                    //retDict["D504_10"]; //就诊类型(代码)
+                    //retDict["D504_11"]; //入院时间
+                    //retDict["D504_16"]; //入院科室(代码)
+                    //retDict["D504_19"]; //入院状态
+                    //retDict["D504_07"]; //家庭编号
+                    //retDict["D504_02"]; //个人编码=成员序号
+                    //retDict["D505_COSTS"]; //住院总费用
+                    //retDict["D505_REDEEMABLE"]; //可补偿医药费
+                    //retDict["D504_21"]; //疾病代码
+                    //retDict["D505_SELFPAY"]; //自费金额
+                    //retDict["D506_25"]; //补偿日期
+                    //retDict["CHSJ"]; //参合时间
+                    //retDict["D506_23_JT"]; //家庭累补
+                    //retDict["D506_23_GR"]; //个人累补
+                    //retDict["DIAGNOSIS_NAME"]; //入院诊断
+                    //retDict["SBSJ"]; //上补时间
+                    //retDict["D401_04"]; //出生日期
+                    //retDict["IDENTITY"]; //个人性质
+
+                    //进行试算
+                    RJZ_getShisuanResult shisuan = new RJZ_getShisuanResult();
+                    Dictionary<string, string> input = new Dictionary<string, string>();
+                    input.Add("D505_02", D504_01); //登记流水号
+                    input.Add("COME_AREA", COME_AREA); //地区代码(支付单位)
+                    input.Add("AREA_CODE", AREA_NO); //病人地区编码(取前台选择的地区编码)
+                    input.Add("D504_07", retDict["D504_07"]); //家庭编号
+                    input.Add("D504_02", D401_21); //成员序号
+                    input.Add("D504_14", COME_AREA); //就医机构
+                    input.Add("D504_21", retDict["D504_21"]); //入院诊断(疾病代码)
+                    input.Add("D504_11", retDict["D504_11"]); //就诊日期(入院时间) (格式为YYYY-MM-DD)
+                    input.Add("D506_15", BCLB); //补偿类别代码
+                    input.Add("D504_15", "3"); //就医机构级别(相关数据代码标准:S201-06)
+                    input.Add("D504_06", retDict["D504_06"]); //年龄
+                    input.Add("D504_10", retDict["D504_10"]); //就诊类型(相关数据代码标准:S301-05)
+                    input.Add("D504_12", CYSJ); //出院时间(格式为YYYY-MM-DD)
+                    input.Add("D504_29", CYZD); //出院诊断（疾病代码）
+                    input.Add("D504_16_D", retDict["D504_16"]); //入院科室(相关数据代码标准:S201-03)
+                    input.Add("D504_16_T", CYKS); //出院科室(相关数据代码标准:S201-03)
+                    input.Add("S701_01", SFZTJS); //是否是中途结算(相关数据代码标准:S701-01)
+                    //进行试算
+                    shisuan.executeSql(input);
+                    XnhLogger.log("getShisuanResult 试算参数：" + shisuan.parames + " 试算结果：" + shisuan.getExecuteResultPlainString());
+                    if (shisuan.getExecuteStatus() == true)
+                    {
+                        //试算成功返回结果
+                        //TOTAL_COSTS		总费用
+                        //ZF_COSTS		自费费用
+                        //TOTAL_CHAGE		合理费用
+                        //D506_23		实际补偿金额
+                        //D506_18		核算补偿金额(实际补偿合计额)
+                        //BEGINPAY		本次起伏线
+                        //SCALE	          报销比例
+                        //HEAV_REDEEM_SUM 大病支付额
+                        //REDEEM_TOTAL		单次补偿合计
+                        Dictionary<string, string> shisuanjieguo = shisuan.getResponseResultWrapperMap();
+                        string jsonStr = DataConvert.Dict2Json(shisuanjieguo);
+                        retStr = DataConvert.getReturnJson("0", jsonStr);
+                    }
+                }
+                else
+                {
+                    retStr = DataConvert.getReturnJson("-1", "未找到住院信息：" + info.getExecuteResultPlainString());
+                }
+                
+
+
+
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+
+        
+
+        public string retStr { get; set; }
     }
 }
