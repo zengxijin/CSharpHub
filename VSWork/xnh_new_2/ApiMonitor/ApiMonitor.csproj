@@ -109,8 +109,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <None Include="Properties\PublishProfiles\sys.pubxml" />
+    <None Include="Properties\PublishProfiles\web.pubxml" />
     <None Include="Properties\PublishProfiles\xnh.pubxml" />
-    <None Include="Properties\PublishProfiles\xnhweb.pubxml" />
     <None Include="Service References\ServiceReference1\Data_Update_M.wsdl" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -185,6 +185,7 @@
     <Compile Include="log\XnhLogger.cs" />
     <Compile Include="DataConvertUtil\DataConvert.cs" />
     <Compile Include="pages\BizService.cs" />
+    <Compile Include="pages\substrb.cs" />
     <Compile Include="pages\xnhservice.asmx.cs">
       <DependentUpon>xnhservice.asmx</DependentUpon>
       <SubType>Component</SubType>

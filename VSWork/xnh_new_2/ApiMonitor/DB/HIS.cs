@@ -353,13 +353,18 @@ namespace ApiMonitor.DB
         /// <summary>
         /// 存储住院结算返回费用，后期做报表
         /// create table ZYJS
-        ///  ( NAME     VARCHAR2(16),  姓名（从未结算患者列表sql查询返回的结果）
-        ///    IP_NO    VARCHAR2(24),  住院号（从未结算患者列表sql查询返回的结果）
-        ///    D505_02   VARCHAR2(24),  住院登记流水号
-        ///    d505_01  VARCHAR2(24),  住院处方流水号
-        ///    TOTAL_COSTS  NUMBER(8,2),  住院总费用
-        ///    TOTAL_CHAGE  NUMBER(8,2),   住院可补偿金额
-       ///     ZF_COSTS  NUMBER(8,2)    住院自费费用
+        ///  ( NAME     VARCHAR2(16), -- 姓名（）
+        ///    IP_NO    VARCHAR2(24), -- 住院号（）
+        ///    D504_01   VARCHAR2(24),--  住院登记流水号
+        ///    
+        ///    TOTAL_COSTS  NUMBER(8,2), -- 住院总费用
+        ///    TOTAL_CHAGE  NUMBER(8,2),  -- 住院可补偿金额
+        ///    D506_18   NUMBER(8,2),   -- 核算补偿金额
+        ///    D506_23    NUMBER(8,2),  --  实际补偿额
+        ///    ZF_COSTS   NUMBER(8,2),    --自费金额
+        ///    HEAV_REDEEM_SUM  NUMBER(8,2), --大病支付金额
+        ///    BEGINPAY  NUMBER(8,2)     --起伏线
+        ///    
         ///   )
         /// </summary> 
         /// <param name="sqlParam"></param>
@@ -370,8 +375,8 @@ namespace ApiMonitor.DB
                 XnhLogger.log("MZJS sqlParam参数为空");
                 return;
             }
-            string sql = "insert into ZYJS(NAME,IP_NO,D505_02,d505_01,TOTAL_COSTS,TOTAL_CHAGE,TOTAL_CHAGE,ZF_COSTS) "
-                          + "values (NAME,IP_NO,D505_02,d505_01,TOTAL_COSTS,TOTAL_COSTS,TOTAL_CHAGE,TOTAL_CHAGE,ZF_COSTS)";
+            string sql = "insert into ZYJS(NAME,IP_NO,D504_01,TOTAL_COSTS,TOTAL_CHAGE,D506_18,D506_23,ZF_COSTS,HEAV_REDEEM_SUM,BEGINPAY) "
+                          + "values (NAME,IP_NO,D504_01,TOTAL_COSTS,TOTAL_CHAGE,D506_18,D506_23,ZF_COSTS,HEAV_REDEEM_SUM,BEGINPAY)";
           
             try
             {
@@ -381,7 +386,12 @@ namespace ApiMonitor.DB
                 sql = sql.Replace("$d505_01$", (sqlParam.ContainsKey("d505_01") == true ? sqlParam["d505_01"] : ""));
                 sql = sql.Replace("$TOTAL_COSTS$", (sqlParam.ContainsKey("TOTAL_COSTS") == true ? sqlParam["TOTAL_COSTS"] : ""));
                 sql = sql.Replace("$TOTAL_CHAGE$", (sqlParam.ContainsKey("TOTAL_CHAGE") == true ? sqlParam["TOTAL_CHAGE"] : ""));
+               
+                sql = sql.Replace("$D506_18$", (sqlParam.ContainsKey("D506_18") == true ? sqlParam["D506_18"] : ""));
+                sql = sql.Replace("$D506_23$", (sqlParam.ContainsKey("D506_23") == true ? sqlParam["D506_23"] : ""));
                 sql = sql.Replace("$ZF_COSTS$", (sqlParam.ContainsKey("ZF_COSTS") == true ? sqlParam["ZF_COSTS"] : ""));
+                sql = sql.Replace("$HEAV_REDEEM_SUM$", (sqlParam.ContainsKey("HEAV_REDEEM_SUM") == true ? sqlParam["HEAV_REDEEM_SUM"] : ""));
+                sql = sql.Replace("$BEGINPAY$", (sqlParam.ContainsKey("BEGINPAY") == true ? sqlParam["BEGINPAY"] : ""));
               
                 DBUtil.updateExecute(sql);
             }
@@ -476,13 +486,14 @@ namespace ApiMonitor.DB
             }
             return null;
         }
-        ///提取本地his药品编码
+        ///提取本地his药品编码1
         /// </summary>
         public static DataTable fetchHIS(string ypdm)
         {
 
             string sql = "";
-            try
+           
+             try
             {
                 sql = "select a.item_code,  " //--his编码
                           + "a.item_name,  " // --his项目名称
@@ -494,7 +505,120 @@ namespace ApiMonitor.DB
        + "b.small_unit, "  //  --单位
        + " b.ret_price  "  //  --价格
       +" from code_item a,plus_item b "
-      + " where (b.type = '3' and a.item_code = b.item_code) and (a.item_code like '%" + ypdm + "%' or a.item_code like '%" + ypdm + "%' or a.py_code like '%" + ypdm + "%')  order by a.item_code ";
+      + " where (b.type = '3' and a.item_code = b.item_code) and (a.item_code like '%" + ypdm + "%' or a.item_name like '%" + ypdm + "%' or a.py_code like '%" + ypdm + "%')  order by a.item_code ";
+                DataTable dt = DBUtil.queryExecute(sql);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log("his药品数据提取：sql=" + sql + " 异常：" + ex.StackTrace);
+            }
+            return null;
+        }
+        ///未对吗
+        public static DataTable fetchHIS1()
+        {
+
+            string sql = "";
+
+            try
+            {
+                sql = "select * from (select a.item_code,  " //--his编码
+                          + "a.item_name,  " // --his项目名称
+       + "(select wydm from xnh_dm where xnh_dm.item_code = a.item_code) as nh_code, "  //  --农合中心编码
+       + " (select ypmc from xnh_ypzl,xnh_dm where xnh_ypzl.wydm = xnh_dm.wydm and xnh_dm.item_code = a.item_code) as nh_name, "      //--农合名称
+       + " a.item_cls, "    //--项目类别123药品，其他诊疗
+       + " a.py_code, "   // --拼音码
+       + " b.standard, "   //--规格
+       + "b.small_unit, "  //  --单位
+       + " b.ret_price  "  //  --价格
+      + " from code_item a,plus_item b "
+      + " where b.type = '3' and a.item_code = b.item_code and a.disable = 'F') h where h.nh_code is null and rownum < 10";
+                DataTable dt = DBUtil.queryExecute(sql);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log("his药品数据提取：sql=" + sql + " 异常：" + ex.StackTrace);
+            }
+            return null;
+        }
+
+        ///药品
+        public static DataTable fetchHIS3()
+        {
+
+            string sql = "";
+
+            try
+            {
+                sql = "select * from (select a.item_code,  " //--his编码
+                          + "a.item_name,  " // --his项目名称
+       + "(select wydm from xnh_dm where xnh_dm.item_code = a.item_code) as nh_code, "  //  --农合中心编码
+       + " (select ypmc from xnh_ypzl,xnh_dm where xnh_ypzl.wydm = xnh_dm.wydm and xnh_dm.item_code = a.item_code) as nh_name, "      //--农合名称
+       + " a.item_cls, "    //--项目类别123药品，其他诊疗
+       + " a.py_code, "   // --拼音码
+       + " b.standard, "   //--规格
+       + "b.small_unit, "  //  --单位
+       + " b.ret_price  "  //  --价格
+      + " from code_item a,plus_item b "
+      + " where b.type = '3' and a.item_code = b.item_code  and a.disable = 'F' and a.item_cls <>4 and a.item_cls <>5 and a.item_cls <>6 and a.item_cls <>7 and a.item_cls <>9 ) h where h.nh_code is null and rownum < 10";
+                DataTable dt = DBUtil.queryExecute(sql);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log("his药品数据提取：sql=" + sql + " 异常：" + ex.StackTrace);
+            }
+            return null;
+        }
+        ///诊疗
+        public static DataTable fetchHIS4()
+        {
+
+            string sql = "";
+
+            try
+            {
+                sql = "select * from (select a.item_code,  " //--his编码
+                          + "a.item_name,  " // --his项目名称
+       + "(select wydm from xnh_dm where xnh_dm.item_code = a.item_code) as nh_code, "  //  --农合中心编码
+       + " (select ypmc from xnh_ypzl,xnh_dm where xnh_ypzl.wydm = xnh_dm.wydm and xnh_dm.item_code = a.item_code) as nh_name, "      //--农合名称
+       + " a.item_cls, "    //--项目类别123药品，其他诊疗
+       + " a.py_code, "   // --拼音码
+       + " b.standard, "   //--规格
+       + "b.small_unit, "  //  --单位
+       + " b.ret_price  "  //  --价格
+      + " from code_item a,plus_item b "
+      + " where b.type = '3' and a.item_code = b.item_code  and a.disable = 'F' and a.item_cls <>1 and a.item_cls <>2 and a.item_cls <>3 and a.item_cls <>4 ) h where h.nh_code is null and rownum < 10";
+                DataTable dt = DBUtil.queryExecute(sql);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log("his药品数据提取：sql=" + sql + " 异常：" + ex.StackTrace);
+            }
+            return null;
+        }
+        ///以对吗
+        public static DataTable fetchHIS2()
+        {
+
+            string sql = "";
+
+            try
+            {
+                sql = "select * from (select a.item_code,  " //--his编码
+                          + "a.item_name,  " // --his项目名称
+       + "(select wydm from xnh_dm where xnh_dm.item_code = a.item_code) as nh_code, "  //  --农合中心编码
+       + " (select ypmc from xnh_ypzl,xnh_dm where xnh_ypzl.wydm = xnh_dm.wydm and xnh_dm.item_code = a.item_code) as nh_name, "      //--农合名称
+       + " a.item_cls, "    //--项目类别123药品，其他诊疗
+       + " a.py_code, "   // --拼音码
+       + " b.standard, "   //--规格
+       + "b.small_unit, "  //  --单位
+       + " b.ret_price  "  //  --价格
+      + " from code_item a,plus_item b "
+      + " where b.type = '3' and a.item_code = b.item_code) h where h.nh_code is not null";
                 DataTable dt = DBUtil.queryExecute(sql);
                 return dt;
             }

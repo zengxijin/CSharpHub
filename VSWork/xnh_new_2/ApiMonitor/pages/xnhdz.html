@@ -168,6 +168,10 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <div class="text-muted bootstrap-admin-box-title">本地His药品目录</div>
+                        <button type="button" class="btn btn-default" onclick="javascript:wdm();">未对照</button> 
+                        <button type="button" class="btn btn-default" onclick="javascript:ydm();">已对照</button>
+                        <button type="button" class="btn btn-default" onclick="javascript:yp();">药品</button>
+                        <button type="button" class="btn btn-default" onclick="javascript:zl();">诊疗</button>
                     </div>
                     <div class="bootstrap-admin-panel-content">
                         <div class="form-inline" role="form">
@@ -202,13 +206,13 @@
         <tr>
             <td></td>
             <td></td>
+            <td></td>
+            <td></td>
             <td>HIS编码：<span id="nowHIS"></span></td>
             <td></td>
             <td></td>
+            <td></td>
             <td>农合编码：<span id="nowNH"></span></td>
-            <td></td>
-            <td></td>
-            <td></td>
             <td></td>
             <td></td>
             <td></td>
@@ -425,7 +429,228 @@
             });
         }
     });
-       
+        ///
+    function wdm() {
+        var query = " ";
+        $.ajax({
+            type: "Post",
+            url: "xnhservice.asmx/nhbm1",
+            data: "{'query':'" + query + "'}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                closeMask();
+                //返回的数据用data.d获取内容
+                var retVal = data.d;
+                //遍历json数组操作
+                var retJson = getJsonObj(retVal);
+                buffer = retJson;
+                if (retJson.flag == '0') {
+                    var dataJson = retJson.msg.data;
+                    $("#bdhis tbody tr").detach();
+
+                    for (var i = 0; i < dataJson.length; i++) {
+                        var row = dataJson[i];
+                        var tdId = dataJson[i]["ITEM_CODE"];
+                        var td =
+                           '<tr>               '
+                           + '<td ><a onclick="javascript:hisdmxz(\'' + tdId + '\');" id="' + tdId + '_ITEM_CODE"></a></td> '
+                           + '<td id="' + tdId + '_ITEM_NAME"></td> '
+                           + '<td id="' + tdId + '_NH_CODE"></td> '
+                           + '<td id="' + tdId + '_NH_NAME"></td> '
+                           + '<td id="' + tdId + '_ITEM_CLS"></td> '
+                           + '<td id="' + tdId + '_PY_CODE"></td> '
+                           + '<td id="' + tdId + '_STANDARD"></td> '
+                           + '<td id="' + tdId + '_SMALL_UNIT"></td> '
+                           + '<td id="' + tdId + '_RET_PRICE"></td> '
+                           + '</tr>             ';
+                        $("#bdhis tbody").append(td);
+
+                        for (var item in row) {
+                            $("#" + tdId + "_" + item).html(row[item]);
+                        }
+
+                    }
+                } else {
+                    alert("查询失败：" + retJson.msg);
+                }
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                closeMask();
+                alert(textStatus + ":" + errorThrown);
+            }
+        });
+
+
+        }
+        ///
+
+    function yp() {
+        var query = " ";
+        $.ajax({
+            type: "Post",
+            url: "xnhservice.asmx/nhbm3",
+            data: "{'query':'" + query + "'}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                closeMask();
+                //返回的数据用data.d获取内容
+                var retVal = data.d;
+                //遍历json数组操作
+                var retJson = getJsonObj(retVal);
+                buffer = retJson;
+                if (retJson.flag == '0') {
+                    var dataJson = retJson.msg.data;
+                    $("#bdhis tbody tr").detach();
+
+                    for (var i = 0; i < dataJson.length; i++) {
+                        var row = dataJson[i];
+                        var tdId = dataJson[i]["ITEM_CODE"];
+                        var td =
+                           '<tr>               '
+                           + '<td ><a onclick="javascript:hisdmxz(\'' + tdId + '\');" id="' + tdId + '_ITEM_CODE"></a></td> '
+                           + '<td id="' + tdId + '_ITEM_NAME"></td> '
+                           + '<td id="' + tdId + '_NH_CODE"></td> '
+                           + '<td id="' + tdId + '_NH_NAME"></td> '
+                           + '<td id="' + tdId + '_ITEM_CLS"></td> '
+                           + '<td id="' + tdId + '_PY_CODE"></td> '
+                           + '<td id="' + tdId + '_STANDARD"></td> '
+                           + '<td id="' + tdId + '_SMALL_UNIT"></td> '
+                           + '<td id="' + tdId + '_RET_PRICE"></td> '
+                           + '</tr>             ';
+                        $("#bdhis tbody").append(td);
+
+                        for (var item in row) {
+                            $("#" + tdId + "_" + item).html(row[item]);
+                        }
+
+                    }
+                } else {
+                    alert("查询失败：" + retJson.msg);
+                }
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                closeMask();
+                alert(textStatus + ":" + errorThrown);
+            }
+        });
+
+
+    }
+        ///
+    function zl() {
+        var query = " ";
+        $.ajax({
+            type: "Post",
+            url: "xnhservice.asmx/nhbm4",
+            data: "{'query':'" + query + "'}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                closeMask();
+                //返回的数据用data.d获取内容
+                var retVal = data.d;
+                //遍历json数组操作
+                var retJson = getJsonObj(retVal);
+                buffer = retJson;
+                if (retJson.flag == '0') {
+                    var dataJson = retJson.msg.data;
+                    $("#bdhis tbody tr").detach();
+
+                    for (var i = 0; i < dataJson.length; i++) {
+                        var row = dataJson[i];
+                        var tdId = dataJson[i]["ITEM_CODE"];
+                        var td =
+                           '<tr>               '
+                           + '<td ><a onclick="javascript:hisdmxz(\'' + tdId + '\');" id="' + tdId + '_ITEM_CODE"></a></td> '
+                           + '<td id="' + tdId + '_ITEM_NAME"></td> '
+                           + '<td id="' + tdId + '_NH_CODE"></td> '
+                           + '<td id="' + tdId + '_NH_NAME"></td> '
+                           + '<td id="' + tdId + '_ITEM_CLS"></td> '
+                           + '<td id="' + tdId + '_PY_CODE"></td> '
+                           + '<td id="' + tdId + '_STANDARD"></td> '
+                           + '<td id="' + tdId + '_SMALL_UNIT"></td> '
+                           + '<td id="' + tdId + '_RET_PRICE"></td> '
+                           + '</tr>             ';
+                        $("#bdhis tbody").append(td);
+
+                        for (var item in row) {
+                            $("#" + tdId + "_" + item).html(row[item]);
+                        }
+
+                    }
+                } else {
+                    alert("查询失败：" + retJson.msg);
+                }
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                closeMask();
+                alert(textStatus + ":" + errorThrown);
+            }
+        });
+
+
+    }
+    ///
+    function ydm() {
+        var query = " ";
+        $.ajax({
+            type: "Post",
+            url: "xnhservice.asmx/nhbm2",
+            data: "{'query':'" + query + "'}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                closeMask();
+                //返回的数据用data.d获取内容
+                var retVal = data.d;
+                //遍历json数组操作
+                var retJson = getJsonObj(retVal);
+                buffer = retJson;
+                if (retJson.flag == '0') {
+                    var dataJson = retJson.msg.data;
+                    $("#bdhis tbody tr").detach();
+
+                    for (var i = 0; i < dataJson.length; i++) {
+                        var row = dataJson[i];
+                        var tdId = dataJson[i]["ITEM_CODE"];
+                        var td =
+                           '<tr>               '
+                           + '<td ><a onclick="javascript:hisdmxz(\'' + tdId + '\');" id="' + tdId + '_ITEM_CODE"></a></td> '
+                           + '<td id="' + tdId + '_ITEM_NAME"></td> '
+                           + '<td id="' + tdId + '_NH_CODE"></td> '
+                           + '<td id="' + tdId + '_NH_NAME"></td> '
+                           + '<td id="' + tdId + '_ITEM_CLS"></td> '
+                           + '<td id="' + tdId + '_PY_CODE"></td> '
+                           + '<td id="' + tdId + '_STANDARD"></td> '
+                           + '<td id="' + tdId + '_SMALL_UNIT"></td> '
+                           + '<td id="' + tdId + '_RET_PRICE"></td> '
+                           + '</tr>             ';
+                        $("#bdhis tbody").append(td);
+
+                        for (var item in row) {
+                            $("#" + tdId + "_" + item).html(row[item]);
+                        }
+
+                    }
+                } else {
+                    alert("查询失败：" + retJson.msg);
+                }
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                closeMask();
+                alert(textStatus + ":" + errorThrown);
+            }
+        });
+
+
+    }
+    ///
     function dm() {
         var hisCode = $("#nowHIS").html();
         var nhCode = $("#nowNH").html();

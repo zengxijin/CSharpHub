@@ -755,7 +755,7 @@
 
             ssMap["D503_15"] = $("#bclb").val(); //补偿类别代码
             ssMap["DEP_LEVEL"] = getCookie("DEP_LEVEL"); //就医机构级别，从存储过的变量中取
-            ssMap["D503_16"] = getCookie("DEP_LEVEL"); //补偿机构代码(鉴于不做转外的，补偿机构代码和就医机构代码暂时一样)=DEP_ID
+            ssMap["D503_16"] = getCookie("DEP_ID"); //补偿机构代码(鉴于不做转外的，补偿机构代码和就医机构代码暂时一样)=DEP_ID
             //ssMap["D501_10"] = ; //就诊日期(前台是用户自己选择的)格式为(YYYY-MM-DD)，可能选多个，传之后拼接
             ssMap["USER_ID"] = getCookie("USER_ID"); //取存储过的的用户ID
             ssMap["FLAG"] = "1"; //1 试算 2 收费

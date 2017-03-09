@@ -598,6 +598,7 @@ namespace ApiMonitor.pages
                     param.Add("D501_16", jsonDict["D501_16"]); //疾病代码
                     param.Add("D503_15", jsonDict["D503_15"]); //补偿类别代码
                     param.Add("DEP_LEVEL", jsonDict["DEP_LEVEL"]); //就医机构级别，从存储过的变量中取
+                    //param.Add("DEP_LEVEL", "2"); //就医机构级别，从存储过的变量中取
                     param.Add("D503_16", jsonDict["DEP_ID"]); //补偿机构代码(鉴于不做转外的，补偿机构代码和就医机构代码暂时一样)=DEP_ID
                     param.Add("D501_10", REC_TIME); //就诊日期(前台是用户自己选择的)格式为(YYYY-MM-DD)
                     param.Add("USER_ID", jsonDict["USER_ID"]); //取存储过的的用户ID
@@ -1207,6 +1208,7 @@ namespace ApiMonitor.pages
                 string paramsJson = DataConvert.Base64Decode(PARAM);//解码
                 Dictionary<string, string> jsonDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(paramsJson);
                 string D504_09 = jsonDict["D504_09"]; //住院号
+                //string COME_AREA = jsonDict["COME_AREA"]; //地区编码
                 //根据住院号查之前的入院登记信息
                 string sql = "select * from zybc where D504_09 ='" + D504_09 + "'";
                 DataTable dt = DBUtil.queryExecute(sql);
@@ -1229,16 +1231,24 @@ namespace ApiMonitor.pages
                 }
 
                 DataRow row = dtMX.Rows[0];
+                string bill_time = dtMX.Rows[0]["bill_time"] as  string;  //记账时间
+                string basic_cls = dtMX.Rows[0]["basic_cls"] as string;  //区分
+                string pre_no = dtMX.Rows[0]["pre_no"] as string;  // 医嘱号
+               
+                string ss1 = bill_time.Substring(9, 1) + bill_time.Substring(bill_time.Length - 2, 2);
+                string ss2 = bill_time.Substring(17, 2) + bill_time.Substring(bill_time.Length - 2, 2);
+                string aaa = ss1+ss2+basic_cls+pre_no;
 
+                var bbb = aaa.Replace(" ", "");
                 Dictionary<string, string> dict = new Dictionary<string, string>();
                 dict.Add("D505_02", D504_01); //入院登记成功后返回的住院登记流水号
-                dict.Add("COME_AREA", jsonDict["COME_AREA"]); //登录返回的
+                dict.Add("COME_AREA", jsonDict["COME_AREA"]); //前台选择
                 dict.Add("AREA_CODE", AREA_NO); //存储的病人地区编码
-                dict.Add("D505_04", dtMX.Rows[0]["ITEM_CODE"] as string); //住院明细sql查询里面的item_code（收费项目编码组合   （药品代码、数量、单价））
+                dict.Add("D505_04", dtMX.Rows[0]["NH_BM"] as string); //住院明细sql查询里面的item_code（收费项目编码组合   （药品代码、数量、单价））
                 dict.Add("D505_08", dtMX.Rows[0]["QTY"].ToString()); //住院明细sql查询里面的qty
                 dict.Add("D505_07", dtMX.Rows[0]["PRICE"].ToString()); //住院明细sql查询里面的price
                 dict.Add("D505_09", dtMX.Rows[0]["NH_BNW"] as string); //（农合技术部说是保内是1 保外是0）
-                dict.Add("D505_ID_HIS", dtMX.Rows[0]["NH_BM"] as string); //农合编码
+                dict.Add("D505_ID_HIS", bbb); //收费项目唯一ID组合(对应HIS)
                 dict.Add("USER_ID", jsonDict["USER_ID"]); //登录返回的
                 dict.Add("D504_14", jsonDict["D504_14"]); //取用户登录后返回的诊治单位代码
                 dict.Add("USER_NAME", jsonDict["USER_NAME"]); //取用户登录后返回的操作员姓名
@@ -1495,6 +1505,107 @@ namespace ApiMonitor.pages
 
 
         [WebMethod]
+        public string nhbm1(string query)
+        {
+            string retStr = "";
+            try
+            {
+                DataTable dt = HIS.fetchHIS1();
+                if ((dt == null) || (dt.Rows.Count == 0))
+                {
+                    retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
+                    return retStr;
+                }
+                string msg = DataConvert.DataTable2Json(dt);
+                retStr = DataConvert.getReturnJson("0", msg);
+                //todo:由HIS提供字段信息
+                // retStr = DataConvert.getReturnJson("-1", "data=" + data + "　待由HIS提供字段数据");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+
+        [WebMethod]
+        public string nhbm2(string query)
+        {
+            string retStr = "";
+            try
+            {
+                DataTable dt = HIS.fetchHIS2();
+                if ((dt == null) || (dt.Rows.Count == 0))
+                {
+                    retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
+                    return retStr;
+                }
+                string msg = DataConvert.DataTable2Json(dt);
+                retStr = DataConvert.getReturnJson("0", msg);
+                //todo:由HIS提供字段信息
+                // retStr = DataConvert.getReturnJson("-1", "data=" + data + "　待由HIS提供字段数据");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+
+        [WebMethod]
+        public string nhbm3(string query)
+        {
+            string retStr = "";
+            try
+            {
+                DataTable dt = HIS.fetchHIS3();
+                if ((dt == null) || (dt.Rows.Count == 0))
+                {
+                    retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
+                    return retStr;
+                }
+                string msg = DataConvert.DataTable2Json(dt);
+                retStr = DataConvert.getReturnJson("0", msg);
+                //todo:由HIS提供字段信息
+                // retStr = DataConvert.getReturnJson("-1", "data=" + data + "　待由HIS提供字段数据");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+        [WebMethod]
+
+       
+        public string nhbm4(string query)
+        {
+            string retStr = "";
+            try
+            {
+                DataTable dt = HIS.fetchHIS4();
+                if ((dt == null) || (dt.Rows.Count == 0))
+                {
+                    retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
+                    return retStr;
+                }
+                string msg = DataConvert.DataTable2Json(dt);
+                retStr = DataConvert.getReturnJson("0", msg);
+                //todo:由HIS提供字段信息
+                // retStr = DataConvert.getReturnJson("-1", "data=" + data + "　待由HIS提供字段数据");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
+
+        [WebMethod]
         public string dzbm(string HIS, string NH)
         {
             string retStr = "";
@@ -1730,11 +1841,11 @@ namespace ApiMonitor.pages
                     input.Add("AREA_CODE", AREA_NO); //病人地区编码(取前台选择的地区编码)
                     input.Add("D504_07", retDict["D504_07"]); //家庭编号
                     input.Add("D504_02", D401_21); //成员序号
-                    input.Add("D504_14", COME_AREA); //就医机构
+                    input.Add("D504_14", DEP_ID); //就医机构
                     input.Add("D504_21", retDict["D504_21"]); //入院诊断(疾病代码)
                     input.Add("D504_11", retDict["D504_11"]); //就诊日期(入院时间) (格式为YYYY-MM-DD)
                     input.Add("D506_15", BCLB); //补偿类别代码
-                    input.Add("D504_15", "3"); //就医机构级别(相关数据代码标准:S201-06)
+                    input.Add("D504_15", "2"); //就医机构级别(相关数据代码标准:S201-06)
                     input.Add("D504_06", retDict["D504_06"]); //年龄
                     input.Add("D504_10", retDict["D504_10"]); //就诊类型(相关数据代码标准:S301-05)
                     input.Add("D504_12", CYSJ); //出院时间(格式为YYYY-MM-DD)
@@ -1779,8 +1890,74 @@ namespace ApiMonitor.pages
             return retStr;
         }
 
-        
+        /// <summary>
+        ///住院 结算
+        /// </summary>
+       
+        [WebMethod]
+        public string zyjiesuan(string USER_ID, string D504_09, string DEP_ID, string COME_AREA, string REG_NO,
+            string BCLB, string SFZTJS, string CYKS, string CYSJ, string CYZD, string CYZT, string TOTAL_COSTS,
+            string ZF_COSTS, string TOTAL_CHAGE, string D506_23, string D506_18, string BEGINPAY, string SCALE,
+            string HEAV_REDEEM_SUM, string REDEEM_TOTAL, string BCZHLB, string HSJGDM, string HSR, string NAME)
+        {
 
+            try
+            {
+
+                string sql = "select * from zybc where D504_09 ='" + D504_09 + "'"; //根据住院号查入院登记信息
+                DataTable dt = DBUtil.queryExecute(sql);
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    retStr = DataConvert.getReturnJson("-1", "表zybc未找到已登记过的入院流水号D504_01");
+                    XnhLogger.log("未找到已登记过的流水号，sql=" + sql);
+                    return retStr;
+                }
+                string AREA_NO = dt.Rows[0]["AREA_CODE"] as string;
+                string D401_10 = dt.Rows[0]["D401_10"] as string;
+                string D401_21 = dt.Rows[0]["D401_21"] as string;
+                string D504_01 = dt.Rows[0]["D504_01"] as string;
+                RJZ_shoufei jiesuan = new RJZ_shoufei();
+                Dictionary<string, string> input = new Dictionary<string, string>();
+                input.Add("AREA_CODE", AREA_NO); //病人地区编码(取前台选择的地区编码)
+                input.Add("D505_02", D504_01); //登记流水号
+                input.Add("D504_12", CYSJ); //出院时间(格式为YYYY-MM-DD)
+                input.Add("D504_15", "3"); //就医机构级别(相关数据代码标准:S201-06)
+                input.Add("D504_16_T", CYKS); //出院科室(相关数据代码标准:S201-03)
+                input.Add("D504_18","王改兰"); //出院科室(相关数据代码标准:S201-03)
+                input.Add("D504_20",CYZT); //出状态
+                input.Add("D504_22", ""); //并发症(为空时传’NULL’)
+                input.Add("D506_03", "TOTAL_COSTS"); //总费用总费用（TOTAL_COSTS 总费用）试算得到
+                input.Add("D506_13", "TOTAL_CHAGE"); //合理费用
+                input.Add("D506_18", "D506_18"); //核算补偿金额
+                input.Add("D506_15", "BCLB"); //补偿类别代码
+                input.Add("D506_14", "BCZHLB"); //补偿账户类别(相关数据代码标准:S301-09)
+                input.Add("D506_16", "HSJGDM"); //核算机构代码
+                input.Add("D506_17", "HSR"); //核算人
+                input.Add("D506_23", "D506_23"); //实际补偿额（D506_23   实际补偿金额）试算得到
+                input.Add("D506_26", "NAME"); //付款人
+                input.Add("D506_27", "SFZTJS"); //中途结算标志(相关数据代码标准:S701-01)
+                input.Add("SELF_PAY", "ZF_COSTS"); //自费金额（ZF_COSTS  自费费用）试算得到
+                input.Add("HEAV_REDEEM_SUM", "HEAV_REDEEM_SUM"); //大病支付金额（HEAV_REDEEM_SUM  大病支付额）试算得到
+                input.Add("BEGINPAY", "BEGINPAY"); //起伏线
+                input.Add("D504_29", "CYZD");
+                //进行结算
+                jiesuan.executeSql(input);
+                XnhLogger.log("getjiesuanResult 结算参数：" + jiesuan.parames + " 结算结果：" + jiesuan.getExecuteResultPlainString());
+                if (jiesuan.getExecuteStatus() == true)
+                {
+                    //保存到数据库
+                    Dictionary<string, string> jiesuanjieguo = jiesuan.getResponseResultWrapperMap();
+                    string jsonStr = DataConvert.Dict2Json(jiesuanjieguo);
+                    retStr = DataConvert.getReturnJson("0", jsonStr);
+                }
+            }
+            catch(Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
         public string retStr { get; set; }
     }
 }

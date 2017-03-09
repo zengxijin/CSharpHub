@@ -312,7 +312,7 @@
                 <td>
                     <input type="text" id="date" class="form-control docs-date" name="date" placeholder="选择日期">
                 </td>
-                <td style="padding-left:20px;">出院科室：</td>
+                <td style="padding-left:10px;">出院科室：</td>
                 <td>
                     <select id="cyks" name="">
                         <option value="">请选择</option>
@@ -488,7 +488,7 @@
                     </select>
                 </td>
 
-                <td style="padding-left:20px;">是否中途结算：</td>
+                <td style="padding-left:10px;">是否中途结算：</td>
                 <td>
                     <select id="sfztjs" name="">
                         <option value="">请选择</option>
@@ -496,7 +496,29 @@
                         <option value="2">否</option>
                      </select>
                 </td>
-
+                <td style="padding-left:10px;">出院状态：</td>
+                <td>
+                    <select id="cyzt" name="">
+                        <option value="">请选择</option>
+                        <option value="1">治愈</option>
+                        <option value="2">好转</option>
+                        <option value="3">未愈</option>
+                        <option value="4">死亡</option>
+                        <option value="9">其他</option>
+                    </select>
+                </td>
+                <td style="padding-left:10px;">补偿账户类别：</td>
+                <td>
+                    <select id="bczhlb" name="">
+                        <option value="">请选择</option>
+                        <option value="1">家庭帐户</option>
+                        <option value="2">个人帐户</option>
+                        <option value="3">统筹帐户</option>
+                        <option value="9">其他</option>
+                    </select>
+                </td>
+            </tr>
+            
             </tr>
         </table>
 
@@ -681,7 +703,7 @@
                                     + '    <td class="center">                              '
                                     + '        <a onclick="javascript:shisuan(\'' + dataJson[i]["IP_NO"] + '\',\'' + dataJson[i]["REG_NO"] + '\');">试算</a>                                  '
                                     + '        <br />                                       '
-                                    + '        <a>结算收费</a>                              '
+                                    + '        <a onclick="javascript:jiesuan(\'' + dataJson[i]["IP_NO"] + '\',\''+ dataJson[i]["NAME"] +'\',\'' + dataJson[i]["REG_NO"] + '\');">结算收费</a>                              '
                                     + '    </td>                                            '
                                     + '    <td>                                             '
                                     + '        <button type="button" class="btn btn-default" onclick="javascript:ckmx(\'' + dataJson[i]["REG_NO"] + '\');">查看明细项目</button>                          '
@@ -879,14 +901,21 @@
             }
 
             var USER_ID = getCookie("USER_ID");
+            var COME_AREA = $("#areaNo").val();
+            if (COME_AREA == "") {
+                alert("请选择地区");
+                return;
+            }
             var pMap = {};
+
             pMap["USER_ID"] = USER_ID; //当前操作员id
-            pMap["COME_AREA"] = getCookie("DEP_AREA"); //地区代码(医疗机构)
+            pMap["COME_AREA"] = COME_AREA; //地区代码(医疗机构)
             pMap["D504_14"] = getCookie("DEP_ID"); //诊治单位代码
             pMap["D504_09"] = IP_NO; //住院号
             pMap["USER_NAME"] = getCookie("USER_NAME"); //操作员姓名
             pMap["LEVEL"] = getCookie("DEP_LEVEL"); //诊治单位级别
             pMap["REG_NO"] = REG_NO; //住院流水
+            //pMap["COME_AREA"] = COME_AREA; //地区编码
             var paramBase64 = $.base64.encode(map2Json(pMap), "utf8"); //base64编码，防止传到后台乱码
 
             var newMap = {};
@@ -967,7 +996,7 @@
             pMap["USER_ID"] = USER_ID; //当前操作员id
             pMap["D504_09"] = IP_NO; //住院号
             pMap["DEP_ID"] = getCookie("DEP_ID"); //诊治单位代码
-            pMap["COME_AREA"] = getCookie("DEP_AREA"); //地区代码(医疗机构)
+            pMap["COME_AREA"] = getCookie("AREA_CODE"); //地区代码(医疗机构)
             pMap["REG_NO"] = REG_NO; //住院流水
             pMap["BCLB"] = BCLB; //补偿类别
             pMap["SFZTJS"] = sfztjs; //是否中途结算
@@ -1005,6 +1034,119 @@
                     alert(textStatus + ":" + errorThrown);
                 }
             });
+        }
+
+        //结算
+        function jiesuan(IP_NO,NAME, REG_NO)
+        {
+            var BCLB = $("#bclb").val(); //补偿类别
+            var areaNo = $("#areaNo").val(); //地区代码
+            var sfztjs = $("#sfztjs").val(); //是否中途结算
+            var cyks = $("#cyks").val(); //出院科室
+            var cysj = $("#date").val(); //出院时间
+            var cyzd = $("#jbbm").val(); //出院诊断
+            var cyzt = $("#cyzt").val(); //出院状态
+            var TOTAL_COSTS = $("#TOTAL_COSTS").html(); //总费用
+            var ZF_COSTS = $("#ZF_COSTS").html();
+            var TOTAL_CHAGE = $("#TOTAL_CHAGE").html();
+            var D506_23 = $("#D506_23").html();
+            var D506_18 = $("#D506_18").html();
+            var BEGINPAY = $("#BEGINPAY").html();
+            var SCALE = $("#SCALE").html();
+            var HEAV_REDEEM_SUM = $("#HEAV_REDEEM_SUM").html();
+            var REDEEM_TOTAL = $("REDEEM_TOTAL").html();
+            var bczhlb = $("bczhlb").val();
+            if (BCLB == "") {
+                alert("请选择地区选择补偿类别");
+                return;
+            }
+
+            if (cysj == "") {
+                alert("请选择出院时间");
+                return;
+            }
+
+            if (cyks == "") {
+                alert("请选择出院科室");
+                return;
+            }
+
+            if (sfztjs == "") {
+                alert("请选择是否中途结算");
+                return;
+            }
+
+            if (cyzd == "") {
+                alert("请确定出院诊断");
+                return;
+            }
+            if (cyzt == "") {
+                alert("请确定出院状态");
+                return;
+            }
+            //由于出院诊断需要搜索，因此，只需要取第一个的值即可
+            if (cyzd != "" && cyzd != null) {
+                var tmpCode = cyzd.split('|');
+                if (tmpCode != null && tmpCode.length > 0) {
+                    cyzd = tmpCode[0];
+                }
+            }
+            var USER_ID = getCookie("USER_ID");
+            var pMap = {};
+            pMap["USER_ID"] = USER_ID; //当前操作员id
+            pMap["D504_09"] = IP_NO; //住院号
+            pMap["DEP_ID"] = getCookie("DEP_ID"); //诊治单位代码
+            pMap["COME_AREA"] = getCookie("DEP_AREA"); //地区代码(医疗机构)
+            pMap["REG_NO"] = REG_NO; //住院流水
+            pMap["BCLB"] = BCLB; //补偿类别
+            pMap["SFZTJS"] = sfztjs; //是否中途结算
+            pMap["CYKS"] = cyks; //出院科室
+            pMap["CYSJ"] = cysj; //出院时间
+            pMap["CYZD"] = cyzd; //出院诊断
+            pMap["CYZT"] = cyzt; //出院状态
+            pMap["TOTAL_COSTS"] = TOTAL_COSTS; //总费用
+            pMap["ZF_COSTS"] = ZF_COSTS; //自费费用
+            pMap["TOTAL_CHAGE"] = TOTAL_CHAGE; //合理费用
+            pMap["D506_23"] = D506_23; //合理费用
+            pMap["D506_18"] = D506_18; //核算补偿金额(实际补偿合计额)
+            pMap["BEGINPAY"] = BEGINPAY; //本次起浮线
+            pMap["SCALE"] = SCALE; //报销比例
+            pMap["HEAV_REDEEM_SUM"] = HEAV_REDEEM_SUM; //大病支付额
+            pMap["REDEEM_TOTAL"] = REDEEM_TOTAL; //单次补偿合计
+            pMap["hsjgdm"] = getCookie("DEP_ID"); //核算机构(代码)
+            pMap["hsr"] = getCookie("USER_ID"); //核算人
+            pMap["D506_23"] = getCookie("D506_23"); //实际补偿额（D506_23   实际补偿金额）试算得到
+            pMap["NAME"] = NAME;//患者姓名
+            pJson = map2Json(pMap);
+            showMask("正在处理，请稍后...");
+            $.ajax({
+                type: "Post",
+                url: "xnhservice.asmx/zyjiesuan",
+                data: pJson,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    closeMask();
+                    var retVal = data.d;
+                    var retJson = getJsonObj(retVal);
+                    if (retJson.flag == '0') {
+                        //绑定试算结果
+                        var json = retJson.msg;
+                        for (var item in json) {
+                            $("#" + item).html(json[item]);
+                        }
+
+                    } else {
+                        alert("处理失败：" + retJson.msg);
+                    }
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    closeMask();
+                    alert(textStatus + ":" + errorThrown);
+                }
+            });
+
         }
     
         //根据选择的地区获取补偿类别数据
