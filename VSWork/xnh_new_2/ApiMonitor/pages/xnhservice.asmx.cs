@@ -500,6 +500,7 @@ namespace ApiMonitor.pages
             try
             {
                 MZBC_Get_S301_06 s301 = new MZBC_Get_S301_06();
+               
                 //补偿类别返回结果 0;ITEM_CODE/ITEM_NAME;ITEM_CODE/ITEM_NAME
                 string retStr = s301.executeSql(new Dictionary<string, string>() { { "AREA_NO", AREA_NO } });
                 //返回格式ITEM_CODE/ITEM_NAME;ITEM_CODE/ITEM_NAME
@@ -567,7 +568,7 @@ namespace ApiMonitor.pages
                         string NAME = map["NAME"];            //患者姓名
                         //string REC_NO = map["IP_DR"];       //处方医生
                         string FEE_CODE = map["FEE_CODE"];    //农合结算
-
+                        //string qty = map["QTY"];
                         DataTable dt = HIS.getMZMX(map);
                         if (dt == null || dt.Rows.Count == 0)
                         {
@@ -576,7 +577,9 @@ namespace ApiMonitor.pages
                         }
                         //拼接多个流水的数据
                         D502_04 += dt.Rows[0]["nh_bm"] as string + ";"; //农合编码
-                        D502_09 += dt.Rows[0]["qty"] as string + ";";
+                        //D502_09 += dt.Rows[0]["qty"] as string + ";";
+                        D502_09 += dt.Rows[0]["qty"].ToString() + ";";
+                       // D502_09 += qty + ";";
                         D502_08 += dt.Rows[0]["price"].ToString() + ";";
                         D502_10 += dt.Rows[0]["nh_bnw"] as string + ";";
                         D501_14 = dt.Rows[0]["oper_name"] as string;
@@ -605,6 +608,7 @@ namespace ApiMonitor.pages
                     param.Add("FLAG", "1"); //1 试算 2 收费
                     param.Add("D502_04", D502_04); //药品编码字符串(用分号分隔)此处因药品可能是多个，药品编码和下一个药品编码用分号分隔(下面的数量、单价、比例也一样)
                     param.Add("D502_09", D502_09); //药品数量字符串(用分号分隔)
+                   // param.Add("D502_09", "1"); //药品数量字符串(用分号分隔
                     param.Add("D502_08", D502_08); //药品单价字符串(用分号分隔)
                     param.Add("D502_10", D502_10); //药品比例字符串(用分号分隔)
                     param.Add("D501_13", jsonDict["D501_13"]); //接诊科室(前台选择)对应S201-03.xls
@@ -654,6 +658,7 @@ namespace ApiMonitor.pages
                         buffer["XY_OUT"] = retDict["XY_OUT"];           //西药补偿金额(试算的时候传’NULL’)  收费时传(XY_OUT：西药补偿金额)
                         buffer["ZCAOY_OUT"] = retDict["ZCAOY_OUT"];     //中草药补偿金额(试算的时候传’NULL’)  收费时传(ZCAOY_OUT：中草药补偿金额)
                         buffer["ZCHENGY_OUT"] = retDict["ZCHENGY_OUT"];  //中成药补偿金额(试算的时候传’NULL’)  收费时传(ZCHENGY_OUT：中成药补偿金额)
+                        buffer["O_OUT_JJ"] = retDict["O_OUT_JJ"];     //增加基金补偿
                         string shoufeiJson = DataConvert.Dict2Json(buffer);
                         shoufeiJson = DataConvert.Base64Encode(shoufeiJson);
 
@@ -700,67 +705,240 @@ namespace ApiMonitor.pages
         /// <param name="PARAM">试算缓存的参数</param>
         /// <returns></returns>
         [WebMethod]
-        public string charge(string USER_ID, string PARAM)
+        public string charge(string USER_ID, string PARAM, string ROWS)
+        {
+            string retStr = "";
+            string[] array = ROWS.Split('$');
+            foreach (string item in array)
+            {
+                if (string.IsNullOrEmpty(item) == true)
+                {
+                    continue;
+                }
+
+                string selectedParam = DataConvert.Base64Decode(item);
+
+                Dictionary<string, string> map = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(selectedParam);
+                string REC_NO = map["REC_NO"];        //处方号
+                string REG_NO = map["REG_NO"];        //门诊流水号
+                string REC_TIME = map["REC_TIME"] != "" ? map["REC_TIME"].ToString().Split(' ')[0].Replace(".", "-") : "";   //结算日期
+                string TOTAL = map["TOTAL"];          //结算金额
+                string TOTAL_REC = map["TOTAL_REC"];  //处方金额
+                string OPER_NAME = map["OPER_NAME"];  //结算人
+                string NAME = map["NAME"];            //患者姓名
+                //string REC_NO = map["IP_DR"];       //处方医生
+                string FEE_CODE = map["FEE_CODE"];    //农合结算
+                try
+                {
+                    //(1)收费
+                    MZBC_PROC_CALE_PRICE_LIST shoufei = new MZBC_PROC_CALE_PRICE_LIST();
+                    //根据前面一步缓存的试算信息
+                    string paramBase64 = DataConvert.Base64Decode(PARAM); //解码参数
+                    Dictionary<string, string> paramDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(paramBase64);
+                    Dictionary<string, string> param = new Dictionary<string, string>();
+                    param.Add("AREA_NO", paramDict["AREA_NO"]); //病人地区编码(取前台选择的地区编码)
+                    param.Add("D401_10", paramDict["D401_10"]); //取存储过的的新医疗证号
+                    param.Add("D401_21", paramDict["D401_21"]); //取存储过的成员序号
+                    param.Add("DEP_ID", paramDict["DEP_ID"]); //就医机构代码(取存储过的用户单位ID)=DEP_ID
+                    param.Add("D501_16", paramDict["D501_16"]); //疾病代码
+                    param.Add("D503_15", paramDict["D503_15"]); //补偿类别代码
+                    param.Add("DEP_LEVEL", paramDict["DEP_LEVEL"]); //就医机构级别，从存储过的变量中取
+                    //param.Add("DEP_LEVEL", "2"); //就医机构级别，从存储过的变量中取
+                    param.Add("D503_16", paramDict["DEP_ID"]); //补偿机构代码(鉴于不做转外的，补偿机构代码和就医机构代码暂时一样)=DEP_ID
+                    param.Add("D501_10", paramDict["D501_10"]); //就诊日期(前台是用户自己选择的)格式为(YYYY-MM-DD)
+                    param.Add("USER_ID", USER_ID); //取存储过的的用户ID
+                    param.Add("FLAG", "2"); //1 试算 2 收费
+                    param.Add("D502_04", paramDict["D502_04"]); //药品编码字符串(用分号分隔)此处因药品可能是多个，药品编码和下一个药品编码用分号分隔(下面的数量、单价、比例也一样)
+                    param.Add("D502_09", paramDict["D502_09"]); //药品数量字符串(用分号分隔)
+                    param.Add("D502_08", paramDict["D502_08"]); //药品单价字符串(用分号分隔)
+                    param.Add("D502_10", paramDict["D502_10"]); //药品比例字符串(用分号分隔)
+                    param.Add("D501_13", paramDict["D501_13"]); //接诊科室(前台选择)对应S201-03.xls
+                    param.Add("D501_14", paramDict["D501_14"]); //经治医生
+                    param.Add("D501_15", paramDict["D501_15"]); //来院状态(前台选择)对应S301-02.xls
+                    param.Add("D503_03", paramDict["D503_03"]); //总费用 (试算的时候传’NULL’)  收费时传(O_TOTAL_COSTS：总费用)
+                    param.Add("D503_08", paramDict["D503_08"]); //可补偿门诊医药费(试算的时候传’NULL’) 收费时传(O_TOTAL_CHAGE：合理费用)
+                    param.Add("D503_09", paramDict["D503_09"]); //核算补偿金额(试算的时候传’NULL’) 收费时传(O_D503_09：核算补偿金额(实际补偿合计额))
+                    param.Add("OUTP_FACC", paramDict["OUTP_FACC"]); //账户补偿(试算的时候传’NULL’) 收费时传(O_OUTP_FACC：帐户补偿)
+                    param.Add("SELF_PAY", paramDict["SELF_PAY"]); //自费金额(试算的时候传’NULL’)  收费时传(O_ZF_COSTS：自费费用)
+                    param.Add("D501_09", paramDict["D501_09"]); //就诊类型（对应s301_05.xls）
+                    param.Add("D503_18", paramDict["D503_18"]); //经办人(取用户姓名 USER_NAME)
+                    param.Add("HOSP_NAME", paramDict["HOSP_NAME"]); //诊治单位名称(目前取用户所在单位名称DEP_NAME，以后可能存在诊治单位用户自己填的情况)
+                    param.Add("D601_17_OUT", paramDict["D601_17_OUT"]); //家庭账户支出(试算的时候传’NULL’)  收费时传(D601_17_OUT：家庭账户支出)
+                    param.Add("XY_OUT", paramDict["XY_OUT"]); //西药补偿金额(试算的时候传’NULL’)  收费时传(XY_OUT：西药补偿金额)
+                    param.Add("ZCAOY_OUT", paramDict["ZCAOY_OUT"]); //中草药补偿金额(试算的时候传’NULL’)  收费时传(ZCAOY_OUT：中草药补偿金额)
+                    param.Add("ZCHENGY_OUT", paramDict["ZCHENGY_OUT"]); //中成药补偿金额(试算的时候传’NULL’)  收费时传(ZCHENGY_OUT：中成药补偿金额)
+                    // paramDict.Add("AREA_CODE", paramDict["AREA_CODE"]);//病人地区编码(取前台选择的地区编码)
+                    // paramDict.Add("D504_01", "");//住院登记流水号
+                    //paramDict.Add("D504_12", "");//出院时间(格式为YYYY-MM-DD)
+                    //paramDict.Add("D504_15", "");//就医机构级别(相关数据代码标准:S201-06)
+                    //paramDict.Add("D504_17", "");//出院科室(相关数据代码标准:S201-03)
+                    //paramDict.Add("D504_18", "");//经治医生
+                    //paramDict.Add("D504_20", "");//出院状态(相关数据代码标准:S301-03)
+                    //paramDict.Add("D504_22", "");//并发症(为空时传’NULL’)
+                    //paramDict.Add("D506_03", "");//总费用（TOTAL_COSTS 总费用）试算得到
+                    //paramDict.Add("D506_13", "");//可补偿住院医药费（TOTAL_CHAGE 合理费用）试算得到
+                    //paramDict.Add("D506_18", "");//核算补偿金额（D506_18  核算补偿金额(实际补偿合计额)）试算得到
+                    //paramDict.Add("D506_15", "");//补偿类别代码
+                    //paramDict.Add("D506_14", "");//补偿账户类别(相关数据代码标准:S301-09)
+                    //paramDict.Add("D506_16", "");//核算机构(代码)
+                    //paramDict.Add("D506_17", "");//核算人
+                    //paramDict.Add("D506_23", "");//实际补偿额（D506_23   实际补偿金额）试算得到
+                    //paramDict.Add("D506_26", "");//付款人
+                    //paramDict.Add("D506_27", "");//中途结算标志(相关数据代码标准:S701-01)
+                    //paramDict.Add("SELF_PAY", "");//自费金额（ZF_COSTS  自费费用）试算得到
+                    //paramDict.Add("HEAV_REDEEM_SUM", "");//大病支付金额（HEAV_REDEEM_SUM  大病支付额）试算得到
+                    //paramDict.Add("BEGINPAY", "");//本次起付额（BEGINPAY   本次起伏线）试算得到
+                    //paramDict.Add("D504_29", "");//出院诊断(疾病代码)
+
+                    shoufei.executeSql(param);
+                    
+                    //(2)收费成功后将相应的信息保存到数据库中，并修改HIS中补偿标志（供以后制作报表查询使用）
+                    //加上更新HIS的SQL操作
+
+                    //收费成功： S_Returns= 0;T_D502_01   （分号分隔）
+                    //T_D502_01：门诊登记流水号，此号要存储，以便后面打印补偿凭据的时候用。
+                    if (shoufei.getExecuteStatus() == true)
+                    {
+                        XnhLogger.log("收费成功，参数：" + shoufei.parames);
+                        XnhLogger.log("收费成功，结果：" + shoufei.getExecuteResultPlainString());
+                        retStr = DataConvert.getReturnJson("0", "收费成功，返回结果：" + shoufei.getExecuteResultPlainString());
+                        string T_D502_01 = shoufei.getExecuteResultPlainString().Substring(2); //S_Returns= 0;T_D502_01   （分号分隔），获取T_D502_01
+                        //存储结算结果
+                        string data = DateTime.Now.ToLocalTime().ToString();
+                        //string data = map["data1"] != "" ? map["data1"].ToString().Split(' ')[0].Replace(".", "-") : "";
+                        Dictionary<string, string> CCMZJS_Param = new Dictionary<string, string>();
+                        //Dictionary<string, string> retDict = shoufei.getResponseResultWrapperMap();
+                        CCMZJS_Param.Add("D401_02", NAME);
+                        CCMZJS_Param.Add("T_D502_01", T_D502_01);
+                        CCMZJS_Param.Add("O_TOTAL_COSTS", paramDict["D503_03"]);
+                        CCMZJS_Param.Add("O_ZF_COSTS", paramDict["SELF_PAY"]);
+                        CCMZJS_Param.Add("O_TOTAL_CHAGE", paramDict["D503_08"]);
+                        CCMZJS_Param.Add("O_OUTP_FACC", paramDict["OUTP_FACC"]);
+                        CCMZJS_Param.Add("O_OUT_JJ", paramDict["O_OUT_JJ"]);
+                        CCMZJS_Param.Add("O_D503_09", paramDict["D503_09"]);
+                        CCMZJS_Param.Add("D601_17_OUT", paramDict["D601_17_OUT"]);
+                        CCMZJS_Param.Add("XY_OUT", paramDict["XY_OUT"]);
+                        CCMZJS_Param.Add("ZCAOY_OUT", paramDict["ZCAOY_OUT"]);
+                        CCMZJS_Param.Add("ZCHENGY_OUT", paramDict["ZCHENGY_OUT"]);
+                        CCMZJS_Param.Add("MZ_BILL_TIME", data);   //获取系统时间
+                        CCMZJS_Param.Add("AREA_NO", paramDict["AREA_NO"]);   //地区编码
+                        HIS.CCMZJS(CCMZJS_Param);
+                    }
+                    else
+                    {
+                        retStr = DataConvert.getReturnJson("-1", "收费失败，返回结果：" + shoufei.getExecuteResultPlainString());
+                    }
+
+                   
+                }
+                catch (Exception ex)
+                {
+                    XnhLogger.log(this.GetType().ToString() + " 收费失败： " + ex.StackTrace);
+                }
+
+                
+            }
+            return retStr;
+        }
+        /// <summary>
+        /// 门诊打印
+        /// </summary>
+        /// <param name="USER_ID"></param>
+        /// <param name="AREA_NO">地区代码</param>
+        /// <param name="MZLSH">门诊流水号（多个用$分割）</param>
+        /// <returns></returns>
+        [WebMethod]
+        public string mzdyfp(string T_D502_01, string AREA_CODE)
         {
             string retStr = "";
             try
             {
-                //(1)收费
-                MZBC_PROC_CALE_PRICE_LIST shoufei = new MZBC_PROC_CALE_PRICE_LIST();
-                //根据前面一步缓存的试算信息
-                string paramBase64 = DataConvert.Base64Decode(PARAM); //解码参数
-                Dictionary<string, string> paramDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(paramBase64);
-                
-                //paramDict.Add("AREA_CODE", "");//病人地区编码(取前台选择的地区编码)
-                //paramDict.Add("D504_01", "");//住院登记流水号
-                //paramDict.Add("D504_12", "");//出院时间(格式为YYYY-MM-DD)
-                //paramDict.Add("D504_15", "");//就医机构级别(相关数据代码标准:S201-06)
-                //paramDict.Add("D504_17", "");//出院科室(相关数据代码标准:S201-03)
-                //paramDict.Add("D504_18", "");//经治医生
-                //paramDict.Add("D504_20", "");//出院状态(相关数据代码标准:S301-03)
-                //paramDict.Add("D504_22", "");//并发症(为空时传’NULL’)
-                //paramDict.Add("D506_03", "");//总费用（TOTAL_COSTS 总费用）试算得到
-                //paramDict.Add("D506_13", "");//可补偿住院医药费（TOTAL_CHAGE 合理费用）试算得到
-                //paramDict.Add("D506_18", "");//核算补偿金额（D506_18  核算补偿金额(实际补偿合计额)）试算得到
-                //paramDict.Add("D506_15", "");//补偿类别代码
-                //paramDict.Add("D506_14", "");//补偿账户类别(相关数据代码标准:S301-09)
-                //paramDict.Add("D506_16", "");//核算机构(代码)
-                //paramDict.Add("D506_17", "");//核算人
-                //paramDict.Add("D506_23", "");//实际补偿额（D506_23   实际补偿金额）试算得到
-                //paramDict.Add("D506_26", "");//付款人
-                //paramDict.Add("D506_27", "");//中途结算标志(相关数据代码标准:S701-01)
-                //paramDict.Add("SELF_PAY", "");//自费金额（ZF_COSTS  自费费用）试算得到
-                //paramDict.Add("HEAV_REDEEM_SUM", "");//大病支付金额（HEAV_REDEEM_SUM  大病支付额）试算得到
-                //paramDict.Add("BEGINPAY", "");//本次起付额（BEGINPAY   本次起伏线）试算得到
-                //paramDict.Add("D504_29", "");//出院诊断(疾病代码)
+                string temp = T_D502_01.Replace(" ", "");
 
-                shoufei.executeSql(paramDict);
-                XnhLogger.log("收费成功，参数：" + shoufei.parames);
-                XnhLogger.log("收费成功，结果：" + shoufei.getExecuteResultPlainString());
-                //收费成功： S_Returns= 0;T_D502_01   （分号分隔）
-                //T_D502_01：门诊登记流水号，此号要存储，以便后面打印补偿凭据的时候用。
-                if (shoufei.getExecuteStatus() == true)
+                string info = "";
+
+                MZBC_MZCZ mzdyfp = new MZBC_MZCZ();
+                Dictionary<string, string> paramDict = new Dictionary<string, string>();
+                paramDict.Add("AREA_NO", AREA_CODE);//病人地区编码(取前台选择的地区编码)
+                paramDict.Add("T_D502_01", temp);//取存储过的门诊登记流水号
+
+                mzdyfp.executeSql(paramDict);
+                if (mzdyfp.getExecuteStatus() == true) //冲正成功
                 {
-                    retStr = DataConvert.getReturnJson("0", "收费成功，返回结果：" + shoufei.getExecuteResultPlainString());
+                    info += "门诊流水:" + temp + "打印成功;";
+                    //冲正成功要修改HIS标志
+
+                    //   Dictionary<string, string> map = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(selectedParam);
+                    //    string REC_NO = map["REC_NO"];        //处方号
+                    //     string REG_NO = map["REG_NO"];        //门诊流水号
+                    //  Dictionary<string, string> record = new Dictionary<string, string>() { { "REC_NO", REC_NO }, { "REC_NO", REC_NO } };
+                    //   HIS.modifyMZCZBJ(record);
+
                 }
                 else
                 {
-                    retStr = DataConvert.getReturnJson("-1", "收费失败，返回结果：" + shoufei.getExecuteResultPlainString());
+                    info += "门诊流水:" + temp + "打印失败;失败信息:" + mzdyfp.getExecuteResultPlainString();
                 }
-
-                //(2)收费成功后将相应的信息保存到数据库中，并修改HIS中补偿标志（供以后制作报表查询使用）
-                //加上更新HIS的SQL操作
-                Dictionary<string, string> retDict = shoufei.getResponseResultWrapperMap();
-                //tDict["T_D502_01"]; 这个就是获取收费返回的结果
+                retStr = DataConvert.getReturnJson("0", info);
             }
+
+
             catch (Exception ex)
             {
-                XnhLogger.log(this.GetType().ToString() + " 收费失败： " + ex.StackTrace);
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
             }
 
             return retStr;
         }
+         /// <summary>
+        /// 住院打印
+        /// </summary>
+        /// <param name="D504_01"></param>
+        /// <param name="AREA_CODE"></param>
+        /// <returns></returns>
+        public string zydyfp(string D504_01, string AREA_CODE)
+        {
+            string retStr = "";
+            try
+            {
+                string temp = D504_01.Replace(" ", "");
+                string info = "";
 
+                RJZ_Print_Zy_New zydy = new RJZ_Print_Zy_New();
+                Dictionary<string, string> paramDict = new Dictionary<string, string>();
+                paramDict.Add("AREA_NO", AREA_CODE);//病人地区编码(取前台选择的地区编码)
+                paramDict.Add("T_D502_01", temp);//取存储过的门诊登记流水号
+
+                zydy.executeSql(paramDict);
+                if (zydy.getExecuteStatus() == true) //冲正成功
+                {
+                    info += "住院流水:" + D504_01 + "打印成功;";
+                    //冲正成功要修改HIS标志
+
+                    //   Dictionary<string, string> map = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(selectedParam);
+                    //    string REC_NO = map["REC_NO"];        //处方号
+                    //     string REG_NO = map["REG_NO"];        //门诊流水号
+                    //  Dictionary<string, string> record = new Dictionary<string, string>() { { "REC_NO", REC_NO }, { "REC_NO", REC_NO } };
+                    //   HIS.modifyMZCZBJ(record);
+
+                }
+                else
+                {
+                    info += "住院流水:" + D504_01 + "打印失败;失败信息:" + zydy.getExecuteResultPlainString();
+                }
+                retStr = DataConvert.getReturnJson("0", info);
+            }
+
+
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+
+            return retStr;
+        }
         /// <summary>
         /// 冲正
         /// </summary>
@@ -769,30 +947,24 @@ namespace ApiMonitor.pages
         /// <param name="MZLSH">门诊流水号（多个用$分割）</param>
         /// <returns></returns>
         [WebMethod]
-        public string chongzheng(string USER_ID, string AREA_NO,string MZLSH)
+        public string chongzheng(string T_D502_01, string AREA_CODE)
         {
             string retStr = "";
             try
             {
-                string[] array = MZLSH.Split('$'); //前台选中多个流水号
+                string temp = T_D502_01.Replace(" ","");
 
-                string info = "";
-                foreach (string T_D502_01 in array)
-                {
-                    if (string.IsNullOrEmpty(T_D502_01) == true)
-                    {
-                        continue;
-                    }
+                    string info = "";
 
                     MZBC_MZCZ mzcz = new MZBC_MZCZ();
                     Dictionary<string, string> paramDict = new Dictionary<string, string>();
-                    paramDict.Add("AREA_NO", AREA_NO);//病人地区编码(取前台选择的地区编码)
-                    paramDict.Add("T_D502_01", T_D502_01);//取存储过的门诊登记流水号
+                    paramDict.Add("AREA_NO", AREA_CODE);//病人地区编码(取前台选择的地区编码)
+                    paramDict.Add("T_D502_01", temp);//取存储过的门诊登记流水号
 
                     mzcz.executeSql(paramDict);
                     if(mzcz.getExecuteStatus() == true) //冲正成功
                     {
-                        info += "门诊流水:" + T_D502_01 + "冲正成功;";
+                        info += "门诊流水:" + temp + "冲正成功;";
                         //冲正成功要修改HIS标志
                         
                     //   Dictionary<string, string> map = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(selectedParam);
@@ -804,12 +976,12 @@ namespace ApiMonitor.pages
                     }
                     else
                     {
-                        info += "门诊流水:" + T_D502_01 + "冲正失败;失败信息:" + mzcz.getExecuteResultPlainString();
+                        info += "门诊流水:" + temp + "冲正失败;失败信息:" + mzcz.getExecuteResultPlainString();
                     }
-
+                    retStr = DataConvert.getReturnJson("0", info);
                 }
-                retStr = DataConvert.getReturnJson("0", info);
-            }
+                
+            
             catch (Exception ex)
             {
                 XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
@@ -818,8 +990,54 @@ namespace ApiMonitor.pages
             
             return retStr;
         }
+        /// <summary>
+        /// 住院冲正
+        /// </summary>
+        /// <param name="D504_01"></param>
+        /// <param name="AREA_CODE"></param>
+        /// <returns></returns>
+        [WebMethod] 
+        public string zychongzheng(string D504_01, string AREA_CODE)
+        {
+            string retStr = "";
+            try
+            {
+                string info = "";
+                string temp = D504_01.Replace(" ", "");
+                RJZ_Zycz zycz = new RJZ_Zycz();
+                Dictionary<string, string> paramDict = new Dictionary<string, string>();
+                paramDict.Add("AREA_NO", AREA_CODE);//病人地区编码(取前台选择的地区编码)
+                paramDict.Add("T_D502_01", D504_01);//取存储过的门诊登记流水号
+                paramDict.Add("IS_SAVE", "yes");  //是否保留yes保留 no不保留
+                zycz.executeSql(paramDict);
+                if (zycz.getExecuteStatus() == true) //冲正成功
+                {
+                    info += "住院流水:" + D504_01 + "冲正成功;";
+                    //冲正成功要修改HIS标志
+
+                    //   Dictionary<string, string> map = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(selectedParam);
+                    //    string REC_NO = map["REC_NO"];        //处方号
+                    //     string REG_NO = map["REG_NO"];        //门诊流水号
+                    //  Dictionary<string, string> record = new Dictionary<string, string>() { { "REC_NO", REC_NO }, { "REC_NO", REC_NO } };
+                    //   HIS.modifyMZCZBJ(record);
+
+                }
+                else
+                {
+                    info += "住院流水:" + D504_01 + "冲正失败;失败信息:" + zycz.getExecuteResultPlainString();
+                }
+                retStr = DataConvert.getReturnJson("0", info);
+            }
 
 
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+
+            return retStr;
+        }
         public string upload()
         {
             string retStr = "";
@@ -942,6 +1160,7 @@ namespace ApiMonitor.pages
 
         [WebMethod]
         public string getRYZD(string query)
+        
         {
             string retStr = "";
             try
@@ -1079,26 +1298,46 @@ namespace ApiMonitor.pages
             string retStr = "";
             try
             {
+         //       string sql = "SELECT IP_REGISTER.REG_NO," //住院流水号
+         //+ "IP_REGISTER.IP_NO,"  	  //住院号
+         //+ "IP_REGISTER.IP_CNT,"   	  // -次数
+         //+ "IP_REGISTER.FEE_CODE,"    //费用类别(11农合)
+         //+ "IP_REGISTER.NAME,"     // 患者名称
+         //+ "IP_REGISTER.IP_DATE,"  //--入院日期
+         //+ "IP_REGISTER.OP_DATE,"   //--出院日期
+         //+ "IP_REGISTER.OP_DEPT,"    //   --出院科室
+         //+ "(select card_no from PATIENTINFO where PATIENTINFO.PID=ip_register.pid) as card_no,"   // --卡号
+         //+ "CODE_FEE.FEE_NAME,"      //   	--费用类别名称
+         //+ "CODE_DEPARTMENT.DEPT_NAME,"  // --出院科室名称
+         //+ "IP_REGISTER.OP_TIME,"    //	--出院时间
+         //+ "IP_REGISTER.LOC_FLAG "  		//--状态(1:在院,2:科室出院)
+         //+ "FROM IP_REGISTER,CODE_FEE,CODE_DEPARTMENT "
+         //+ "WHERE ( IP_REGISTER.FEE_CODE = CODE_FEE.FEE_CODE ) and"
+         //+ "( IP_REGISTER.OP_DEPT = CODE_DEPARTMENT.DEPT_CODE(+) ) and "
+         //+ "( ( IP_REGISTER.LOC_FLAG in ('1','2') ) AND"
+         //+ "( IP_REGISTER.CHRG_FLAG <> '3' ) )"
+         //+ "and (trim(IP_REGISTER.FEE_CODE) in ('11')) and "
+         //+ "order by ip_no";
                 string sql = "SELECT IP_REGISTER.REG_NO," //住院流水号
-         + "IP_REGISTER.IP_NO,"  	  //住院号
-         + "IP_REGISTER.IP_CNT,"   	  // -次数
-         + "IP_REGISTER.FEE_CODE,"    //费用类别(11农合)
-         + "IP_REGISTER.NAME,"     // 患者名称
-         + "IP_REGISTER.IP_DATE,"  //--入院日期
-         + "IP_REGISTER.OP_DATE,"   //--出院日期
-         + "IP_REGISTER.OP_DEPT,"    //   --出院科室
-         + "(select card_no from PATIENTINFO where PATIENTINFO.PID=ip_register.pid) as card_no,"   // --卡号
-         + "CODE_FEE.FEE_NAME,"      //   	--费用类别名称
-         + "CODE_DEPARTMENT.DEPT_NAME,"  // --出院科室名称
-         + "IP_REGISTER.OP_TIME,"    //	--出院时间
-         + "IP_REGISTER.LOC_FLAG "  		//--状态(1:在院,2:科室出院)
-         + "FROM IP_REGISTER,CODE_FEE,CODE_DEPARTMENT "
-         + "WHERE ( IP_REGISTER.FEE_CODE = CODE_FEE.FEE_CODE ) and"
-         + "( IP_REGISTER.OP_DEPT = CODE_DEPARTMENT.DEPT_CODE(+) ) and"
-         + "( ( IP_REGISTER.LOC_FLAG in ('1','2') ) AND"
-         + "( IP_REGISTER.CHRG_FLAG <> '3' ) )"
-         + "and (trim(IP_REGISTER.FEE_CODE) in ('11'))"
-         + "order by ip_no";
+        + "IP_REGISTER.IP_NO,"  	  //住院号
+        + "IP_REGISTER.IP_CNT,"   	  // -次数
+        + "IP_REGISTER.FEE_CODE,"    //费用类别(11农合)
+        + "IP_REGISTER.NAME,"     // 患者名称
+        + "IP_REGISTER.IP_DATE,"  //--入院日期
+        + "IP_REGISTER.OP_DATE,"   //--出院日期
+        + "IP_REGISTER.OP_DEPT,"    //   --出院科室
+        + "(select card_no from PATIENTINFO where PATIENTINFO.PID=ip_register.pid) as card_no,"   // --卡号
+        + "CODE_FEE.FEE_NAME,"      //   	--费用类别名称
+        + "CODE_DEPARTMENT.DEPT_NAME,"  // --出院科室名称
+        + "IP_REGISTER.OP_TIME,"    //	--出院时间
+        + "IP_REGISTER.LOC_FLAG "  		//--状态(1:在院,2:科室出院)
+        + "FROM IP_REGISTER,CODE_FEE,CODE_DEPARTMENT "
+        + "WHERE ( IP_REGISTER.FEE_CODE = CODE_FEE.FEE_CODE ) and"
+        + "( IP_REGISTER.OP_DEPT = CODE_DEPARTMENT.DEPT_CODE(+) ) and"
+        + "( ( IP_REGISTER.LOC_FLAG in ('1','2') ) AND"
+        + "( IP_REGISTER.CHRG_FLAG <> '3' ) ) and ((IP_REGISTER.LOC_FLAG) in ('1','2')) "
+        + "and (trim(IP_REGISTER.FEE_CODE) in ('11'))"
+        + "order by ip_no";
                 DataTable dt = DBUtil.queryExecute(sql);
                 if ((dt == null) || (dt.Rows.Count == 0))
                 {
@@ -1127,7 +1366,7 @@ namespace ApiMonitor.pages
             string retStr = "";
             try
             {
-                DataTable dt = HIS.cxzymx(data);
+                DataTable dt = HIS.cxzymx1(data);
                 if ((dt == null) || (dt.Rows.Count == 0))
                 {
                     retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
@@ -1335,23 +1574,40 @@ namespace ApiMonitor.pages
 
             try
             {
+      //          string sql = " SELECT cl_CHARGE_RECIPE.REC_NO as REC_NO,CODE_OPERATOR.oper_name,PATIENTINFO.NAME ,CL_RECIPE.REC_TIME, " +
+      //          "CL_RECIPE.UP_FLAG,CL_RECIPE.REG_NO,CL_RECIPE.REG_NO as mzh, CL_CHARGE.CHRG_NO ,CL_CHARGE.CHRG_TIME, " +
+      //          "CL_CHARGE.OPER_CODE ,CL_CHARGE.TYPE ,CL_CHARGE.REC_FLAG ,CL_CHARGE.FEE_CODE ,CL_CHARGE.STATUS, " +
+      //          "WMSYS.WM_CONCAT(CL_CHARGE_INVOICE.INVO_NO) as INVO_NO, " +
+      //          "(select sum(total_sum) from CL_CHRGENTRY where chrg_no = CL_CHARGE.CHRG_NO) as total, " +
+      //"max((select sum(total) from CL_RECENTRY where CL_RECENTRY.rec_no = CL_RECIPE.rec_no)) as total_rec,d.dept_name " +
+      //"FROM CL_CHARGE , CL_CHARGE_INVOICE ,CL_CHARGE_RECIPE,CL_RECIPE , PATIENTINFO,CODE_OPERATOR , CODE_DEPARTMENT d " +
+      //"WHERE ( CL_CHARGE.CHRG_NO = CL_CHARGE_INVOICE.CHRG_NO(+)) and (CL_CHARGE.CHRG_NO = CL_CHARGE_RECIPE.CHRG_NO) AND " +
+      //"(CL_CHARGE_RECIPE.REC_NO = CL_RECIPE.REC_NO) AND (CL_RECIPE.PID = PATIENTINFO.PID) AND (CL_CHARGE_RECIPE.FLAG = '1') AND " +
+      //"(CL_CHARGE.CLASS = '2' ) AND ((PATIENTINFO.NAME LIKE '%" + query + "%') or (INVO_NO like '%" + query + "%') ) " +
+      //              //"(CL_CHARGE.CHRG_DATE >= '2016.01.01') AND (cl_CHARGE_RECIPE.TYPE = '2') and " +
+      //dateSql + " AND (cl_CHARGE_RECIPE.TYPE = '2') and " +
+      //"d.dept_code=CL_RECIPE.dept_code and CODE_OPERATOR.OPER_CODE=CL_RECIPE.dr_code " +
+      //"group by cl_CHARGE_RECIPE.REC_NO,CODE_OPERATOR.oper_name,PATIENTINFO.NAME ,CL_RECIPE.REC_TIME, " +
+      //"CL_RECIPE.UP_FLAG,CL_RECIPE.REG_NO,CL_CHARGE.CHRG_NO ,CL_CHARGE.CHRG_TIME ,CL_CHARGE.OPER_CODE ,CL_CHARGE.TYPE , " +
+      //"CL_CHARGE.REC_FLAG ,CL_CHARGE.FEE_CODE ,CL_CHARGE.STATUS,d.dept_name " +
+      //"order by cl_CHARGE_RECIPE.REC_NO ";
                 string sql = " SELECT cl_CHARGE_RECIPE.REC_NO as REC_NO,CODE_OPERATOR.oper_name,PATIENTINFO.NAME ,CL_RECIPE.REC_TIME, " +
-                "CL_RECIPE.UP_FLAG,CL_RECIPE.REG_NO,CL_RECIPE.REG_NO as mzh, CL_CHARGE.CHRG_NO ,CL_CHARGE.CHRG_TIME, " +
-                "CL_CHARGE.OPER_CODE ,CL_CHARGE.TYPE ,CL_CHARGE.REC_FLAG ,CL_CHARGE.FEE_CODE ,CL_CHARGE.STATUS, " +
-                "WMSYS.WM_CONCAT(CL_CHARGE_INVOICE.INVO_NO) as INVO_NO, " +
-                "(select sum(total_sum) from CL_CHRGENTRY where chrg_no = CL_CHARGE.CHRG_NO) as total, " +
-      "max((select sum(total) from CL_RECENTRY where CL_RECENTRY.rec_no = CL_RECIPE.rec_no)) as total_rec,d.dept_name " +
-      "FROM CL_CHARGE , CL_CHARGE_INVOICE ,CL_CHARGE_RECIPE,CL_RECIPE , PATIENTINFO,CODE_OPERATOR , CODE_DEPARTMENT d " +
-      "WHERE ( CL_CHARGE.CHRG_NO = CL_CHARGE_INVOICE.CHRG_NO(+)) and (CL_CHARGE.CHRG_NO = CL_CHARGE_RECIPE.CHRG_NO) AND " +
-      "(CL_CHARGE_RECIPE.REC_NO = CL_RECIPE.REC_NO) AND (CL_RECIPE.PID = PATIENTINFO.PID) AND (CL_CHARGE_RECIPE.FLAG = '1') AND " +
-      "(CL_CHARGE.CLASS = '2' ) AND ((PATIENTINFO.NAME LIKE '%" + query + "%') or (INVO_NO like '%" + query + "%') ) " +
-      //"(CL_CHARGE.CHRG_DATE >= '2016.01.01') AND (cl_CHARGE_RECIPE.TYPE = '2') and " +
-      dateSql + " AND (cl_CHARGE_RECIPE.TYPE = '2') and " +
-      "d.dept_code=CL_RECIPE.dept_code and CODE_OPERATOR.OPER_CODE=CL_RECIPE.dr_code " +
-      "group by cl_CHARGE_RECIPE.REC_NO,CODE_OPERATOR.oper_name,PATIENTINFO.NAME ,CL_RECIPE.REC_TIME, " +
-      "CL_RECIPE.UP_FLAG,CL_RECIPE.REG_NO,CL_CHARGE.CHRG_NO ,CL_CHARGE.CHRG_TIME ,CL_CHARGE.OPER_CODE ,CL_CHARGE.TYPE , " +
-      "CL_CHARGE.REC_FLAG ,CL_CHARGE.FEE_CODE ,CL_CHARGE.STATUS,d.dept_name " +
-      "order by cl_CHARGE_RECIPE.REC_NO ";
+               "CL_RECIPE.UP_FLAG,CL_RECIPE.REG_NO,CL_RECIPE.REG_NO as mzh, CL_CHARGE.CHRG_NO ,CL_CHARGE.CHRG_TIME, " +
+               "CL_CHARGE.OPER_CODE ,CL_CHARGE.TYPE ,CL_CHARGE.REC_FLAG ,CL_CHARGE.FEE_CODE ,CL_CHARGE.STATUS, " +
+               "WMSYS.WM_CONCAT(CL_CHARGE_INVOICE.INVO_NO) as INVO_NO, " +
+               "(select sum(total_sum) from CL_CHRGENTRY where chrg_no = CL_CHARGE.CHRG_NO) as total, " +
+     "max((select sum(total) from CL_RECENTRY where CL_RECENTRY.rec_no = CL_RECIPE.rec_no)) as total_rec,d.dept_name,e.qty " +
+     "FROM CL_CHARGE , CL_CHARGE_INVOICE ,CL_CHARGE_RECIPE,CL_RECIPE , PATIENTINFO,CODE_OPERATOR , CODE_DEPARTMENT d,cl_recentry e " +
+     "WHERE ( CL_CHARGE.CHRG_NO = CL_CHARGE_INVOICE.CHRG_NO(+)) and (CL_CHARGE.CHRG_NO = CL_CHARGE_RECIPE.CHRG_NO) AND (e.rec_no = CL_RECIPE.REC_NO) AND " +
+     "(CL_CHARGE_RECIPE.REC_NO = CL_RECIPE.REC_NO) AND (CL_RECIPE.PID = PATIENTINFO.PID) AND (CL_CHARGE_RECIPE.FLAG = '1') AND " +
+     "(CL_CHARGE.CLASS = '2' ) AND ((PATIENTINFO.NAME LIKE '%" + query + "%') or (INVO_NO like '%" + query + "%') ) " +
+                    //"(CL_CHARGE.CHRG_DATE >= '2016.01.01') AND (cl_CHARGE_RECIPE.TYPE = '2') and " +
+     dateSql + " AND (cl_CHARGE_RECIPE.TYPE = '2') and " +
+     "d.dept_code=CL_RECIPE.dept_code and CODE_OPERATOR.OPER_CODE=CL_RECIPE.dr_code " +
+     "group by cl_CHARGE_RECIPE.REC_NO,e.qty,CODE_OPERATOR.oper_name,PATIENTINFO.NAME ,CL_RECIPE.REC_TIME, " +
+     "CL_RECIPE.UP_FLAG,CL_RECIPE.REG_NO,CL_CHARGE.CHRG_NO ,CL_CHARGE.CHRG_TIME ,CL_CHARGE.OPER_CODE ,CL_CHARGE.TYPE , " +
+     "CL_CHARGE.REC_FLAG ,CL_CHARGE.FEE_CODE ,CL_CHARGE.STATUS,d.dept_name " +
+     "order by cl_CHARGE_RECIPE.REC_NO ";
                 DataTable dt = DBUtil.queryExecute(sql);
                 // XnhLogger.log(dt.ReadXml);
 
@@ -1415,6 +1671,7 @@ namespace ApiMonitor.pages
             {
                 //RJZ_Get_S301_06_Zy zy = new RJZ_Get_S301_06_Zy();
                 MZBC_Get_S301_06 zy = new MZBC_Get_S301_06();
+                //RJZ_Get_S301_06_Zy zy = new RJZ_Get_S301_06_Zy();
                 //RJZ_Get_S301_06 zy = new RJZ_Get_S301_06();
                 zy.executeSql(new Dictionary<string, string>() { { "AREA_NO", AREA_NO } });
 
@@ -1445,6 +1702,49 @@ namespace ApiMonitor.pages
             return retStr;
         }
 
+        /// <summary>
+        /// 住院补偿类别
+        /// </summary>
+        /// <param name="AREA_NO"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public string zybclb(string AREA_NO)
+        {
+            string retStr = "";
+            try
+            {
+                //RJZ_Get_S301_06_Zy zy = new RJZ_Get_S301_06_Zy();
+               // MZBC_Get_S301_06 zy = new MZBC_Get_S301_06();
+                RJZ_Get_S301_06_Zy zy = new RJZ_Get_S301_06_Zy();
+                //RJZ_Get_S301_06 zy = new RJZ_Get_S301_06();
+                zy.executeSql(new Dictionary<string, string>() { { "AREA_NO", AREA_NO } });
+
+                if (zy.getExecuteStatus() == true && zy.getExecuteResultPlainString().Length > 2)
+                {
+                    // 0	成功
+                    // 1	失败  未找到该信息
+                    // 成功返回：
+                    // S_Returns=0;ITEM_CODE/ ITEM_NAME; ITEM_CODE/ ITEM_NAME
+                    // ITEM_CODE：VARCHAR2(3)   补偿类别编码
+                    // ITEM_NAME：VARCHAR2(64)  补偿类别名称
+                    retStr = DataConvert.getReturnJson("0", zy.getExecuteResultPlainString().Substring(2));
+                }
+                else if (zy.getExecuteResultPlainString() == "1")
+                {
+                    retStr = DataConvert.getReturnJson("-1", "未找到该地区补偿类别信息");
+                }
+                else
+                {
+                    retStr = DataConvert.getReturnJson("-1", zy.getExecuteResultPlainString());
+                }
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
         /// <summary>
         ///对码页面本地his查询
         /// </summary>
@@ -1690,12 +1990,19 @@ namespace ApiMonitor.pages
             {
                 string sql = "select a.name, "    //--姓名
                       + "a.ip_no, "      //--住院号
-                      + "a.D505_02, "    //-- 住院登记流水号
+                      + "a.D504_01, "    //-- 住院登记流水号
                       + "a.TOTAL_COSTS, " // --住院总费用
                       + "a.TOTAL_CHAGE, "  //--住院可补偿金额
                       + "a.ZF_COSTS,  "   // --住院自费费用
-                      + "b.area_code "   //--地区编码
-                      + "from ZYJS a left join ZYBC b on a.ip_no = b.D504_01 where ip_no = '" + query + "'"; 
+                      + "a.D506_23, "  //实际补偿额
+                      + "a.D506_18, "   //核算补偿金额
+                      + "a.BEGINPAY, "  //起伏线
+                      + "a.SCALE, "  //报销比例
+                      + "a.HEAV_REDEEM_SUM, "//大病支付
+                      + "a.REDEEM_TOTAL," //单次补偿合计
+                      + "a.BILL_TIME, "  //结算时间
+                      + "a.area_code "   //--地区编码
+                      + "from ZYJS a   where ip_no = '" + query + "'  Or name = '" + query + "' "; 
                 DataTable dt = DBUtil.queryExecute(sql);
                 if ((dt == null) || (dt.Rows.Count == 0))
                 {
@@ -1715,7 +2022,46 @@ namespace ApiMonitor.pages
             return retStr;
         }
 
-     
+    ///门诊冲正
+        [WebMethod]
+        public string czmz(string query)
+        {
+            string retStr = "";
+            try
+            {
+                string sql = "select a.D401_02, "    //--姓名
+                      + "a.T_D502_01, "      //--门诊登记流水号
+                      + "a.O_TOTAL_COSTS, "    //-- 总费用
+                      + "a.O_ZF_COSTS, " // --自费费用
+                      + "a.O_TOTAL_CHAGE,  "   // --合理费用
+                      + "a.O_OUTP_FACC, "  //帐户补偿
+                      + "a.O_OUT_JJ, "   //基金补偿
+                      + "a.O_D503_09, "  //实际补偿合计额
+                      + "a.D601_17_OUT, "  //家庭账户支出
+                      + "a.XY_OUT, "//西药补偿金额
+                      + "a.ZCAOY_OUT," //中草药补偿金额
+                      + "a.ZCHENGY_OUT, "  //中成药补偿金额
+                      + "a.MZ_BILL_TIME,  "   //--门诊结算日期
+                      + "a.AREA_NO "
+                      + "from MZJS a where D401_02 = '" + query + "'";
+                DataTable dt = DBUtil.queryExecute(sql);
+                if ((dt == null) || (dt.Rows.Count == 0))
+                {
+                    retStr = DataConvert.getReturnJson("-1", "信息有误，请核实信息！");
+                    return retStr;
+                }
+                string msg = DataConvert.DataTable2Json(dt);
+                retStr = DataConvert.getReturnJson("0", msg);
+                //todo:由HIS提供视图或查询字段绑定
+                // retStr = DataConvert.getReturnJson("-1", "query=" + query + "　待由HIS提供视图或查询字段完成数据绑定");
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(this.GetType().ToString() + " " + ex.StackTrace);
+                retStr = DataConvert.getReturnJson("-1", ex.ToString());
+            }
+            return retStr;
+        }
         /// <summary>
         /// 作废该收费项目成功
         /// </summary>
@@ -1724,7 +2070,7 @@ namespace ApiMonitor.pages
         /// <param name="NH_BM"></param>
         /// <returns></returns>
         [WebMethod]
-        public string zfsfxm(string USER_ID, string D504_09, string NH_BM)
+        public string zfsfxm(string USER_ID, string D504_09, string BILL_TIME, string BASIC_CLS, string PRE_NO, string REG_NO)
         {
             string retStr = "";
             try
@@ -1739,20 +2085,33 @@ namespace ApiMonitor.pages
                     XnhLogger.log("未找到已登记过的流水号，sql=" + sql);
                     return retStr;
                 }
+                string ss1 = BILL_TIME.Substring(9, 1) + BILL_TIME.Substring(BILL_TIME.Length - 2, 2);
+                string ss2 = BILL_TIME.Substring(17, 2) + BILL_TIME.Substring(BILL_TIME.Length - 2, 2);
+                string aa = ss1+ss2+BASIC_CLS+PRE_NO;
 
+                var bb = aa.Replace(" ", "");
                 string D504_01 = dt.Rows[0]["D504_01"] as string; //住院登记流水号
                 string AREA_NO = dt.Rows[0]["AREA_CODE"] as string; //地区代码
                 zf.executeSql(new Dictionary<string, string>() { 
-                { "AREA_NO", AREA_NO }, 
-                {"D504_01",D504_01}, 
-                {"HIS_ID",NH_BM == "" ? "0" : NH_BM} // 如果是空，传0过去
+                { "AREA_NO", AREA_NO },   //地区编码
+                {"D504_01",D504_01},   //住院登记流水号
+                //{"HIS_ID",NH_BM == "" ? "0" : NH_BM} // 如果是空，传0过去
+                {"HIS_ID",bb}    //对应HIS项目唯一ID
                 });
 
                 XnhLogger.log("作废收费项目，参数：" + zf.parames + " 结果：" + zf.getExecuteResultPlainString());
 
                 if (zf.getExecuteStatus() == true)
                 {
+                    Dictionary<string, string> modifyZYBJ_Param = new Dictionary<string, string>();
+                    modifyZYBJ_Param.Add("up_flag", "");
+                    modifyZYBJ_Param.Add("pre_no", PRE_NO);
+                    modifyZYBJ_Param.Add("reg_no", REG_NO);
+                    modifyZYBJ_Param.Add("bill_time", BILL_TIME);
+                    modifyZYBJ_Param.Add("basic_cls",BASIC_CLS);
+                    HIS.modifyZYJSBJ(modifyZYBJ_Param);
                     retStr = DataConvert.getReturnJson("0", "作废该收费项目成功");
+
                 }
                 else
                 {
@@ -1771,7 +2130,7 @@ namespace ApiMonitor.pages
         //住院费用上传-试算
         [WebMethod]
         public string zyshisuan(string USER_ID, string D504_09, string DEP_ID, string COME_AREA, string REG_NO,
-            string BCLB,string SFZTJS,string CYKS,string CYSJ, string CYZD)  
+            string BCLB,string SFZTJS,string CYKS,string CYSJ, string CYZD, string DEP_LEVEL)  
         {
             string retStr = "";
             try
@@ -1788,7 +2147,7 @@ namespace ApiMonitor.pages
                 string D401_10 = dt.Rows[0]["D401_10"] as string;
                 string D401_21 = dt.Rows[0]["D401_21"] as string;
                 string D504_01 = dt.Rows[0]["D504_01"] as string;
-
+                string D504_21 = dt.Rows[0]["D504_21"] as string;
                 //通过选择的成员来查询成员住院基础信息
                 //说明：此接口只能查询出做了入院登记还没收费的信息。
                 RJZ_Get_Member_Zy_Information info = new RJZ_Get_Member_Zy_Information();
@@ -1842,14 +2201,18 @@ namespace ApiMonitor.pages
                     input.Add("D504_07", retDict["D504_07"]); //家庭编号
                     input.Add("D504_02", D401_21); //成员序号
                     input.Add("D504_14", DEP_ID); //就医机构
-                    input.Add("D504_21", retDict["D504_21"]); //入院诊断(疾病代码)
-                    input.Add("D504_11", retDict["D504_11"]); //就诊日期(入院时间) (格式为YYYY-MM-DD)
-                    input.Add("D506_15", BCLB); //补偿类别代码
-                    input.Add("D504_15", "2"); //就医机构级别(相关数据代码标准:S201-06)
+                    //input.Add("D504_21", retDict["D504_21"]); //入院诊断(疾病代码)
+                    input.Add("D504_21", D504_21); //入院诊断(疾病代码)
+                    input.Add("D504_11", retDict["D504_11"]); //就诊日期(入院时间) (格式为YYYY-MM-DD)   ！！！！     正式库传这个（农合说测试库没有2017）
+                    //input.Add("D504_11", "2016-03-08"); //就诊日期(入院时间) (格式为YYYY-MM-DD)                     测试库传这个
+                    //input.Add("D506_15", BCLB); //补偿类别代码
+                    input.Add("D506_15", "20"); //补偿类别代码
+                    input.Add("D504_15", DEP_LEVEL); //就医机构级别(相关数据代码标准:S201-06)
                     input.Add("D504_06", retDict["D504_06"]); //年龄
                     input.Add("D504_10", retDict["D504_10"]); //就诊类型(相关数据代码标准:S301-05)
                     input.Add("D504_12", CYSJ); //出院时间(格式为YYYY-MM-DD)
-                    input.Add("D504_29", CYZD); //出院诊断（疾病代码）
+                   // input.Add("D504_12", "2016-05-08"); //出院时间(格式为YYYY-MM-DD)    ----正式库传这个
+                    input.Add("D504_29", CYZD); //出院诊断（疾病代码）                  ---测试库传这个
                     input.Add("D504_16_D", retDict["D504_16"]); //入院科室(相关数据代码标准:S201-03)
                     input.Add("D504_16_T", CYKS); //出院科室(相关数据代码标准:S201-03)
                     input.Add("S701_01", SFZTJS); //是否是中途结算(相关数据代码标准:S701-01)
@@ -1895,10 +2258,11 @@ namespace ApiMonitor.pages
         /// </summary>
        
         [WebMethod]
-        public string zyjiesuan(string USER_ID, string D504_09, string DEP_ID, string COME_AREA, string REG_NO,
-            string BCLB, string SFZTJS, string CYKS, string CYSJ, string CYZD, string CYZT, string TOTAL_COSTS,
-            string ZF_COSTS, string TOTAL_CHAGE, string D506_23, string D506_18, string BEGINPAY, string SCALE,
-            string HEAV_REDEEM_SUM, string REDEEM_TOTAL, string BCZHLB, string HSJGDM, string HSR, string NAME)
+        public string zyjiesuan(string USER_ID,string D504_09,string DEP_ID,string COME_AREA,
+            string REG_NO,string BCLB,string SFZTJS,string CYKS,string CYSJ,string CYZD,
+            string CYZT,string TOTAL_COSTS,string ZF_COSTS,string TOTAL_CHAGE,string D506_23,
+            string D506_18,string BEGINPAY,string SCALE,string HEAV_REDEEM_SUM,
+            string REDEEM_TOTAL, string HSJGDM, string HSR, string NAME, string BCZHLB, string DEP_LEVEL)
         {
 
             try
@@ -1919,36 +2283,79 @@ namespace ApiMonitor.pages
                 RJZ_shoufei jiesuan = new RJZ_shoufei();
                 Dictionary<string, string> input = new Dictionary<string, string>();
                 input.Add("AREA_CODE", AREA_NO); //病人地区编码(取前台选择的地区编码)
-                input.Add("D505_02", D504_01); //登记流水号
-                input.Add("D504_12", CYSJ); //出院时间(格式为YYYY-MM-DD)
-                input.Add("D504_15", "3"); //就医机构级别(相关数据代码标准:S201-06)
-                input.Add("D504_16_T", CYKS); //出院科室(相关数据代码标准:S201-03)
+                input.Add("D504_01", D504_01); //登记流水号
+                // input.Add("D504_12", CYSJ); //出院时间(格式为YYYY-MM-DD)2016-03-08
+                input.Add("D504_12", "2016-05-08");    //测试库
+                input.Add("D504_15", DEP_LEVEL); //就医机构级别(相关数据代码标准:S201-06)
+                input.Add("D504_17", CYKS); //出院科室(相关数据代码标准:S201-03)
                 input.Add("D504_18","王改兰"); //出院科室(相关数据代码标准:S201-03)
                 input.Add("D504_20",CYZT); //出状态
-                input.Add("D504_22", ""); //并发症(为空时传’NULL’)
-                input.Add("D506_03", "TOTAL_COSTS"); //总费用总费用（TOTAL_COSTS 总费用）试算得到
-                input.Add("D506_13", "TOTAL_CHAGE"); //合理费用
-                input.Add("D506_18", "D506_18"); //核算补偿金额
-                input.Add("D506_15", "BCLB"); //补偿类别代码
-                input.Add("D506_14", "BCZHLB"); //补偿账户类别(相关数据代码标准:S301-09)
-                input.Add("D506_16", "HSJGDM"); //核算机构代码
-                input.Add("D506_17", "HSR"); //核算人
-                input.Add("D506_23", "D506_23"); //实际补偿额（D506_23   实际补偿金额）试算得到
-                input.Add("D506_26", "NAME"); //付款人
-                input.Add("D506_27", "SFZTJS"); //中途结算标志(相关数据代码标准:S701-01)
-                input.Add("SELF_PAY", "ZF_COSTS"); //自费金额（ZF_COSTS  自费费用）试算得到
-                input.Add("HEAV_REDEEM_SUM", "HEAV_REDEEM_SUM"); //大病支付金额（HEAV_REDEEM_SUM  大病支付额）试算得到
-                input.Add("BEGINPAY", "BEGINPAY"); //起伏线
-                input.Add("D504_29", "CYZD");
+                input.Add("D504_22", "NULL"); //并发症(为空时传’NULL’)
+                input.Add("D506_03", TOTAL_COSTS); //总费用总费用（TOTAL_COSTS 总费用）试算得到
+                input.Add("D506_13", TOTAL_CHAGE); //合理费用
+                input.Add("D506_18", D506_18); //核算补偿金额
+                input.Add("D506_15", BCLB); //补偿类别代码
+                input.Add("D506_14", BCZHLB); //补偿账户类别(相关数据代码标准:S301-09)
+                input.Add("D506_16", HSJGDM); //核算机构代码
+                input.Add("D506_17", HSR); //核算人
+                input.Add("D506_23", D506_23); //实际补偿额（D506_23   实际补偿金额）试算得到
+                //input.Add("D506_23", "null"); 
+                input.Add("D506_26", NAME); //付款人
+                input.Add("D506_27", SFZTJS); //中途结算标志(相关数据代码标准:S701-01)
+                input.Add("SELF_PAY", ZF_COSTS); //自费金额（ZF_COSTS  自费费用）试算得到
+                input.Add("HEAV_REDEEM_SUM", HEAV_REDEEM_SUM); //大病支付金额（HEAV_REDEEM_SUM  大病支付额）试算得到
+                input.Add("BEGINPAY", BEGINPAY); //起伏线
+                input.Add("D504_29", CYZD);
                 //进行结算
                 jiesuan.executeSql(input);
                 XnhLogger.log("getjiesuanResult 结算参数：" + jiesuan.parames + " 结算结果：" + jiesuan.getExecuteResultPlainString());
                 if (jiesuan.getExecuteStatus() == true)
                 {
-                    //保存到数据库
+                    //结算成功
                     Dictionary<string, string> jiesuanjieguo = jiesuan.getResponseResultWrapperMap();
                     string jsonStr = DataConvert.Dict2Json(jiesuanjieguo);
+                  //存储结算结果
+                    // create table ZYJS
+                    //  ( NAME     VARCHAR2(16), -- 姓名（）
+                    //    IP_NO    VARCHAR2(24), -- 住院号（）
+                    //    D504_01   VARCHAR2(24),--  住院登记流水号   
+                    //    TOTAL_COSTS  NUMBER(8,2), -- 住院总费用
+                    //     ZF_COSTS   NUMBER(8,2),    --自费金额
+                    //    TOTAL_CHAGE  NUMBER(8,2),  -- 住院可补偿金额        
+                    //    D506_23    NUMBER(8,2),  --  实际补偿额
+                    //   D506_18   NUMBER(8,2),   -- 核算补偿金额
+                    //   BEGINPAY  NUMBER(8,2),     --起伏线
+                    //   SCALE	   NUMBER(3,2),	     --报销比例
+                    //    HEAV_REDEEM_SUM  NUMBER(8,2),   --大病支付金额
+                    //    REDEEM_TOTAL	NUMBER(8,2),	  --单次补偿合计
+                    //    BILL_TIME CHAR(30)     --结算时间（取结算系统时间）
+                    //   )
+                    string data = DateTime.Now.ToLocalTime().ToString();
+                  //  string data = data1 != "" ? data1.ToString().Split(' ')[0].Replace(".", "-") : "";   //结算日期
+                    Dictionary<string, string> CCZYJS_Param = new Dictionary<string, string>();
+                    CCZYJS_Param.Add("NAME", NAME);
+                    CCZYJS_Param.Add("IP_NO", D504_09);
+                    CCZYJS_Param.Add("D504_01", D504_01);
+                    CCZYJS_Param.Add("TOTAL_COSTS", TOTAL_COSTS);
+                    CCZYJS_Param.Add("ZF_COSTS", ZF_COSTS);
+                    CCZYJS_Param.Add("TOTAL_CHAGE", TOTAL_CHAGE);
+                    CCZYJS_Param.Add("D506_23", D506_23);
+                    CCZYJS_Param.Add("D506_18", D506_18);
+                    CCZYJS_Param.Add("BEGINPAY", BEGINPAY);
+                    CCZYJS_Param.Add("SCALE", SCALE);
+                    CCZYJS_Param.Add("HEAV_REDEEM_SUM", HEAV_REDEEM_SUM);
+                    CCZYJS_Param.Add("REDEEM_TOTAL", REDEEM_TOTAL);
+                    CCZYJS_Param.Add("BILL_TIME",data);   //获取系统时间
+                    CCZYJS_Param.Add("AREA_CODE", AREA_NO);   //获取系统时间
+
+                    HIS.CCZYJS(CCZYJS_Param);
+
                     retStr = DataConvert.getReturnJson("0", jsonStr);
+                    
+                }
+                else
+                {
+                    retStr = DataConvert.getReturnJson("-1", "信息有误：" + jiesuan.getExecuteResultPlainString());
                 }
             }
             catch(Exception ex)

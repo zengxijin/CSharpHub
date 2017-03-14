@@ -162,11 +162,16 @@
                                     <tr>
                                         <th>姓名</th>
                                         <th>住院号</th>
-                                        <th>住院登记流水号</th>
                                         <th>住院总费用</th>
                                         <th>住院可补偿金额</th>
                                         <th>住院自费费用 </th>
-                                        <th>地区编码</th>
+                                        <th>实际补偿额</th>
+                                        <th>核算补偿金额</th>
+                                        <th>起伏线</th>
+                                        <th>报销比例</th>
+                                        <th>大病支付</th>
+                                        <th>单次补偿合计</th>
+                                        <th>结算时间</th>
                                         <th>操作</th>
                                     </tr>
                                 </thead>
@@ -182,6 +187,49 @@
             </div>
         </div>
 
+        <div class="container" id="mainContent">
+            <!-- left, vertical navbar & content -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="text-muted bootstrap-admin-box-title">门诊结算患者列表</div>
+                        </div>
+                        <div class="bootstrap-admin-panel-content">
+                            <div class="form-inline" role="form">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="queryBtn1" placeholder="输入回车查询">
+                                </div>
+                            </div>
+                            <p></p>
+                            <table class="table table-striped table-bordered" id="czmz">
+                                <thead>
+                                    <tr>
+                                        <th>姓名</th>
+                                        <th>门诊登记流水号</th>
+                                        <th>门诊总费用</th>
+                                        <th>自费费用 </th>
+                                        <th>合理费用</th>
+                                        <th>帐户补偿</th>
+                                        <th>基金补偿</th>
+                                        <th>实际补偿</th>
+                                        <th>家庭账户支出</th>
+                                        <th>西药补偿</th>
+                                        <th>中草药补偿</th>
+                                        <th>中成药补偿</th>
+                                        <th>结算日期</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
       
 
         <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
@@ -195,6 +243,75 @@
             //明细（也是从HIS取）
             //加个输入框筛选，字段由HIS定；
             var buffer = null;
+            //门诊
+            $('#queryBtn1').bind('keyup', function (event) {
+                if (event.keyCode == "13") {
+                    var query = $("#queryBtn1").val();
+                    if (query == '') {
+                        alert("请输入信息查询");
+                        return;
+                    }
+
+                    showMask("正在查询，请稍后...");
+
+                    $.ajax({
+                        type: "Post",
+                        url: "xnhservice.asmx/czmz",
+                        data: "{'query':'" + query + "'}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (data) {
+                            closeMask();
+                            //返回的数据用data.d获取内容
+                            var retVal = data.d;
+                            //遍历json数组操作
+                            var retJson = getJsonObj(retVal);
+                            buffer = retJson;
+                            if (retJson.flag == '0') {
+                                var dataJson = buffer.msg.data;//buffer.msg.data[0]["NAME"]
+                                $("#czmz tbody tr").detach();
+
+                                for (var i = 0; i < dataJson.length; i++) {
+                                    var row =
+                                         '<tr class="odd gradeX">                               '
+                                        + '    <td>' + dataJson[i]["D401_02"] + '</td>                                        '
+                                        + '    <td> ' + dataJson[i]["T_D502_01"] + '</td>              '
+                                        + ' <td> ' + dataJson[i]["O_TOTAL_COSTS"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["O_ZF_COSTS"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["O_TOTAL_CHAGE"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["O_OUTP_FACC"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["O_OUT_JJ"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["O_D503_09"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["D601_17_OUT"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["XY_OUT"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["ZCAOY_OUT"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["ZCHENGY_OUT"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["MZ_BILL_TIME"] + ' </td>           '
+                                        + '    <td class="center">                              '
+                                        + '        <a onclick="javascript:mzcz1(\'' + dataJson[i]["T_D502_01"] + '\',\'' + dataJson[i]["AREA_NO"] + '\');">冲正</a>                                  '
+                                        + '        <br />                                       '
+                                        + '        <a onclick="javascript:mzdyfp(\'' + dataJson[i]["T_D502_01"] + '\',\'' + dataJson[i]["AREA_NO"] + '\');">打印发票</a>                                  '
+                                        + '    </td>                                            '
+                                        + '</tr>                                                '
+                                    $("#czmz tbody").append(row);
+                                }
+
+                                //todo：根据需要绑定解析和绑定前台数据
+
+                            } else {
+                                alert("查询失败：" + retJson.msg);
+                            }
+
+                        },
+                        error: function (err) {
+                            closeMask();
+                            alert(err.toString());
+                        }
+                    });
+                }
+            });
+
+            //住院
             $('#queryBtn').bind('keyup', function (event) {
                 if (event.keyCode == "13") {
                     var query = $("#queryBtn").val();
@@ -227,15 +344,20 @@
                                          '<tr class="odd gradeX">                               '
                                         + '    <td>' + dataJson[i]["NAME"] + '</td>                                        '
                                         + '    <td> ' + dataJson[i]["IP_NO"] + '</td>              '
-                                        + ' <td> ' + dataJson[i]["D505_02"] + ' </td>              '
                                         + ' <td> ' + dataJson[i]["TOTAL_COSTS"] + ' </td>           '
                                         + ' <td> ' + dataJson[i]["TOTAL_CHAGE"] + ' </td>           '
                                         + ' <td> ' + dataJson[i]["ZF_COSTS"] + ' </td>           '
-                                        + ' <td> ' + dataJson[i]["AREA_CODE"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["D506_23"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["D506_18"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["BEGINPAY"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["SCALE"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["HEAV_REDEEM_SUM"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["REDEEM_TOTAL"] + ' </td>           '
+                                        + ' <td> ' + dataJson[i]["BILL_TIME"] + ' </td>           '
                                         + '    <td class="center">                              '
-                                        + '        <a>冲正</a>                                  '
+                                        + '        <a  onclick="javascript:zycz1(\'' + dataJson[i]["D504_01"] + '\',\'' + dataJson[i]["AREA_CODE"] + '\');">冲正</a>                                  '
                                         + '        <br />                                       '
-                                        + '        <a>打印发票</a>                                  '
+                                        + '        <a onclick="javascript:zydyfp(\'' + dataJson[i]["D504_01"] + '\',\'' + dataJson[i]["AREA_CODE"] + '\'>打印发票</a>                                  '
                                         + '    </td>                                            '
                                         + '</tr>                                                '
                                     $("#czlp tbody").append(row);
@@ -255,6 +377,159 @@
                     });
                 }
             });
+
+            //门诊打印发票
+            function mzdyfp(T_D502_01, AREA_CODE) {
+                var pMap = {};
+                pMap["T_D502_01"] = T_D502_01;//门诊登记流水号
+                pMap["AREA_CODE"] = AREA_CODE;  //地区编码
+                pJson = map2Json(pMap);
+
+                showMask("正在处理，请稍后...");
+                $.ajax({
+                    type: "Post",
+                    url: "xnhservice.asmx/mzdyfp",
+                    data: pJson,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        closeMask();
+                        var retVal = data.d;
+                        var retJson = getJsonObj(retVal);
+                        if (retJson.flag == '0') {
+                            //绑定试算结果
+                            alert("处理成功：" + retJson.msg);
+                            var info = retJson.msg;
+                            for (var item in info) {
+                                var objTest = $("#" + item);
+                                if (objTest != null) {
+                                    $("#" + item).html(info[item]);
+                                }
+                            }
+
+                        } else {
+                            alert("处理失败：" + retJson.msg);
+                        }
+
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        closeMask();
+                        alert(textStatus + ":" + errorThrown);
+                    }
+                });
+
+            }
+
+            //住院打印
+            function zydyfp(D504_01, AREA_CODE) {
+                var pMap = {};
+                pMap["D504_01"] = D504_01;//住院登记流水号
+                pMap["AREA_CODE"] = AREA_CODE;  //地区编码
+                pJson = map2Json(pMap);
+
+                showMask("正在处理，请稍后...");
+                $.ajax({
+                    type: "Post",
+                    url: "xnhservice.asmx/zydyfp",
+                    data: pJson,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        closeMask();
+                        var retVal = data.d;
+                        var retJson = getJsonObj(retVal);
+                        if (retJson.flag == '0') {
+                            //绑定试算结果
+                            alert("处理成功：" + retJson.msg);
+
+
+                        } else {
+                            alert("处理失败：" + retJson.msg);
+                        }
+
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        closeMask();
+                        alert(textStatus + ":" + errorThrown);
+                    }
+                });
+
+            }
+            //门诊冲正
+            function mzcz1(T_D502_01, AREA_CODE)
+            {
+                var pMap = {};
+                pMap["T_D502_01"] = T_D502_01;//门诊登记流水号
+                pMap["AREA_CODE"] = AREA_CODE;  //地区编码
+                pJson = map2Json(pMap);
+
+                showMask("正在处理，请稍后...");
+                $.ajax({
+                    type: "Post",
+                    url: "xnhservice.asmx/chongzheng",
+                    data: pJson,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        closeMask();
+                        var retVal = data.d;
+                        var retJson = getJsonObj(retVal);
+                        if (retJson.flag == '0') {
+                            //绑定试算结果
+                            alert("处理成功：" + retJson.msg);
+                            
+
+                        } else {
+                            alert("处理失败：" + retJson.msg);
+                        }
+
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        closeMask();
+                        alert(textStatus + ":" + errorThrown);
+                    }
+                });
+
+            }
+
+            //住院冲正
+            function zycz1(D504_01, AREA_CODE) {
+                var pMap = {};
+                pMap["D504_01"] = D504_01;//门诊登记流水号
+                pMap["AREA_CODE"] = AREA_CODE;  //地区编码
+                pJson = map2Json(pMap);
+
+                showMask("正在处理，请稍后...");
+                $.ajax({
+                    type: "Post",
+                    url: "xnhservice.asmx/zychongzheng",
+                    data: pJson,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        closeMask();
+                        var retVal = data.d;
+                        var retJson = getJsonObj(retVal);
+                        if (retJson.flag == '0') {
+                            //绑定试算结果
+                            alert("处理成功：" + retJson.msg);
+
+
+                        } else {
+                            alert("处理失败：" + retJson.msg);
+                        }
+
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        closeMask();
+                        alert(textStatus + ":" + errorThrown);
+                    }
+                });
+
+            }
+
+
+            
         </script>
     </body>
 </html>

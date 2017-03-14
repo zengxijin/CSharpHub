@@ -247,8 +247,9 @@
                                     <th>处方金额</th>
                                     <th>结算人</th>
                                     <th>患者姓名</th>
-                                    <th>处方医生</th>
+                                    <!--th>处方医生</th>-->
                                     <th>农合结算</th>
+                                    <th>数量</th>
                                     <th>操作</th>
                                 </tr>
                             </thead>
@@ -673,8 +674,8 @@
             <ul style="list-style:none;">
                 <li style="float:left;width:20%;"><button type="button" class="btn btn-default" onclick="javacript: tryCal();">试算</button></li>
                 <li style="float:left;width:20%;"><button type="button" class="btn btn-default" onclick="javacript: shoufei();">收费</button></li>
-                <li style="float:left;width:20%;"><button type="button" class="btn btn-default" onclick="javacript: chongzheng();">冲正</button></li>
-                <li style="float:left;width:20%;"><button type="button" class="btn btn-default">打印补偿票据</button></li>
+                <!--<li style="float:left;width:20%;"><button type="button" class="btn btn-default" onclick="javacript: chongzheng();">冲正</button></li>-->
+                <!--<li style="float:left;width:20%;"><button type="button" class="btn btn-default">打印补偿票据</button></li>-->
 
             </ul>
         </div>
@@ -847,7 +848,8 @@
                 map["NAME"] = $("#" + checked[i] + "_NAME").html();            //患者姓名
                 map["IP_DR"] = $("#" + checked[i] + "_IP_DR").html();          //处方医生
                 map["FEE_CODE"] = $("#" + checked[i] + "_FEE_CODE").html();    //农合结算
-                selectedRows += $.base64.encode(map2Json(map), "utf8") + "$"; //多个人用$分割
+                map["QTY"] = $("#" + checked[i] + "_QTY").html();              //数量
+                selectedRows += $.base64.encode(map2Json(map), "utf8") + "$";  //多个人用$分割
             }
 
             if (confirm("确定对\n\n" + info + "\n进行试算吗？")) {
@@ -912,11 +914,41 @@
                 alert("无试算信息，请先试算");
                 return;
             }
+            //选中的流水不是同一个人
+            if (isSamePeople == false) {
+                alert("请选择属于 " + nameSelected + " 的流水");
+                return;
+            }
 
+           // var info = "";
+            var selectedRows = "";
+            var checked = getChecked(); //获取被选中的信息
+            var info = "";
+            for (var i = 0; i < checked.length; i++) {
+                info += "流水:" + $("#" + checked[i] + "_REG_NO").html() + " 患者:" + $("#" + checked[i] + "_NAME").html() + "\n";
+
+                var map = {};
+                map["REG_NO"] = $("#" + checked[i] + "_REG_NO").html();        //门诊流水号
+                map["REC_NO"] = $("#" + checked[i] + "_REC_NO").html();        //处方号
+                map["REC_TIME"] = $("#" + checked[i] + "_REC_TIME").html();    //结算日期
+                map["TOTAL"] = $("#" + checked[i] + "_TOTAL").html();          //结算金额
+                map["TOTAL_REC"] = $("#" + checked[i] + "_TOTAL_REC").html();  //处方金额
+                map["OPER_NAME"] = $("#" + checked[i] + "_OPER_NAME").html();  //结算人
+                map["NAME"] = $("#" + checked[i] + "_NAME").html();            //患者姓名
+                map["IP_DR"] = $("#" + checked[i] + "_IP_DR").html();          //处方医生
+                map["FEE_CODE"] = $("#" + checked[i] + "_FEE_CODE").html();    //农合结算
+                selectedRows += $.base64.encode(map2Json(map), "utf8") + "$"; //多个人用$分割
+            }
+
+            if (confirm("确定对\n\n" + info + "\n进行结算吗？")) {
+            } else {
+                return;
+            }
             var USER_ID = getCookie("USER_ID");
             var pMap = {};
             pMap["USER_ID"] = USER_ID;
             pMap["PARAM"] = shoufeicanshu; //收费参数，根据第一步试算缓存而来
+            pMap["ROWS"] = selectedRows; //选中的多个记录
             var pJson = map2Json(pMap);
             showMask("正在收费...");
             $.ajax({
@@ -974,6 +1006,7 @@
 
             var USER_ID = getCookie("USER_ID");
             var pMap = {};
+            pMap["NAME"] = $("#" + checked[i] + "_NAME").html();
             pMap["USER_ID"] = USER_ID;
             pMap["AREA_NO"] = AREA_NO; //地区代码
             pMap["MZLSH"] = selectedRows; //选中的冲正的门诊流水
@@ -1052,8 +1085,9 @@
                                 trStr += '<td id="' + trId + '_TOTAL_REC">' + row['TOTAL_REC'] + '</td>'; //处方金额
                                 trStr += '<td id="' + trId + '_OPER_NAME">' + row['OPER_NAME'] + '</td>'; //结算人
                                 trStr += '<td id="' + trId + '_NAME">' + row['NAME'] + '</td>';           //患者姓名
-                                trStr += '<td id="' + trId + '_IP_DR">' + row['IP_DR'] + '</td>';         //处方医生
+                               // trStr += '<td id="' + trId + '_IP_DR">' + row['IP_DR'] + '</td>';         //处方医生
                                 trStr += '<td id="' + trId + '_FEE_CODE">' + $.trim(row['FEE_CODE']) + '</td>'; //农合结算
+                                trStr += '<td id="' + trId + '_QTY">' + $.trim(row['QTY']) + '</td>';  //数量
                                 trStr += '<td id="' + trId + '_CHECKBOX">' + '<input name="lsCheckBox" type="checkbox" value="' + trId + '" />' + '</td>';
                                 trStr += '</tr>';
                                 $(trStr).appendTo("#bclist");

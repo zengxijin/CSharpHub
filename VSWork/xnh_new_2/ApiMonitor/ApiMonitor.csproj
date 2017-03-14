@@ -154,9 +154,12 @@
     <Content Include="pages\js\respond.min.js" />
     <Content Include="pages\js\twitter-bootstrap-hover-dropdown.js" />
     <Content Include="pages\js\twitter-bootstrap-hover-dropdown.min.js" />
-    <Content Include="pages\mzbcprint.html" />
+    <Content Include="pages\mzfpprint1.html" />
+    <Content Include="pages\zyfpprint1.html" />
     <Content Include="pages\xnhdz.html" />
     <Content Include="pages\xnhservice.asmx" />
+    <Content Include="pages\zyfpprint2.html" />
+    <Content Include="pages\zyfpprint3.html" />
     <Content Include="pages\zymxsc.html" />
     <Content Include="pages\rydj.html" />
     <None Include="Service References\ServiceReference1\configuration91.svcinfo" />

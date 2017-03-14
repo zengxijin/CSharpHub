@@ -428,7 +428,7 @@
 			"service": "Execute_Sql"
 		},
 		"request": {
-			"AREA_CODE": "0"
+			"AREA_NO": "0"
 		},
 		"response": {
 			"return_code": "0",
@@ -610,6 +610,38 @@
             "D504_01": "1",
             "HIS_ID": "2"
              
+		},
+		"response": {
+			"return_code": "0"
+		}
+	},
+    "shoufei": {
+		"callService": {
+			"service": "Update_Data_String"
+		},
+		"request": {
+			"AREA_CODE":"0",
+			"D504_01":"1",
+			"D504_12":"2",
+			"D504_15":"3",
+			"D504_17":"4",
+			"D504_18":"5",
+			"D504_20":"6",
+			"D504_22":"7",
+			"D506_03":"8",
+			"D506_13":"9",
+			"D506_18":"10",
+			"D506_15":"11",
+			"D506_14":"12",
+			"D506_16":"13",
+			"D506_17":"14",
+			"D506_23":"15",
+			"D506_26":"16",
+			"D506_27":"17",
+			"SELF_PAY":"18",
+			"HEAV_REDEEM_SUM":"19",
+			"BEGINPAY":"20",
+			"D504_29":"21"
 		},
 		"response": {
 			"return_code": "0"

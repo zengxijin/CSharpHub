@@ -697,8 +697,8 @@
                                     + '    <td>' + dataJson[i]["NAME"] + '+' + dataJson[i]["IP_NO"] + '</td>                                        '
                                     + '    <td>                                             '
                                     + '        <a onclick="javascript:ddcmx(\'' + dataJson[i]["IP_NO"] + '\',\'' + dataJson[i]["REG_NO"] + '\');">单独传明细</a>                            '
-                                    + '        <br />                                       '
-                                    + '        <a>删除收费项目</a>                          '
+                                   // + '        <br />                                       '
+                                //    + '        <a>删除收费项目</a>                          '
                                     + '    </td>                                            '
                                     + '    <td class="center">                              '
                                     + '        <a onclick="javascript:shisuan(\'' + dataJson[i]["IP_NO"] + '\',\'' + dataJson[i]["REG_NO"] + '\');">试算</a>                                  '
@@ -782,6 +782,8 @@
             }
         });
 
+        
+
         ///查看明细项目
         function ckmx(REG_NO) {  
 
@@ -798,35 +800,38 @@
                     //返回的数据用data.d获取内容
                     var retVal = data.d;
                     //遍历json数组操作
+                 //  buffer = retJson;
                     var retJson = getJsonObj(retVal);
                     if (retJson.flag == '0') {
-                        var row = retJson.msg.data[0];
+                        var dataJson = retJson.msg.data;
                         
+                      //  var dataJson = buffer.msg.data;
                         $("#zymx tbody tr").detach();
-                        
+                        for (var i = 0; i < dataJson.length; i++) {   //循环
+                            var row = dataJson[i];
 
-                        var trId = $.trim(row['IP_NO']);
+                            var trId = $.trim(row['IP_NO']);
 
-                        var trStr = '<tr class="example" id="' + trId + '" >';//动态拼接table
+                            var trStr = '<tr class="example" id="' + trId + '" >';//动态拼接table
 
-                        //trStr += '<td id="' + trId + '_ip_no">' + $.trim(row['IP_NO']) + '</td>';//数据表的主键值 门诊流水号
-                        trStr += '<td id="' + trId + '_item_code">' + row['ITEM_CODE'] + '</td>';    //项目编码
-                        trStr += '<td id="' + trId + '_item_name">' + row['ITEM_NAME'] + '</td>';  //名称
-                        trStr += '<td id="' + trId + '_price">' + row['PRICE'] + '</td>';   //项目单价
-                        trStr += '<td id="' + trId + '_qty">' + row['QTY'] + '</td>';         //项目数量
-                        trStr += '<td id="' + trId + '_total">' + row['TOTAL'] + '</td>'; //项目总价格
-                        trStr += '<td id="' + trId + '_bill_time">' + row['BILL_TIME'] + '</td>'; //记账时间
-                        trStr += '<td id="' + trId + '_pre_no">' + row['PRE_NO'] + '</td>';         //医嘱编号
-                        trStr += '<td id="' + trId + '_up_flag">' + row['UP_FLAG'] + '</td>'; //上传标志
-                        trStr += '<td id="' + trId + '_standard">' + row['STANDARD'] + '</td>';//规格
-                        trStr += '<td id="' + trId + '_small_unit">' + row['SMALL_UNIT'] + '</td>';//单位
-                        trStr += '<td class="center">                              '
-                        + '        <a onclick="javascript:zfsfxm(\'' + row['IP_NO'] + '\',\'' + row["NH_BM"] + '\');" >作废收费项目</a>                                  '
-                        + '    </td> ';
-                        $(trStr).appendTo("#mxlist");
-                        
-                        //todo：根据需要绑定解析和绑定前台数据
+                            //trStr += '<td id="' + trId + '_ip_no">' + $.trim(row['IP_NO']) + '</td>';//数据表的主键值 门诊流水号
+                            trStr += '<td id="' + trId + '_item_code">' + row['ITEM_CODE'] + '</td>';    //项目编码
+                            trStr += '<td id="' + trId + '_item_name">' + row['ITEM_NAME'] + '</td>';  //名称
+                            trStr += '<td id="' + trId + '_price">' + row['PRICE'] + '</td>';   //项目单价
+                            trStr += '<td id="' + trId + '_qty">' + row['QTY'] + '</td>';         //项目数量
+                            trStr += '<td id="' + trId + '_total">' + row['TOTAL'] + '</td>'; //项目总价格
+                            trStr += '<td id="' + trId + '_bill_time">' + row['BILL_TIME'] + '</td>'; //记账时间
+                            trStr += '<td id="' + trId + '_pre_no">' + row['PRE_NO'] + '</td>';         //医嘱编号
+                            trStr += '<td id="' + trId + '_up_flag">' + row['UP_FLAG'] + '</td>'; //上传标志
+                            trStr += '<td id="' + trId + '_standard">' + row['STANDARD'] + '</td>';//规格
+                            trStr += '<td id="' + trId + '_small_unit">' + row['SMALL_UNIT'] + '</td>';//单位
+                            trStr += '<td class="center">                              '
+                            + '        <a onclick="javascript:zfsfxm(\'' + row['IP_NO'] + '\',\'' + row["BILL_TIME"] + '\',\'' + row["BASIC_CLS"] + '\',\'' + row["PRE_NO"] + '\',\'' + row["REG_NO"] + '\');" >作废收费项目</a>                                  '
+                            + '    </td> ';
+                            $(trStr).appendTo("#mxlist");
 
+                            //todo：根据需要绑定解析和绑定前台数据
+                        }
                     } else {
                         alert("查询失败：" + retJson.msg);
                     }
@@ -841,7 +846,7 @@
         }
     
         //作废收费项目
-        function zfsfxm(D504_09, NH_BM) {
+        function zfsfxm(D504_09,BILL_TIME,BASIC_CLS,PRE_NO,REG_NO) {
             if (confirm("确定作废收费项目？")) {
             } else {
                 return;
@@ -851,7 +856,10 @@
             var pMap = {};
             pMap["USER_ID"] = USER_ID;
             pMap["D504_09"] = D504_09; //住院号
-            pMap["NH_BM"] = NH_BM; //住院号
+            pMap["BILL_TIME"] = BILL_TIME; //记账时间
+            pMap["BASIC_CLS"] = BASIC_CLS; //重复标志
+            pMap["PRE_NO"] = PRE_NO; //医嘱号
+            pMap["REG_NO"] = REG_NO; //zhuyuan lishui
             var pJson = map2Json(pMap);
 
             showMask("正在处理，请稍后...");
@@ -957,7 +965,7 @@
             var cyks = $("#cyks").val(); //出院科室
             var cysj = $("#date").val(); //出院时间
             var cyzd = $("#jbbm").val(); //出院诊断
-
+            var  DEP_LEVEL = getCookie("DEP_LEVEL");
             if (BCLB == "") {
                 alert("请选择地区选择补偿类别");
                 return;
@@ -1003,7 +1011,7 @@
             pMap["CYKS"] = cyks; //出院科室
             pMap["CYSJ"] = cysj; //出院时间
             pMap["CYZD"] = cyzd; //出院诊断
-
+            pMap["DEP_LEVEL"] = DEP_LEVEL; //级别
             pJson = map2Json(pMap);
 
             showMask("正在处理，请稍后...");
@@ -1036,6 +1044,8 @@
             });
         }
 
+        var testBuffer = null;
+
         //结算
         function jiesuan(IP_NO,NAME, REG_NO)
         {
@@ -1054,8 +1064,9 @@
             var BEGINPAY = $("#BEGINPAY").html();
             var SCALE = $("#SCALE").html();
             var HEAV_REDEEM_SUM = $("#HEAV_REDEEM_SUM").html();
-            var REDEEM_TOTAL = $("REDEEM_TOTAL").html();
-            var bczhlb = $("bczhlb").val();
+            var REDEEM_TOTAL = $("#REDEEM_TOTAL").html();
+            var bczhlb = $("#bczhlb").val();
+            var DEP_LEVEL = getCookie("DEP_LEVEL");
             if (BCLB == "") {
                 alert("请选择地区选择补偿类别");
                 return;
@@ -1113,11 +1124,14 @@
             pMap["SCALE"] = SCALE; //报销比例
             pMap["HEAV_REDEEM_SUM"] = HEAV_REDEEM_SUM; //大病支付额
             pMap["REDEEM_TOTAL"] = REDEEM_TOTAL; //单次补偿合计
-            pMap["hsjgdm"] = getCookie("DEP_ID"); //核算机构(代码)
-            pMap["hsr"] = getCookie("USER_ID"); //核算人
-            pMap["D506_23"] = getCookie("D506_23"); //实际补偿额（D506_23   实际补偿金额）试算得到
+            pMap["HSJGDM"] = getCookie("DEP_ID"); //核算机构(代码)
+            pMap["HSR"] = getCookie("USER_ID"); //核算人
+          //  pMap["D506_23"] = getCookie("D506_23"); //实际补偿额（D506_23   实际补偿金额）试算得到
             pMap["NAME"] = NAME;//患者姓名
+            pMap["BCZHLB"] = bczhlb;//账户补偿类别
+            pMap["DEP_LEVEL"] = DEP_LEVEL;//账户补偿类别
             pJson = map2Json(pMap);
+            testBuffer = pJson;
             showMask("正在处理，请稍后...");
             $.ajax({
                 type: "Post",
@@ -1164,7 +1178,7 @@
 
             $.ajax({
                 type: "Post",
-                url: "xnhservice.asmx/bclb",
+                url: "xnhservice.asmx/zybclb",
                 data: pJson,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",

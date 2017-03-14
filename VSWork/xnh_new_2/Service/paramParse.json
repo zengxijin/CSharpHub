@@ -142,7 +142,7 @@
 			"D501_09": "23",
 			"D503_18": "24",
 			"HOSP_NAME": "25",
-			" D601_17_OUT": "26",
+			"D601_17_OUT": "26",
 			"XY_OUT": "27",
 			"ZCAOY_OUT": "28",
 			"ZCHENGY_OUT": "29"
@@ -155,10 +155,10 @@
 			"O_OUTP_FACC": "4",
 			"O_OUT_JJ": "5",
 			"O_D503_09": "6",
-			" D601_17_OUT": "7",
-			" XY_OUT": "8",
-			" ZCAOY_OUT": "9",
-			" ZCHENGY_OUT": "10"
+			"D601_17_OUT": "7",
+			"XY_OUT": "8",
+			"ZCAOY_OUT": "9",
+			"ZCHENGY_OUT": "10"
 		}
 	},
 	"Print_Mz_New": {
@@ -245,14 +245,14 @@
 		"response": {
 			"return_code": "0",
 			"D401_10": "1",
-			" D401_21": "2",
+			"D401_21": "2",
 			"D401_02": "3",
-			" XB": "4",
+			"XB": "4",
 			"D401_03": "5",
 			"D401_01": "6",
 			"AGE": "7",
 			"D401_13": "8",
-			" INP_DATE": "9",
+			"INP_DATE": "9",
 			"IDENTITY": "10"
 		}
 	},
@@ -435,6 +435,18 @@
 			"info": "1"
 		}
 	},
+    "Get_S301_06": {
+		"callService": {
+			"service": "Execute_Sql"
+		},
+		"request": {
+			"AREA_CODE": "0"
+		},
+		"response": {
+			"return_code": "0",
+			"info": "1"
+		}
+	},
 	"getShisuanResult": {
 		"callService": {
 			"service": "Update_Data_String"
@@ -573,6 +585,63 @@
 		"request": {
 			"AREA_NO": "0",
 			"D401_10": "1"
+		},
+		"response": {
+			"return_code": "0"
+		}
+	},
+    "Get_S301_06": {
+		"callService": {
+			"service": "Execute_Sql"
+		},
+		"request": {
+			"AREA_NO": "0"
+		},
+		"response": {
+			"return_code": "0"
+		}
+	},
+    "PROC_DELETE_PRICE_LIST_PER": {
+		"callService": {
+			"service": "Update_Data_String"
+		},
+		"request": {
+			"AREA_NO": "0",
+            "D504_01": "1",
+            "HIS_ID": "2"
+             
+		},
+		"response": {
+			"return_code": "0"
+		}
+	},
+    "shoufei": {
+		"callService": {
+			"service": "Update_Data_String"
+		},
+		"request": {
+			"AREA_CODE":"0",
+			"D504_01":"1",
+			"D504_12":"2",
+			"D504_15":"3",
+			"D504_17":"4",
+			"D504_18":"5",
+			"D504_20":"6",
+			"D504_22":"7",
+			"D506_03":"8",
+			"D506_13":"9",
+			"D506_18":"10",
+			"D506_15":"11",
+			"D506_14":"12",
+			"D506_16":"13",
+			"D506_17":"14",
+			"D506_23":"15",
+			"D506_26":"16",
+			"D506_27":"17",
+			"SELF_PAY":"18",
+			"HEAV_REDEEM_SUM":"19",
+			"BEGINPAY":"20",
+			"D504_29":"21"
 		},
 		"response": {
 			"return_code": "0"

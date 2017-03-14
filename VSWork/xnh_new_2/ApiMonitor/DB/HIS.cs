@@ -96,15 +96,18 @@ namespace ApiMonitor.DB
         /// create table MZJS
         ///  (D401_02        VARCHAR2(18),     -- 成员姓名
         ///   T_D502_01      CHAR(30),       -- 门诊登记流水号
-        ///   TOTAL_COSTS    VARCHAR2(24),      --总费用
-        ///   ZF_COSTS       VARCHAR2(24),      --自费费用
-        ///   TOTAL_CHAGE       VARCHAR2(24),      --合理费用
-        ///   D506_23          VARCHAR2(24),      --实际补偿金额
-        ///   D506_18           VARCHAR2(24),    --核算补偿金额[实际补偿合计额)
-        ///   BEGINPAY           VARCHAR2(24),   --本次起伏线
-        ///   SCALE             VARCHAR2(24),    --报销比例
-        ///   HEAV_REDEEM_SUM   VARCHAR2(24),    --大病支付额
-        ///   REDEEM_TOTAL       VARCHAR2(24)    --单次补偿合计
+        ///   O_TOTAL_COSTS      NUMBER(8,2),      --总费用
+        ///   O_ZF_COSTS         NUMBER(8,2),      --自费费用
+        ///   O_TOTAL_CHAGE      NUMBER(8,2),     --合理费用
+        ///   O_OUTP_FACC        NUMBER(8,2),     --帐户补偿
+        ///   O_OUT_JJ	         NUMBER(8,2),	  --基金补偿
+        ///   O_D503_09           NUMBER(8,2),    --核算补偿金额[实际补偿合计额)
+        ///   D601_17_OUT	      NUMBER(8,2),	  --家庭账户支出
+        ///   XY_OUT	         NUMBER(8,2),	 --西药补偿金额
+        ///   ZCAOY_OUT	         NUMBER(8,2),	 --中草药补偿金额
+        ///   ZCHENGY_OUT	     NUMBER(8,2),	 --中成药补偿金额
+        ///   MZ_BILL_TIME       CHAR(30),        --门诊结算日期
+        ///   AREA_NO            VARCHAR2(18)      --地区编码
         ///   )
         /// </summary> 
         /// <param name="sqlParam"></param>
@@ -115,24 +118,28 @@ namespace ApiMonitor.DB
                 XnhLogger.log("MZJS sqlParam参数为空");
                 return;
             }
-            string sql = "insert into MZJS(D401_02,T_D502_01,TOTAL_COSTS,ZF_COSTS,TOTAL_CHAGE,D506_23,D506_18,BEGINPAY,SCALE,HEAV_REDEEM_SUM,REDEEM_TOTAL) "
-                          + "values (D401_02,T_D502_01,TOTAL_COSTS,ZF_COSTS,TOTAL_CHAGE,D506_23,D506_18,BEGINPAY,SCALE,HEAV_REDEEM_SUM,REDEEM_TOTAL)";
+            string sql = "insert into MZJS(D401_02,T_D502_01,O_TOTAL_COSTS ,O_ZF_COSTS,O_TOTAL_CHAGE,O_OUTP_FACC,O_OUT_JJ,O_D503_09,D601_17_OUT,XY_OUT,ZCAOY_OUT,ZCHENGY_OUT,MZ_BILL_TIME,AREA_NO) "
+                          + "values ('$D401_02$','$T_D502_01$','$O_TOTAL_COSTS$','$O_ZF_COSTS$','$O_TOTAL_CHAGE$','$O_OUTP_FACC$','$O_OUT_JJ$','$O_D503_09$','$D601_17_OUT$','$XY_OUT$','$ZCAOY_OUT$','$ZCHENGY_OUT$','$MZ_BILL_TIME$','$AREA_NO$')";
  ///依次是：成员姓名，门诊登记流水号，总费用，自费费用，合理费用，实际补偿金额，核算补偿金额[实际补偿合计额)，本次起伏线，报销比例，大病支付额，单次补偿合计
             try
             {
                 sql = sql.Replace("$D401_02$", (sqlParam.ContainsKey("D401_02") == true ? sqlParam["D401_02"] : ""));
                 sql = sql.Replace("$T_D502_01$", (sqlParam.ContainsKey("T_D502_01") == true ? sqlParam["T_D502_01"] : ""));
-                sql = sql.Replace("$TOTAL_COSTS$", (sqlParam.ContainsKey("TOTAL_COSTS") == true ? sqlParam["TOTAL_COSTS"] : ""));
-                sql = sql.Replace("$ZF_COSTS$", (sqlParam.ContainsKey("ZF_COSTS") == true ? sqlParam["ZF_COSTS"] : ""));
-                sql = sql.Replace("$TOTAL_CHAGE$", (sqlParam.ContainsKey("TOTAL_CHAGE") == true ? sqlParam["TOTAL_CHAGE"] : ""));
-                sql = sql.Replace("$D506_23$", (sqlParam.ContainsKey("D506_23") == true ? sqlParam["D506_23"] : ""));
-                sql = sql.Replace("$D506_18$", (sqlParam.ContainsKey("D506_18") == true ? sqlParam["D506_18"] : ""));
-                sql = sql.Replace("$BEGINPAY$", (sqlParam.ContainsKey("BEGINPAY") == true ? sqlParam["BEGINPAY"] : ""));
-                sql = sql.Replace("$SCALE$", (sqlParam.ContainsKey("SCALE") == true ? sqlParam["SCALE"] : ""));
-                sql = sql.Replace("$HEAV_REDEEM_SUM$", (sqlParam.ContainsKey("HEAV_REDEEM_SUM") == true ? sqlParam["HEAV_REDEEM_SUM"] : ""));
-                sql = sql.Replace("$REDEEM_TOTAL$", (sqlParam.ContainsKey("REDEEM_TOTAL") == true ? sqlParam["REDEEM_TOTAL"] : ""));
+                sql = sql.Replace("$O_TOTAL_COSTS$", (sqlParam.ContainsKey("O_TOTAL_COSTS") == true ? sqlParam["O_TOTAL_COSTS"] : ""));
+                sql = sql.Replace("$O_ZF_COSTS$", (sqlParam.ContainsKey("O_ZF_COSTS") == true ? sqlParam["O_ZF_COSTS"] : ""));
+                sql = sql.Replace("$O_TOTAL_CHAGE$", (sqlParam.ContainsKey("O_TOTAL_CHAGE") == true ? sqlParam["O_TOTAL_CHAGE"] : ""));
+                sql = sql.Replace("$O_OUTP_FACC$", (sqlParam.ContainsKey("O_OUTP_FACC") == true ? sqlParam["O_OUTP_FACC"] : ""));
+                sql = sql.Replace("$O_OUT_JJ$", (sqlParam.ContainsKey("O_OUT_JJ") == true ? sqlParam["O_OUT_JJ"] : ""));
+                sql = sql.Replace("$O_D503_09$", (sqlParam.ContainsKey("O_D503_09") == true ? sqlParam["O_D503_09"] : ""));
+                sql = sql.Replace("$D601_17_OUT$", (sqlParam.ContainsKey("D601_17_OUT") == true ? sqlParam["D601_17_OUT"] : ""));
+                sql = sql.Replace("$XY_OUT$", (sqlParam.ContainsKey("XY_OUT") == true ? sqlParam["XY_OUT"] : ""));
+                sql = sql.Replace("$ZCAOY_OUT$", (sqlParam.ContainsKey("ZCAOY_OUT") == true ? sqlParam["ZCAOY_OUT"] : ""));
+                sql = sql.Replace("$ZCHENGY_OUT$", (sqlParam.ContainsKey("ZCHENGY_OUT") == true ? sqlParam["ZCHENGY_OUT"] : ""));
+                sql = sql.Replace("$MZ_BILL_TIME$", (sqlParam.ContainsKey("MZ_BILL_TIME") == true ? sqlParam["MZ_BILL_TIME"] : ""));
+                sql = sql.Replace("$AREA_NO$", (sqlParam.ContainsKey("AREA_NO") == true ? sqlParam["AREA_NO"] : ""));
                 //sql = sql.Replace("$TOTAL_COSTS$", (sqlParam.ContainsKey("TOTAL_COSTS") == true ? sqlParam["TOTAL_COSTS"] : ""));
                 DBUtil.updateExecute(sql);
+                XnhLogger.log("存储门诊结算返回结果 SQL:" + sql);
             }
             catch (Exception ex)
             {
@@ -355,16 +362,18 @@ namespace ApiMonitor.DB
         /// create table ZYJS
         ///  ( NAME     VARCHAR2(16), -- 姓名（）
         ///    IP_NO    VARCHAR2(24), -- 住院号（）
-        ///    D504_01   VARCHAR2(24),--  住院登记流水号
-        ///    
+        ///    D504_01   VARCHAR2(24),--  住院登记流水号   
         ///    TOTAL_COSTS  NUMBER(8,2), -- 住院总费用
-        ///    TOTAL_CHAGE  NUMBER(8,2),  -- 住院可补偿金额
-        ///    D506_18   NUMBER(8,2),   -- 核算补偿金额
+        ///     ZF_COSTS   NUMBER(8,2),    --自费金额
+        ///    TOTAL_CHAGE  NUMBER(8,2),  -- 住院可补偿金额        
         ///    D506_23    NUMBER(8,2),  --  实际补偿额
-        ///    ZF_COSTS   NUMBER(8,2),    --自费金额
-        ///    HEAV_REDEEM_SUM  NUMBER(8,2), --大病支付金额
-        ///    BEGINPAY  NUMBER(8,2)     --起伏线
-        ///    
+        ///   D506_18   NUMBER(8,2),   -- 核算补偿金额
+        ///   BEGINPAY  NUMBER(8,2),     --起伏线
+        ///   SCALE	   NUMBER(3,2),	     --报销比例
+        ///    HEAV_REDEEM_SUM  NUMBER(8,2),   --大病支付金额
+        ///    REDEEM_TOTAL	NUMBER(8,2),	  --单次补偿合计
+        ///    BILL_TIME CHAR(30),     --结算时间（取结算系统时间）
+        ///    AREA_CODE      VARCHAR2(24)    --地区编码
         ///   )
         /// </summary> 
         /// <param name="sqlParam"></param>
@@ -372,27 +381,28 @@ namespace ApiMonitor.DB
         {
             if (sqlParam == null || sqlParam.Count == 0)
             {
-                XnhLogger.log("MZJS sqlParam参数为空");
+                XnhLogger.log("ZYJS sqlParam参数为空");
                 return;
             }
-            string sql = "insert into ZYJS(NAME,IP_NO,D504_01,TOTAL_COSTS,TOTAL_CHAGE,D506_18,D506_23,ZF_COSTS,HEAV_REDEEM_SUM,BEGINPAY) "
-                          + "values (NAME,IP_NO,D504_01,TOTAL_COSTS,TOTAL_CHAGE,D506_18,D506_23,ZF_COSTS,HEAV_REDEEM_SUM,BEGINPAY)";
+            string sql = "insert into ZYJS(NAME,IP_NO,D504_01,TOTAL_COSTS,ZF_COSTS,TOTAL_CHAGE,D506_23,D506_18,BEGINPAY,HEAV_REDEEM_SUM,BILL_TIME,AREA_CODE) "
+                          + "values ('$NAME$','$IP_NO$','$D504_01$','$TOTAL_COSTS$','$ZF_COSTS$','$TOTAL_CHAGE$','$D506_23$','$D506_18$','$BEGINPAY$','$HEAV_REDEEM_SUM$','$BILL_TIME$','$AREA_CODE$')";
           
             try
             {
                 sql = sql.Replace("$NAME$", (sqlParam.ContainsKey("NAME") == true ? sqlParam["NAME"] : ""));
                 sql = sql.Replace("$IP_NO$", (sqlParam.ContainsKey("IP_NO") == true ? sqlParam["IP_NO"] : ""));
-                sql = sql.Replace("$d505_02$", (sqlParam.ContainsKey("d505_02") == true ? sqlParam["d505_02"] : ""));
-                sql = sql.Replace("$d505_01$", (sqlParam.ContainsKey("d505_01") == true ? sqlParam["d505_01"] : ""));
+                sql = sql.Replace("$D504_01$", (sqlParam.ContainsKey("D504_01") == true ? sqlParam["D504_01"] : ""));
                 sql = sql.Replace("$TOTAL_COSTS$", (sqlParam.ContainsKey("TOTAL_COSTS") == true ? sqlParam["TOTAL_COSTS"] : ""));
-                sql = sql.Replace("$TOTAL_CHAGE$", (sqlParam.ContainsKey("TOTAL_CHAGE") == true ? sqlParam["TOTAL_CHAGE"] : ""));
-               
-                sql = sql.Replace("$D506_18$", (sqlParam.ContainsKey("D506_18") == true ? sqlParam["D506_18"] : ""));
-                sql = sql.Replace("$D506_23$", (sqlParam.ContainsKey("D506_23") == true ? sqlParam["D506_23"] : ""));
                 sql = sql.Replace("$ZF_COSTS$", (sqlParam.ContainsKey("ZF_COSTS") == true ? sqlParam["ZF_COSTS"] : ""));
-                sql = sql.Replace("$HEAV_REDEEM_SUM$", (sqlParam.ContainsKey("HEAV_REDEEM_SUM") == true ? sqlParam["HEAV_REDEEM_SUM"] : ""));
+                sql = sql.Replace("$TOTAL_CHAGE$", (sqlParam.ContainsKey("TOTAL_CHAGE") == true ? sqlParam["TOTAL_CHAGE"] : ""));
+                sql = sql.Replace("$D506_23$", (sqlParam.ContainsKey("D506_23") == true ? sqlParam["D506_23"] : ""));  
+                sql = sql.Replace("$D506_18$", (sqlParam.ContainsKey("D506_18") == true ? sqlParam["D506_18"] : ""));
                 sql = sql.Replace("$BEGINPAY$", (sqlParam.ContainsKey("BEGINPAY") == true ? sqlParam["BEGINPAY"] : ""));
-              
+                sql = sql.Replace("$SCALE$", (sqlParam.ContainsKey("SCALE") == true ? sqlParam["SCALE"] : ""));
+                sql = sql.Replace("$HEAV_REDEEM_SUM$", (sqlParam.ContainsKey("HEAV_REDEEM_SUM") == true ? sqlParam["HEAV_REDEEM_SUM"] : ""));
+                sql = sql.Replace("$REDEEM_TOTAL$", (sqlParam.ContainsKey("REDEEM_TOTAL") == true ? sqlParam["REDEEM_TOTAL"] : ""));
+                sql = sql.Replace("$BILL_TIME$", (sqlParam.ContainsKey("BILL_TIME") == true ? sqlParam["BILL_TIME"] : ""));
+                sql = sql.Replace("$AREA_CODE$", (sqlParam.ContainsKey("AREA_CODE") == true ? sqlParam["AREA_CODE"] : ""));
                 DBUtil.updateExecute(sql);
             }
             catch (Exception ex)
@@ -409,7 +419,7 @@ namespace ApiMonitor.DB
                 XnhLogger.log("modifyZYCZBJ sqlParam参数为空");
                 return;
             }
-            string sql = "UPDATE ip_bill SET up_flag = '$up_flag$',"
+            string sql = "UPDATE ip_bill SET up_flag = '$up_flag$'"
             + "where REG_NO ='$reg_no$' and pre_no = '$pre_no$' and bill_time = '$bill_time$' and basic_cls = '$basic_cls$'";
             try
             {
@@ -425,7 +435,31 @@ namespace ApiMonitor.DB
                 XnhLogger.log(ex.ToString() + " SQL:" + sql);
             }
         }
-
+        ///住院作废单个项目修改对应his标记
+        /// </summary>
+        public static void modifyZYZFBJ(Dictionary<string, string> sqlParam)
+        {
+            if (sqlParam == null || sqlParam.Count == 0)
+            {
+                XnhLogger.log("modifyZYCZBJ sqlParam参数为空");
+                return;
+            }
+            string sql = "UPDATE ip_bill SET up_flag = '$up_flag$'"
+            + "where REG_NO ='$reg_no$' and pre_no = '$pre_no$' and bill_time = '$bill_time$' and basic_cls = '$basic_cls$'";
+            try
+            {
+                sql = sql.Replace("$up_flag$", (sqlParam.ContainsKey("up_flag") == true ? sqlParam["up_flag"] : ""));
+                sql = sql.Replace("$pre_no$", (sqlParam.ContainsKey("pre_no") == true ? sqlParam["pre_no"] : ""));
+                sql = sql.Replace("$reg_no$", (sqlParam.ContainsKey("reg_no") == true ? sqlParam["reg_no"] : ""));
+                sql = sql.Replace("$bill_time$", (sqlParam.ContainsKey("bill_time") == true ? sqlParam["bill_time"] : ""));
+                sql = sql.Replace("$basic_cls$", (sqlParam.ContainsKey("basic_cls") == true ? sqlParam["basic_cls"] : ""));
+                DBUtil.updateExecute(sql);
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log(ex.ToString() + " SQL:" + sql);
+            }
+        }
         ///入院登记修改对应his标记
         /// </summary>
         public static void modifyRYDJ(Dictionary<string, string> sqlParam)
@@ -474,7 +508,45 @@ namespace ApiMonitor.DB
                   + "from "
                   + "IP_BILL a left join IP_REGISTER b on a.reg_no=b.reg_no ,plus_item c left join xnh_dm d on c.item_code = d.item_code "
                   + "where "
-                  + "c.item_code=a.item_code and c.type=3 and a.reg_no='" + reg_no + "'  "
+                  + "c.item_code=a.item_code and c.type=3 and a.reg_no='" + reg_no + "' and a.up_flag is null "
+                  + "order by bill_time,a.item_code ";
+
+                DataTable dt = DBUtil.queryExecute(sql);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                XnhLogger.log("查询住院明细：sql=" + sql + " 异常：" + ex.StackTrace);
+            }
+            return null;
+        }
+        ///  查询住院明细
+        public static DataTable cxzymx1(string reg_no)
+        {
+            string sql = "";
+            try
+            {
+                sql = "select "
+                  + "b.ip_no, "	//--住院号
+                  + "a.reg_no, "
+                  + "a.item_code, "	//--HIS项目编码
+                  + "price, "		//--HIS项目单价
+                  + "(select wydm from xnh_dm where xnh_dm.item_code = a.item_code) as nh_bm, "    //农合编码
+                  + "(select bxbl from xnh_ypzl  where xnh_ypzl.wydm = d.wydm and d.item_code = a.item_code) as nh_bnw, "//--报销比例
+                  + "qty, "		//--HIS项目数量
+                  + "total, "		//--HIS项目总价格
+                  + "bill_time, "	//--记账时间
+                  + "a.basic_cls, "//多条同批次缺库存，其他批次收费标志
+                  + "pre_no, "		//--医嘱编号
+                  + "a.up_flag, "	//--上传标志
+                  + "standard, "	//--规格
+                  + "small_unit, "	//--单位
+                  + "(select item_cls from code_item where item_code=a.item_code ) as item_cls, "	//--项目类型(1,2,3:药品 4,5,6,7,8,9:其他)
+                  + "(select item_name from code_item where item_code=a.item_code ) as item_name " 	//--项目名称
+                  + "from "
+                  + "IP_BILL a left join IP_REGISTER b on a.reg_no=b.reg_no ,plus_item c left join xnh_dm d on c.item_code = d.item_code "
+                  + "where "
+                  + "c.item_code=a.item_code and c.type=3 and a.reg_no='" + reg_no + "' "
                   + "order by bill_time,a.item_code ";
 
                 DataTable dt = DBUtil.queryExecute(sql);
@@ -533,7 +605,7 @@ namespace ApiMonitor.DB
        + "b.small_unit, "  //  --单位
        + " b.ret_price  "  //  --价格
       + " from code_item a,plus_item b "
-      + " where b.type = '3' and a.item_code = b.item_code and a.disable = 'F') h where h.nh_code is null and rownum < 10";
+      + " where b.type = '3' and a.item_code = b.item_code and a.disable = 'F' order by a.item_code) h where h.nh_code is null and rownum < 18";
                 DataTable dt = DBUtil.queryExecute(sql);
                 return dt;
             }
@@ -562,7 +634,7 @@ namespace ApiMonitor.DB
        + "b.small_unit, "  //  --单位
        + " b.ret_price  "  //  --价格
       + " from code_item a,plus_item b "
-      + " where b.type = '3' and a.item_code = b.item_code  and a.disable = 'F' and a.item_cls <>4 and a.item_cls <>5 and a.item_cls <>6 and a.item_cls <>7 and a.item_cls <>9 ) h where h.nh_code is null and rownum < 10";
+      + " where b.type = '3' and a.item_code = b.item_code  and a.disable = 'F' and a.item_cls <>4 and a.item_cls <>5 and a.item_cls <>6 and a.item_cls <>7 and a.item_cls <>9 order by a.item_code ) h where h.nh_code is null and rownum < 16";
                 DataTable dt = DBUtil.queryExecute(sql);
                 return dt;
             }
@@ -590,7 +662,7 @@ namespace ApiMonitor.DB
        + "b.small_unit, "  //  --单位
        + " b.ret_price  "  //  --价格
       + " from code_item a,plus_item b "
-      + " where b.type = '3' and a.item_code = b.item_code  and a.disable = 'F' and a.item_cls <>1 and a.item_cls <>2 and a.item_cls <>3 and a.item_cls <>4 ) h where h.nh_code is null and rownum < 10";
+      + " where b.type = '3' and a.item_code = b.item_code  and a.disable = 'F' and a.item_cls <>1 and a.item_cls <>2 and a.item_cls <>3 and a.item_cls <>4 order by a.item_code ) h where h.nh_code is null and rownum < 10";
                 DataTable dt = DBUtil.queryExecute(sql);
                 return dt;
             }
@@ -618,7 +690,7 @@ namespace ApiMonitor.DB
        + "b.small_unit, "  //  --单位
        + " b.ret_price  "  //  --价格
       + " from code_item a,plus_item b "
-      + " where b.type = '3' and a.item_code = b.item_code) h where h.nh_code is not null";
+      + " where b.type = '3' and a.item_code = b.item_code order by a.item_code) h where h.nh_code is not null";
                 DataTable dt = DBUtil.queryExecute(sql);
                 return dt;
             }
