@@ -151,7 +151,9 @@
 <body class="bootstrap-admin-with-small-navbar" onload="checkLogin();">
 
     <!--读卡驱动-->
-    <object classid=clsid:8A5B3626-40FC-4563-AF78-C9C4AC2ECFD6 width=0 height=0 align="center" id="CIccardCtrl" hspace=0 vspace=0></object>
+    
+    <object codebase='HDICCardCtrl.ocx' classid=clsid:0390FA98-2A13-479A-B94C-F37FD58FE88C width=0 height=0 align='center' id='CHDICCardCtr3' hspace=0 vspace=0></object>
+<object codebase='nhcard.CAB' classid=clsid:3B47C665-2482-4528-99F0-F40EC0289C6E width=0 height=0 align='center' id='HD4442' hspace=0 vspace=0></object>
 
     <div id="mask_background"></div>
     <div id="mask_content"></div>
@@ -266,7 +268,7 @@
                 <td>
                     <select id="areaNo" name="">
                         <option value="">请选择</option>
-                        <option value="620000">甘肃省(620000)</option>
+                        <!--<option value="620000">甘肃省(620000)</option>
                         <option value="620100">兰州市(620100)</option>
                         <option value="620103">七里河区(620103)</option>
                         <option value="620104">西固区(620104)</option>
@@ -304,7 +306,7 @@
                         <option value="620722">民乐县(620722)</option>
                         <option value="620723">临泽县(620723)</option>
                         <option value="620724">高台县(620724)</option>
-                        <option value="620725">山丹县(620725)</option>
+                        <option value="620725">山丹县(620725)</option>-->
                         <option value="620800">平凉市(620800)</option>
                         <option value="620802">崆峒区(620802)</option>
                         <option value="620821">泾川县(620821)</option>
@@ -313,7 +315,7 @@
                         <option value="620824">华亭县(620824)</option>
                         <option value="620825">庄浪县(620825)</option>
                         <option value="620826">静宁县(620826)</option>
-                        <option value="620900">酒泉市(620900)</option>
+                        <!--<option value="620900">酒泉市(620900)</option>
                         <option value="620902">肃州区(620902)</option>
                         <option value="620921">金塔县(620921)</option>
                         <option value="620922">安西县(620922)</option>
@@ -366,7 +368,7 @@
                         <option value="623025">玛曲县(623025)</option>
                         <option value="623026">碌曲县(623026)</option>
                         <option value="623027">夏河县(623027)</option>
-                        <option value="620201">嘉峪关市(620201)</option>
+                        <option value="620201">嘉峪关市(620201)</option>-->
 
                     </select>
                 </td>

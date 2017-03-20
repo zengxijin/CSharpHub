@@ -123,10 +123,11 @@ function getJsonObj(str) {
 }
 
 /***********************读卡驱动配置********************/
-var CPORT = 20; //串口号
+var CPORT = 1; //串口号
 var CSEAT = 1;  //1:下卡座 2:上卡座
 
 function GetCardinfo() {
-    var str1 = document.getElementById("CIccardCtrl").GetCardinfo(CPORT, CSEAT);
+    var str1 = document.getElementById("CHDICCardCtr3").GetCardinfo(1, 1);
+   
     return str1;
 }

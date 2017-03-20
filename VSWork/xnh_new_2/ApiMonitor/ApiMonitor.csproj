@@ -79,6 +79,9 @@
     <Content Include="pages\calendar\js\main.js" />
     <Content Include="pages\css\datepicker.css" />
     <Content Include="pages\css\maskStyle.css" />
+    <Content Include="pages\HDICCardCtrl.ocx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="pages\iccard.ocx" />
     <Content Include="pages\images\welcomePic.jpg" />
     <Content Include="pages\js\bootstrap-datepicker.js" />
@@ -155,6 +158,9 @@
     <Content Include="pages\js\twitter-bootstrap-hover-dropdown.js" />
     <Content Include="pages\js\twitter-bootstrap-hover-dropdown.min.js" />
     <Content Include="pages\mzfpprint1.html" />
+    <Content Include="pages\nhcard.CAB">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="pages\zyfpprint1.html" />
     <Content Include="pages\xnhdz.html" />
     <Content Include="pages\xnhservice.asmx" />

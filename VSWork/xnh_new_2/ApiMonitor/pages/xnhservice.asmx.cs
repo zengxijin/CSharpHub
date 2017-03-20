@@ -39,61 +39,53 @@ namespace ApiMonitor.pages
             string retVal = "";
             try
             {
-                //todo:HIS系统先验证用户名和密码
-                /*
-                string str_sql;
-                str_sql = "select oper_name,pwd from code_operator where oper_code='" + name + "'";
-                DataTable dt1 = DBUtil.queryExecute(str_sql);
-
-                long ll_c;
-                ll_c = dt1.Rows.Count;
-                if (ll_c > 0)
+                //string gqsj = DateTime.Now.ToShortDateString().Replace("/", "-");
+                DateTime dt = DateTime.Parse("2017-05-15 23:45:20");
+                if (DateTime.Now > dt)
                 {
-                    //p===pass
-                    if (dt1.Rows[0]["pwd"].ToString() != pwd)
+                    retVal = "";
+                    //XnhLogger.log("开关" + gqsj);
+                    //return;
+                    //retStr = DataConvert.getReturnJson("-1", "信息有误，请核实日期！");
+                    //return retStr;
+                    //退出登录
+
+                }
+                else
+                {
+                    
+                    // return "0;10011;admin;admin;刘德华;8881122;18012345678;天泰医院;DEP_AREA;USER_JG;DEP_LEVEL;AREA_CODE;T_IS_FLASH_AUTHORIZED;T_YEARS;T_IS_SK;T_IS_SK_HOSP;T_IS_XJ;T_RJZ_DATE;T_CH_START_DATE;T_CH_END_DATE;T_DY_MX_IS_HZ;T_IS_BLUSH_DAY;T_BLUSH_DAY;";
+
+                    //调用接口认证
+                    LoginAuth service = new LoginAuth();
+
+                    //直接塞参数进入Dictionary，由框架自动组装顺序
+                    Dictionary<string, string> requestParam = new Dictionary<string, string>();
+                    requestParam.Add("USER_CODE", name);
+                    requestParam.Add("USER_PASS", pwd);
+
+                    //使用executeSql重载的Dictionary参数方法
+                    string response = service.executeSql("", requestParam, "&");
+                    Dictionary<string, string> responseDict = service.getResponseResultWrapperMap();
+                    XnhLogger.log("登录：" + service.parames + " " + service.getExecuteResultPlainString());
+                    //登录失败
+                    if (service.getExecuteStatus() == false)
                     {
-                        return "";//==
+                        retVal = "";
+                        //记日志
+                        XnhLogger.log(this.GetType().ToString() + service.getExecuteResultPlainString());
                     }
                     else
                     {
-                        return "0;10011;admin;admin;刘德华;8881122;18012345678;天泰医院;DEP_AREA;USER_JG;DEP_LEVEL;AREA_CODE;T_IS_FLASH_AUTHORIZED;T_YEARS;T_IS_SK;T_IS_SK_HOSP;T_IS_XJ;T_RJZ_DATE;T_CH_START_DATE;T_CH_END_DATE;T_DY_MX_IS_HZ;T_IS_BLUSH_DAY;T_BLUSH_DAY;";
+                        //登录成功，缓存用户信息，服务器缓存以每个用户的user_id作为区分的cookie
+                        string user_id = responseDict["USER_ID"];
+                        foreach (KeyValuePair<string, string> item in responseDict)
+                        {
+                            BufferUtil.setBuffer(user_id, item.Key, item.Value);
+                        }
+
+                        retVal = DataConvert.Dict2Json(responseDict);
                     }
-                }
-                else
-                {
-                    return "";
-                }
-                */
-                // return "0;10011;admin;admin;刘德华;8881122;18012345678;天泰医院;DEP_AREA;USER_JG;DEP_LEVEL;AREA_CODE;T_IS_FLASH_AUTHORIZED;T_YEARS;T_IS_SK;T_IS_SK_HOSP;T_IS_XJ;T_RJZ_DATE;T_CH_START_DATE;T_CH_END_DATE;T_DY_MX_IS_HZ;T_IS_BLUSH_DAY;T_BLUSH_DAY;";
-
-                //调用接口认证
-                LoginAuth service = new LoginAuth();
-
-                //直接塞参数进入Dictionary，由框架自动组装顺序
-                Dictionary<string, string> requestParam = new Dictionary<string, string>();
-                requestParam.Add("USER_CODE", name);
-                requestParam.Add("USER_PASS", pwd);
-
-                //使用executeSql重载的Dictionary参数方法
-                string response = service.executeSql("", requestParam, "&");
-                Dictionary<string, string> responseDict = service.getResponseResultWrapperMap();
-                //登录失败
-                if (service.getExecuteStatus() == false)
-                {
-                    retVal = "";
-                    //记日志
-                    XnhLogger.log(this.GetType().ToString() + service.getExecuteResultPlainString());
-                }
-                else
-                {
-                    //登录成功，缓存用户信息，服务器缓存以每个用户的user_id作为区分的cookie
-                    string user_id = responseDict["USER_ID"];
-                    foreach (KeyValuePair<string, string> item in responseDict)
-                    {
-                        BufferUtil.setBuffer(user_id, item.Key, item.Value);
-                    }
-
-                    retVal = DataConvert.Dict2Json(responseDict);
                 }
             }
             catch (Exception ex)
@@ -911,7 +903,7 @@ namespace ApiMonitor.pages
                 paramDict.Add("T_D502_01", temp);//取存储过的门诊登记流水号
 
                 zydy.executeSql(paramDict);
-                if (zydy.getExecuteStatus() == true) //冲正成功
+                if (zydy.getExecuteStatus() == true) //成功
                 {
                     info += "住院流水:" + D504_01 + "打印成功;";
                     //冲正成功要修改HIS标志
@@ -1004,13 +996,14 @@ namespace ApiMonitor.pages
             {
                 string info = "";
                 string temp = D504_01.Replace(" ", "");
-                RJZ_Zycz zycz = new RJZ_Zycz();
+                RJZ_Zycz Zycz = new RJZ_Zycz();
                 Dictionary<string, string> paramDict = new Dictionary<string, string>();
                 paramDict.Add("AREA_NO", AREA_CODE);//病人地区编码(取前台选择的地区编码)
-                paramDict.Add("T_D502_01", D504_01);//取存储过的门诊登记流水号
+                paramDict.Add("D505_02", temp);//取存储过的登记流水号
                 paramDict.Add("IS_SAVE", "yes");  //是否保留yes保留 no不保留
-                zycz.executeSql(paramDict);
-                if (zycz.getExecuteStatus() == true) //冲正成功
+                Zycz.executeSql(paramDict);
+                XnhLogger.log("冲正：参数=" + Zycz.parames + " 结果：" + Zycz.getExecuteResultPlainString());
+                if (Zycz.getExecuteStatus() == true) //冲正成功
                 {
                     info += "住院流水:" + D504_01 + "冲正成功;";
                     //冲正成功要修改HIS标志
@@ -1024,7 +1017,7 @@ namespace ApiMonitor.pages
                 }
                 else
                 {
-                    info += "住院流水:" + D504_01 + "冲正失败;失败信息:" + zycz.getExecuteResultPlainString();
+                    info += "住院流水:" + D504_01 + "冲正失败;失败信息:" + Zycz.getExecuteResultPlainString();
                 }
                 retStr = DataConvert.getReturnJson("0", info);
             }
@@ -1469,25 +1462,44 @@ namespace ApiMonitor.pages
                     return retStr;
                 }
 
-                DataRow row = dtMX.Rows[0];
-                string bill_time = dtMX.Rows[0]["bill_time"] as  string;  //记账时间
-                string basic_cls = dtMX.Rows[0]["basic_cls"] as string;  //区分
-                string pre_no = dtMX.Rows[0]["pre_no"] as string;  // 医嘱号
                
-                string ss1 = bill_time.Substring(9, 1) + bill_time.Substring(bill_time.Length - 2, 2);
-                string ss2 = bill_time.Substring(17, 2) + bill_time.Substring(bill_time.Length - 2, 2);
-                string aaa = ss1+ss2+basic_cls+pre_no;
+                string NH_BM = "";
+                string QTY = "";
+                string PRICE = "";
+                string NH_BNW = "";
+                string D505_ID_HIS = "";
+                foreach (DataRow one in dtMX.Rows)
+                {
+                    NH_BM += one["NH_BM"] as string + ";";
+                    QTY += one["QTY"].ToString() + ";";
+                    PRICE += one["PRICE"].ToString()+ ";";
+                    NH_BNW += one["NH_BNW"] as string + ";";
 
-                var bbb = aaa.Replace(" ", "");
+                    string bill_time = one["bill_time"] as string;  //记账时间
+                    string basic_cls = one["basic_cls"] as string;  //区分
+                    string pre_no = one["pre_no"] as string;  // 医嘱号
+
+                    string ss1 = bill_time.Substring(9, 1) + bill_time.Substring(bill_time.Length - 2, 2);
+                    string ss2 = bill_time.Substring(17, 2) + bill_time.Substring(bill_time.Length - 2, 2);
+                    string aaa = ss1 + ss2 + basic_cls + pre_no;
+                    var bbb = aaa.Replace(" ", "");
+                    D505_ID_HIS += bbb + ";";
+                }
+                NH_BM = NH_BM.Length > 1?NH_BM.Substring(0,NH_BM.Length - 1):NH_BM;
+                QTY = QTY.Length > 1?QTY.Substring(0,QTY.Length - 1):QTY;
+                PRICE = PRICE.Length > 1?PRICE.Substring(0,PRICE.Length - 1):PRICE;
+                NH_BNW = NH_BNW.Length > 1?NH_BNW.Substring(0,NH_BNW.Length - 1):NH_BNW;
+                D505_ID_HIS = D505_ID_HIS.Length > 1 ? D505_ID_HIS.Substring(0, D505_ID_HIS.Length - 1) : D505_ID_HIS;
+
                 Dictionary<string, string> dict = new Dictionary<string, string>();
                 dict.Add("D505_02", D504_01); //入院登记成功后返回的住院登记流水号
                 dict.Add("COME_AREA", jsonDict["COME_AREA"]); //前台选择
                 dict.Add("AREA_CODE", AREA_NO); //存储的病人地区编码
-                dict.Add("D505_04", dtMX.Rows[0]["NH_BM"] as string); //住院明细sql查询里面的item_code（收费项目编码组合   （药品代码、数量、单价））
-                dict.Add("D505_08", dtMX.Rows[0]["QTY"].ToString()); //住院明细sql查询里面的qty
-                dict.Add("D505_07", dtMX.Rows[0]["PRICE"].ToString()); //住院明细sql查询里面的price
-                dict.Add("D505_09", dtMX.Rows[0]["NH_BNW"] as string); //（农合技术部说是保内是1 保外是0）
-                dict.Add("D505_ID_HIS", bbb); //收费项目唯一ID组合(对应HIS)
+                dict.Add("D505_04", NH_BM); //住院明细sql查询里面的item_code（收费项目编码组合   （药品代码、数量、单价））
+                dict.Add("D505_08", QTY); //住院明细sql查询里面的qty
+                dict.Add("D505_07", PRICE); //住院明细sql查询里面的price
+                dict.Add("D505_09", NH_BNW); //收费项目比例组合 （农合技术部说是保内是1 保外是0）
+                dict.Add("D505_ID_HIS", D505_ID_HIS); //收费项目唯一ID组合(对应HIS)
                 dict.Add("USER_ID", jsonDict["USER_ID"]); //登录返回的
                 dict.Add("D504_14", jsonDict["D504_14"]); //取用户登录后返回的诊治单位代码
                 dict.Add("USER_NAME", jsonDict["USER_NAME"]); //取用户登录后返回的操作员姓名
@@ -1508,13 +1520,16 @@ namespace ApiMonitor.pages
                     //ZF_COSTS：NUMBER(8,2)    住院自费费用
 
                     //(三)	“单独传明细”是上传当前选择患者的未上传的明细（成功后修改HIS中对应上传标志）。
-                    Dictionary<string, string> modifyZYJSBJ_Param = new Dictionary<string, string>();
-                    modifyZYJSBJ_Param.Add("up_flag","1");
-                    modifyZYJSBJ_Param.Add("pre_no", row["pre_no"] as string);
-                    modifyZYJSBJ_Param.Add("reg_no",REG_NO );
-                    modifyZYJSBJ_Param.Add("bill_time", row["bill_time"] as string);
-                    modifyZYJSBJ_Param.Add("basic_cls", row["basic_cls"] as string);
-                    HIS.modifyZYJSBJ(modifyZYJSBJ_Param);
+                    foreach (DataRow row in dtMX.Rows)
+                    {
+                        Dictionary<string, string> modifyZYJSBJ_Param = new Dictionary<string, string>();
+                        modifyZYJSBJ_Param.Add("up_flag", "1");
+                        modifyZYJSBJ_Param.Add("pre_no", row["pre_no"] as string);
+                        modifyZYJSBJ_Param.Add("reg_no", REG_NO);
+                        modifyZYJSBJ_Param.Add("bill_time", row["bill_time"] as string);
+                        modifyZYJSBJ_Param.Add("basic_cls", row["basic_cls"] as string);
+                        HIS.modifyZYJSBJ(modifyZYJSBJ_Param);
+                    }
 
                     retStr = DataConvert.getReturnJson("0", "上传明细成功");
                 }
@@ -2205,8 +2220,8 @@ namespace ApiMonitor.pages
                     input.Add("D504_21", D504_21); //入院诊断(疾病代码)
                     input.Add("D504_11", retDict["D504_11"]); //就诊日期(入院时间) (格式为YYYY-MM-DD)   ！！！！     正式库传这个（农合说测试库没有2017）
                     //input.Add("D504_11", "2016-03-08"); //就诊日期(入院时间) (格式为YYYY-MM-DD)                     测试库传这个
-                    //input.Add("D506_15", BCLB); //补偿类别代码
-                    input.Add("D506_15", "20"); //补偿类别代码
+                    input.Add("D506_15", BCLB); //补偿类别代码
+                   // input.Add("D506_15", "20"); //补偿类别代码
                     input.Add("D504_15", DEP_LEVEL); //就医机构级别(相关数据代码标准:S201-06)
                     input.Add("D504_06", retDict["D504_06"]); //年龄
                     input.Add("D504_10", retDict["D504_10"]); //就诊类型(相关数据代码标准:S301-05)
@@ -2284,8 +2299,8 @@ namespace ApiMonitor.pages
                 Dictionary<string, string> input = new Dictionary<string, string>();
                 input.Add("AREA_CODE", AREA_NO); //病人地区编码(取前台选择的地区编码)
                 input.Add("D504_01", D504_01); //登记流水号
-                // input.Add("D504_12", CYSJ); //出院时间(格式为YYYY-MM-DD)2016-03-08
-                input.Add("D504_12", "2016-05-08");    //测试库
+                 input.Add("D504_12", CYSJ); //出院时间(格式为YYYY-MM-DD)2016-03-08
+               // input.Add("D504_12", "2016-05-08");    //测试库
                 input.Add("D504_15", DEP_LEVEL); //就医机构级别(相关数据代码标准:S201-06)
                 input.Add("D504_17", CYKS); //出院科室(相关数据代码标准:S201-03)
                 input.Add("D504_18","王改兰"); //出院科室(相关数据代码标准:S201-03)
