@@ -849,6 +849,7 @@
                 map["NAME"] = $("#" + checked[i] + "_NAME").html();            //患者姓名
                 map["IP_DR"] = $("#" + checked[i] + "_IP_DR").html();          //处方医生
                 map["FEE_CODE"] = $("#" + checked[i] + "_FEE_CODE").html();    //农合结算
+                map["ITEM_CODE"] = $("#" + checked[i] + "_ITEM_CODE").html();    //药品编码
                 selectedRows += $.base64.encode(map2Json(map), "utf8") + "$"; //多个人用$分割
             }
 
@@ -1000,6 +1001,7 @@
                                // trStr += '<td id="' + trId + '_IP_DR">' + row['IP_DR'] + '</td>';         //处方医生
                                 trStr += '<td id="' + trId + '_FEE_CODE">' + $.trim(row['FEE_CODE']) + '</td>'; //农合结算
                                 trStr += '<td id="' + trId + '_QTY">' + $.trim(row['QTY']) + '</td>';  //数量
+                                trStr += '<td id="' + trId + '_ITEM_CODE">' + $.trim(row['ITEM_CODE']) + '</td>';  //药品编码
                                 trStr += '<td id="' + trId + '_CHECKBOX">' + '<input name="lsCheckBox" type="checkbox" value="' + trId + '" />' + '</td>';
                                 trStr += '</tr>';
                                 $(trStr).appendTo("#bclist");

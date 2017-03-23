@@ -560,6 +560,7 @@ namespace ApiMonitor.pages
                         string NAME = map["NAME"];            //患者姓名
                         //string REC_NO = map["IP_DR"];       //处方医生
                         string FEE_CODE = map["FEE_CODE"];    //农合结算
+                        string ITEM_CODE = map["ITEM_CODE"];    //药品编码
                         //string qty = map["QTY"];
                         DataTable dt = HIS.getMZMX(map);
                         if (dt == null || dt.Rows.Count == 0)
