@@ -238,6 +238,7 @@
         <script type="text/javascript" src="js/bootstrap-admin-theme-change-size.js"></script>
         <script type="text/javascript" src="js/jquery.cookie.js"></script>
         <script type="text/javascript" src="js/xnh.js"></script>
+        <script type="text/javascript" src="js/jquery.base64.js"></script>
         <script type="text/javascript">
             //列表信息从HIS查，HIS提供接口
             //明细（也是从HIS取）
@@ -357,7 +358,7 @@
                                         + '    <td class="center">                              '
                                         + '        <a  onclick="javascript:zycz1(\'' + dataJson[i]["D504_01"] + '\',\'' + dataJson[i]["AREA_CODE"] + '\');">冲正</a>                                  '
                                         + '        <br />                                       '
-                                        + '        <a onclick="javascript:zydyfp(\'' + dataJson[i]["D504_01"] + '\',\'' + dataJson[i]["AREA_CODE"] + '\'>打印发票</a>                                  '
+                                        + '        <a onclick="javascript:zydyfp(\'' + dataJson[i]["D504_01"] + '\',\'' + dataJson[i]["AREA_CODE"] + '\');">打印发票</a>                                  '
                                         + '    </td>                                            '
                                         + '</tr>                                                '
                                     $("#czlp tbody").append(row);
@@ -381,10 +382,13 @@
             //门诊打印发票
             function mzdyfp(T_D502_01, AREA_CODE) {
                 var pMap = {};
-                pMap["T_D502_01"] = T_D502_01;//门诊登记流水号
+                pMap["D502_01"] = T_D502_01;//门诊登记流水号
                 pMap["AREA_CODE"] = AREA_CODE;  //地区编码
                 pJson = map2Json(pMap);
-
+                //绑定发票
+                //var param = $.base64.encode(map2Json(pMap), "utf8");
+                //var url = "zyfpprint1.html?PARAM=" + param;
+                //window.open(url);
                 showMask("正在处理，请稍后...");
                 $.ajax({
                     type: "Post",
@@ -397,15 +401,12 @@
                         var retVal = data.d;
                         var retJson = getJsonObj(retVal);
                         if (retJson.flag == '0') {
-                            //绑定试算结果
+                            //绑定发票结果
+                            var param = $.base64.encode(retJson, "utf8");
+                            var url = "mzfpprint1.html?PARAM=" + param;
+                            window.open(url);
                             alert("处理成功：" + retJson.msg);
-                            var info = retJson.msg;
-                            for (var item in info) {
-                                var objTest = $("#" + item);
-                                if (objTest != null) {
-                                    $("#" + item).html(info[item]);
-                                }
-                            }
+
 
                         } else {
                             alert("处理失败：" + retJson.msg);
@@ -419,6 +420,9 @@
                 });
 
             }
+
+
+            
 
             //住院打印
             function zydyfp(D504_01, AREA_CODE) {
@@ -440,6 +444,13 @@
                         var retJson = getJsonObj(retVal);
                         if (retJson.flag == '0') {
                             //绑定试算结果
+                            var param = $.base64.encode(retJson, "utf8");
+                            var url = "zyfpprint1.html?PARAM=" + param;
+                            var ur2 = "zyfpprint2.html?PARAM=" + param;
+                            var ur3 = "zyfpprint3.html?PARAM=" + param;
+                            window.open(url);
+                            window.open(ur2);
+                            window.open(ur3);
                             alert("处理成功：" + retJson.msg);
 
 

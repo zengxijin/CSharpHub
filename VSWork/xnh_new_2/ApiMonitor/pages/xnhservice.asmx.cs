@@ -849,13 +849,13 @@ namespace ApiMonitor.pages
 
                 string info = "";
 
-                MZBC_MZCZ mzdyfp = new MZBC_MZCZ();
+                MZBC_MZCZ Print_Zy_New = new MZBC_MZCZ();
                 Dictionary<string, string> paramDict = new Dictionary<string, string>();
                 paramDict.Add("AREA_NO", AREA_CODE);//病人地区编码(取前台选择的地区编码)
                 paramDict.Add("T_D502_01", temp);//取存储过的门诊登记流水号
 
-                mzdyfp.executeSql(paramDict);
-                if (mzdyfp.getExecuteStatus() == true) //冲正成功
+                Print_Zy_New.executeSql(paramDict);
+                if (Print_Zy_New.getExecuteStatus() == true) //冲正成功
                 {
                     info += "门诊流水:" + temp + "打印成功;";
                     //冲正成功要修改HIS标志
@@ -869,7 +869,7 @@ namespace ApiMonitor.pages
                 }
                 else
                 {
-                    info += "门诊流水:" + temp + "打印失败;失败信息:" + mzdyfp.getExecuteResultPlainString();
+                    info += "门诊流水:" + temp + "打印失败;失败信息:" + Print_Zy_New.getExecuteResultPlainString();
                 }
                 retStr = DataConvert.getReturnJson("0", info);
             }
@@ -897,13 +897,13 @@ namespace ApiMonitor.pages
                 string temp = D504_01.Replace(" ", "");
                 string info = "";
 
-                RJZ_Print_Zy_New zydy = new RJZ_Print_Zy_New();
+                RJZ_Print_Zy_New Print_Zy_New = new RJZ_Print_Zy_New();
                 Dictionary<string, string> paramDict = new Dictionary<string, string>();
                 paramDict.Add("AREA_NO", AREA_CODE);//病人地区编码(取前台选择的地区编码)
                 paramDict.Add("T_D502_01", temp);//取存储过的门诊登记流水号
 
-                zydy.executeSql(paramDict);
-                if (zydy.getExecuteStatus() == true) //成功
+                Print_Zy_New.executeSql(paramDict);
+                if (Print_Zy_New.getExecuteStatus() == true) //成功
                 {
                     info += "住院流水:" + D504_01 + "打印成功;";
                     //冲正成功要修改HIS标志
@@ -917,7 +917,7 @@ namespace ApiMonitor.pages
                 }
                 else
                 {
-                    info += "住院流水:" + D504_01 + "打印失败;失败信息:" + zydy.getExecuteResultPlainString();
+                    info += "住院流水:" + D504_01 + "打印失败;失败信息:" + Print_Zy_New.getExecuteResultPlainString();
                 }
                 retStr = DataConvert.getReturnJson("0", info);
             }
@@ -1611,7 +1611,7 @@ namespace ApiMonitor.pages
                "CL_CHARGE.OPER_CODE ,CL_CHARGE.TYPE ,CL_CHARGE.REC_FLAG ,CL_CHARGE.FEE_CODE ,CL_CHARGE.STATUS, " +
                "WMSYS.WM_CONCAT(CL_CHARGE_INVOICE.INVO_NO) as INVO_NO, " +
                "(select sum(total_sum) from CL_CHRGENTRY where chrg_no = CL_CHARGE.CHRG_NO) as total, " +
-     "max((select sum(total) from CL_RECENTRY where CL_RECENTRY.rec_no = CL_RECIPE.rec_no)) as total_rec,d.dept_name,e.qty " +
+     "max((select sum(total) from CL_RECENTRY where CL_RECENTRY.rec_no = CL_RECIPE.rec_no)) as total_rec,d.dept_name,e.qty,e.item_code " +
      "FROM CL_CHARGE , CL_CHARGE_INVOICE ,CL_CHARGE_RECIPE,CL_RECIPE , PATIENTINFO,CODE_OPERATOR , CODE_DEPARTMENT d,cl_recentry e " +
      "WHERE ( CL_CHARGE.CHRG_NO = CL_CHARGE_INVOICE.CHRG_NO(+)) and (CL_CHARGE.CHRG_NO = CL_CHARGE_RECIPE.CHRG_NO) AND (e.rec_no = CL_RECIPE.REC_NO) AND " +
      "(CL_CHARGE_RECIPE.REC_NO = CL_RECIPE.REC_NO) AND (CL_RECIPE.PID = PATIENTINFO.PID) AND (CL_CHARGE_RECIPE.FLAG = '1') AND " +
@@ -1619,7 +1619,7 @@ namespace ApiMonitor.pages
                     //"(CL_CHARGE.CHRG_DATE >= '2016.01.01') AND (cl_CHARGE_RECIPE.TYPE = '2') and " +
      dateSql + " AND (cl_CHARGE_RECIPE.TYPE = '2') and " +
      "d.dept_code=CL_RECIPE.dept_code and CODE_OPERATOR.OPER_CODE=CL_RECIPE.dr_code " +
-     "group by cl_CHARGE_RECIPE.REC_NO,e.qty,CODE_OPERATOR.oper_name,PATIENTINFO.NAME ,CL_RECIPE.REC_TIME, " +
+     "group by cl_CHARGE_RECIPE.REC_NO,e.qty,CODE_OPERATOR.oper_name,PATIENTINFO.NAME ,CL_RECIPE.REC_TIME,e.item_code, " +
      "CL_RECIPE.UP_FLAG,CL_RECIPE.REG_NO,CL_CHARGE.CHRG_NO ,CL_CHARGE.CHRG_TIME ,CL_CHARGE.OPER_CODE ,CL_CHARGE.TYPE , " +
      "CL_CHARGE.REC_FLAG ,CL_CHARGE.FEE_CODE ,CL_CHARGE.STATUS,d.dept_name " +
      "order by cl_CHARGE_RECIPE.REC_NO ";

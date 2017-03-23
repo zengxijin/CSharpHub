@@ -65,7 +65,11 @@ function showDate() {
 
     //时间拼接  
     var dateTime = year + "年" + month + "月" + date + "日" + hours + "时" + minutes + "分" + seconds + "秒";
-    $("#loginInfo_dateTime").html(dateTime);
+    var obj = $("#loginInfo_dateTime");
+    if(obj != null || obj != undefined){
+        $("#loginInfo_dateTime").html(dateTime);
+    }
+    
 }
 //每隔1秒，调用一次showDate() 
 window.setInterval("showDate()", 1000);
@@ -130,4 +134,11 @@ function GetCardinfo() {
     var str1 = document.getElementById("CHDICCardCtr3").GetCardinfo(1, 1);
    
     return str1;
+}
+
+//获取url中的参数
+function getUrlParam(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+    var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+    if (r != null) return unescape(r[2]); return null; //返回参数值
 }

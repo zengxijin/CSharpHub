@@ -120,5 +120,38 @@
             <td colspan="3"><p align="left">领款人(签字)： </p></td>
         </tr>
     </table>
+
+    <!--测试字段，用完删除-->
+    <!--D502_01:<span id="D502_01"></span>
+    <br />
+
+    AREA_CODE:<span id="AREA_CODE"></span>-->
+
+    <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="js/xnh.js"></script>
+    <script type="text/javascript" src="js/jquery.base64.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var param = getUrlParam("PARAM");
+            
+            if (param == "" || param == null) {
+                return;
+            }
+
+            var baseStr = $.base64.decode(param, "utf8");
+            var json = getJsonObj(baseStr);
+            for (var item in json) {
+                //alert(item + "=" +  json[item]);
+                var obj = $("#" + item);
+                if (obj != null || obj != undefined) {
+                    $("#" + item).html(json[item]);
+                }
+            }
+        });
+    </script>
+    
 </body>
+
+
 </html>
