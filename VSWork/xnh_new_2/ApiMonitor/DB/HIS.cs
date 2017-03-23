@@ -216,11 +216,12 @@ namespace ApiMonitor.DB
                 + " (select dept_name from CODE_DEPARTMENT where dept_code=d.dept_code) as dept_name"  //科室名称
                 + " from CL_RECENTRY a,code_item b,plus_item c ,cl_recipe d"
                 + " where a.item_code<>'9999'"
-                + " and a.row_status='0' and a.rec_no='$REC_NO$' "
+                + " and a.row_status='0' and a.rec_no='$REC_NO$' and a.item_code = '$ITEM_CODE$' "
                 + " and a.rec_no = d.REC_NO"
                 + " and a.item_code=b.item_code and b.item_code=c.item_code and c.type=2";
 
                 sql = sql.Replace("$REC_NO$", (sqlParam.ContainsKey("REC_NO") == true ? sqlParam["REC_NO"] : ""));
+                sql = sql.Replace("$ITEM_CODE$", (sqlParam.ContainsKey("ITEM_CODE") == true ? sqlParam["ITEM_CODE"] : ""));
 
                 dt = DBUtil.queryExecute(sql);
             }
